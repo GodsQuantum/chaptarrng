@@ -220,6 +220,42 @@ namespace Chaptarr.Core.Test.Http
             }
         }
 
+        [Test]
+        public void should_not_expose_query_when_blocking_cloud_metadata_request_with_logging_disabled()
+        {
+            const string sensitiveValue = "Native%20Book%0D%0Apassword%3Dtopsecret";
+            var request = new HttpRequest($"http://169.254.169.254/latest/meta-data?query={sensitiveValue}")
+            {
+                LogRequest = false
+            };
+
+            var exception = Assert.ThrowsAsync<WebException>(async () => await new DirectDownloadTestHttp().CreateClient().ExecuteAsync(request));
+
+            Assert.That(exception.Message, Does.Not.Contain(sensitiveValue));
+            Assert.That(exception.Message, Does.Not.Contain("topsecret"));
+            Assert.That(exception.Message, Does.Not.Contain("169.254.169.254"));
+        }
+
+        [Test]
+        public void should_not_expose_query_when_blocking_cloud_metadata_redirect_with_logging_disabled()
+        {
+            const string sensitiveValue = "Native%20Book%0D%0Apassword%3Dtopsecret";
+            var destinationUrl = $"http://169.254.169.254/latest/meta-data?query={sensitiveValue}";
+            var transport = new DirectDownloadTestHttp();
+            transport.AddRoute(
+                url => url == SourceUrl,
+                request => Task.FromResult(BuildRedirectResponse(request, destinationUrl)));
+            var request = CreateRequest();
+            request.LogRequest = false;
+
+            var exception = Assert.ThrowsAsync<WebException>(async () => await transport.CreateClient().ExecuteAsync(request));
+
+            Assert.That(exception.Message, Does.Not.Contain(sensitiveValue));
+            Assert.That(exception.Message, Does.Not.Contain("topsecret"));
+            Assert.That(exception.Message, Does.Not.Contain("169.254.169.254"));
+            Assert.That(transport.RequestedUrls, Is.EqualTo(new[] { SourceUrl }));
+        }
+
         private static DirectDownloadTestHttp CreateRedirectTransport()
         {
             var transport = new DirectDownloadTestHttp();

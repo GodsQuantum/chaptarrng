@@ -99,7 +99,9 @@ namespace NzbDrone.Core.MetadataSource.Audible
         {
             try
             {
-                _logger.DebugSafe("Audiobooks search called against Audible catalog (useCache: {0})", useCache);
+                // Keep useCache for caller compatibility, but search URLs contain user terms and
+                // the persistent response cache stores complete URLs as record keys.
+                _logger.DebugSafe("Audiobooks search called against Audible catalog");
 
                 var sanitizedQuery = SanitizeSearchQuery(query);
 
@@ -122,7 +124,7 @@ namespace NzbDrone.Core.MetadataSource.Audible
                 _logger.Debug("Making HTTP request to Audible catalog...");
                 var httpResponse = _cachedHttpClient.Get(
                     httpRequest,
-                    useCache,
+                    false,
                     TimeSpan.FromHours(CACHE_TTL_HOURS),
                     candidate => Json.Deserialize<AudibleCatalogProductsResponse>(candidate.Content)?.Products?.Any(product =>
                         product != null &&
