@@ -16,15 +16,19 @@ def api(path):
     return json.loads(subprocess.check_output(['gh', 'api', f'repos/{repository}/{path}'], text=True))
 
 run = api(f'actions/runs/{run_id}')
+trusted_producers = {
+    '.github/workflows/standalone-asset-validation.yml': 'Build Linux x86 and FreeBSD runtime packs',
+    '.github/workflows/release.yml': 'Build Linux x86 and FreeBSD .NET 10 runtime packs',
+}
 if not (
     run['head_repository']['full_name'] == repository
     and run['event'] == 'workflow_dispatch'
     and run['head_branch'] == 'main'
-    and run['path'] == '.github/workflows/standalone-asset-validation.yml'
+    and run['path'] in trusted_producers
 ):
     raise SystemExit('Runtime pack source must be this repository\'s trusted main archive workflow')
 jobs = api(f'actions/runs/{run_id}/jobs?per_page=100')['jobs']
-producer = [job for job in jobs if job['name'] == 'Build Linux x86 and FreeBSD runtime packs']
+producer = [job for job in jobs if job['name'] == trusted_producers[run['path']]]
 if len(producer) != 1 or producer[0]['conclusion'] != 'success':
     raise SystemExit('The source runtime pack producer did not complete successfully')
 
