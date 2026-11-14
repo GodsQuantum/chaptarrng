@@ -222,7 +222,7 @@
         },
         {
           "file": "src/NzbDrone.Core/Download/CompletedDownloadService.cs",
-          "line": 224,
+          "line": 230,
           "sourceLine": "var reason = string.Format(\"No file in this download is in a format allowed by the quality profile ({0})\",",
           "sourceLineSha256": "717f23e6d24730b54efa1ef05bf959157b62d35c9286c95152901faaf1f5096d"
         }
