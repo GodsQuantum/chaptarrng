@@ -5,7 +5,4 @@ area: api
 action: none
 breaking: false
 ---
-### Fixed
-
-- **API:** Requests for provider-backed books that were deleted during refresh now return no match instead of raising repeated server errors.
-Readarr-compatible numeric book routes now tolerate provider or legacy identity records that point to a deleted local book row.
+Deleted provider-backed books now return no match instead of repeated server errors, including on Readarr-compatible numeric routes with stale identity mappings.

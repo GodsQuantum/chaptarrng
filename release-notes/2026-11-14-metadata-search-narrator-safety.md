@@ -5,4 +5,4 @@ area: security
 action: none
 breaking: false
 ---
-Metadata searches no longer persist query URLs in the response cache or include search terms and response bodies in exception text when request logging is disabled. Pinned audiobook imports now require complete, specific narrator evidence; generic labels such as “Unknown narrator” cannot establish recording identity. FreeBSD runtime-pack builds verify the full .NET and ASP.NET Core versions before cloning the runtime source.
+Metadata search URLs and response bodies are no longer persisted or exposed in errors when request logging is disabled. Pinned imports reject vague narrator labels unless recording identity is specific. FreeBSD pack builds verify exact .NET and ASP.NET Core versions before fetching runtime source.
