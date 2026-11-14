@@ -42,6 +42,18 @@ namespace Chaptarr.Core.Test.DecisionEngine
         }
 
         [Test]
+        public void should_reject_when_release_narrator_adds_another_name_to_the_pinned_narrator()
+        {
+            var remoteBook = BuildRemoteBook(releaseNarrator: "Roy Dotrice featuring Michael Kramer");
+
+            var decision = CreateSubject().IsSatisfiedBy(remoteBook, new BookSearchCriteria());
+
+            Assert.That(decision.Accepted, Is.False);
+            Assert.That(decision.CanBypass, Is.True);
+            Assert.That(decision.Category, Is.EqualTo("Narrator"));
+        }
+
+        [Test]
         public void should_accept_when_release_narrator_matches_pinned_narrator()
         {
             var remoteBook = BuildRemoteBook(releaseNarrator: "Roy Dotrice");
