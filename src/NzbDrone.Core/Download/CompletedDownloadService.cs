@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using NLog;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Extensions;
@@ -338,38 +339,39 @@ namespace NzbDrone.Core.Download
                 return false;
             }
 
-            var bookIds = new List<int>();
+            var duplicateBookIds = new List<int>();
             foreach (var result in importResults)
             {
-                var bookId = result.ImportDecision?.Item?.Book?.Id ?? 0;
-                if (result.Result == ImportResultType.Imported ||
+                var decision = result?.ImportDecision;
+                var bookId = decision?.Item?.Book?.Id ?? 0;
+                if (result?.Result != ImportResultType.Skipped ||
+                    decision == null ||
+                    !decision.Approved ||
                     bookId <= 0 ||
                     result.Errors == null ||
-                    result.Errors.Count == 0 ||
-                    !result.Errors.All(error => error != null &&
-                        error.StartsWith(ImportApprovedBooks.AdditionalCopyDestinationOccupiedRejectionPrefix, StringComparison.Ordinal)))
+                    result.Errors.Count != 1 ||
+                    result.Errors[0] == null ||
+                    !result.Errors[0].StartsWith(ImportApprovedBooks.AdditionalCopyDestinationOccupiedRejectionPrefix, StringComparison.Ordinal))
                 {
                     return false;
                 }
 
-                bookIds.Add(bookId);
-            }
-
-            foreach (var bookId in bookIds.Distinct())
-            {
                 var importedFromOtherDownload = _historyService.GetByBook(bookId, EntityHistoryEventType.BookFileImported)?
-                    .Any(h => !h.DownloadId.IsNullOrWhiteSpace() &&
-                              !string.Equals(h.DownloadId, downloadId, StringComparison.OrdinalIgnoreCase)) == true;
+                    .Any(history => !history.DownloadId.IsNullOrWhiteSpace() &&
+                                    !string.Equals(history.DownloadId, downloadId, StringComparison.OrdinalIgnoreCase) &&
+                                    IsSameImportedPayload(decision.Item, history)) == true;
 
                 if (!importedFromOtherDownload)
                 {
                     return false;
                 }
+
+                duplicateBookIds.Add(bookId);
             }
 
             _logger.Info("Download {0} only duplicates book(s) {1} that were already imported from another download; marking it imported without importing a second copy.",
                 trackedDownload.DownloadItem.Title,
-                string.Join(", ", bookIds.Distinct()));
+                string.Join(", ", duplicateBookIds.Distinct()));
 
             _downloadClientFileSnapshotService.Delete(trackedDownload.DownloadItem);
             _downloadClientFileSnapshotService.Delete(trackedDownload.ImportItem);
@@ -381,6 +383,47 @@ namespace NzbDrone.Core.Download
             trackedDownload.State = TrackedDownloadState.Imported;
             PublishTrackedDownloadUpdated(trackedDownload);
             return true;
+        }
+
+        private static bool IsSameImportedPayload(LocalBook incoming, EntityHistory imported)
+        {
+            if (incoming == null || incoming.Book == null || incoming.Book.Id <= 0 || incoming.Edition == null || incoming.Edition.Id <= 0 ||
+                incoming.Quality == null || incoming.Size <= 0 ||
+                imported == null || imported.BookId != incoming.Book.Id || imported.EditionId != incoming.Edition.Id ||
+                !incoming.Quality.Equals(imported.Quality) || imported.Data == null ||
+                !imported.Data.TryGetValue("ImportedPath", out var importedPath) || importedPath.IsNullOrWhiteSpace() ||
+                !imported.Data.TryGetValue("Size", out var importedSize) ||
+                !long.TryParse(importedSize, out var importedLength) || importedLength != incoming.Size ||
+                !File.Exists(incoming.Path) || !File.Exists(importedPath))
+            {
+                return false;
+            }
+
+            try
+            {
+                using var incomingStream = File.OpenRead(incoming.Path);
+                using var importedStream = File.OpenRead(importedPath);
+                if (incomingStream.Length != importedStream.Length || incomingStream.Length != incoming.Size)
+                {
+                    return false;
+                }
+
+                var incomingHash = SHA256.HashData(incomingStream);
+                var importedHash = SHA256.HashData(importedStream);
+                return CryptographicOperations.FixedTimeEquals(incomingHash, importedHash);
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return false;
+            }
+            catch (CryptographicException)
+            {
+                return false;
+            }
         }
 
         private void BlockImport(TrackedDownload trackedDownload, params TrackedDownloadStatusMessage[] statusMessages)

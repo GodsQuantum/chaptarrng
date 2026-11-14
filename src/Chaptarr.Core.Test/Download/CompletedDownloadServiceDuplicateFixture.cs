@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Moq;
 using NLog;
@@ -24,6 +25,23 @@ namespace Chaptarr.Core.Test.Download
     public class CompletedDownloadServiceDuplicateFixture
     {
         private const string OccupiedReason = ImportApprovedBooks.AdditionalCopyDestinationOccupiedRejectionPrefix + ": /books/Author/Title.epub. Current naming settings cannot represent a separate copy.";
+        private string _testDirectory;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _testDirectory = Path.Combine(Path.GetTempPath(), "chaptarr-download-duplicate-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(_testDirectory);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (Directory.Exists(_testDirectory))
+            {
+                Directory.Delete(_testDirectory, true);
+            }
+        }
 
         private sealed class RecordingEventAggregator : IEventAggregator
         {
@@ -72,7 +90,17 @@ namespace Chaptarr.Core.Test.Download
             public bool IsImported(TrackedDownload trackedDownload, List<EntityHistory> historyItems) => false;
         }
 
-        private static ImportResult Rejected(int bookId, params string[] errors)
+        private ImportResult Rejected(int bookId, params string[] errors)
+        {
+            return CreateRejected(bookId, null, errors);
+        }
+
+        private ImportResult RejectedWithPath(int bookId, string path, params string[] errors)
+        {
+            return CreateRejected(bookId, path, errors);
+        }
+
+        private static ImportResult CreateRejected(int bookId, string path, string[] errors)
         {
             var author = new Author { Id = 7, Name = "Test Author" };
             var book = new Book { Id = bookId, AuthorId = 7, Author = author, Title = "Title " + bookId, MediaType = BookMediaType.Ebook };
@@ -80,22 +108,41 @@ namespace Chaptarr.Core.Test.Download
             {
                 Author = author,
                 Book = book,
-                Path = $"/tmp/chaptarr-duplicate/{bookId}.epub",
+                Edition = new Edition { Id = 20 + bookId, BookId = bookId },
+                Path = path ?? $"/tmp/chaptarr-duplicate/{bookId}.epub",
+                Size = path != null && File.Exists(path) ? new FileInfo(path).Length : 0,
+                SceneName = book.Title,
                 Quality = new QualityModel(Quality.EPUB)
             };
 
             return new ImportResult(new ImportDecision<LocalBook>(localBook), errors);
         }
 
-        private static EntityHistory Imported(int bookId, string downloadId)
+        private static EntityHistory Imported(int bookId, string downloadId, string path = null, long size = 0)
         {
+            var book = new Book { Id = bookId, Title = "Title " + bookId, AuthorId = 7 };
             return new EntityHistory
             {
                 EventType = EntityHistoryEventType.BookFileImported,
                 BookId = bookId,
+                EditionId = 20 + bookId,
                 DownloadId = downloadId,
-                Date = DateTime.UtcNow
+                Date = DateTime.UtcNow,
+                SourceTitle = book.Title,
+                Quality = new QualityModel(Quality.EPUB),
+                Data = path == null ? new Dictionary<string, string>() : new Dictionary<string, string>
+                {
+                    ["ImportedPath"] = path,
+                    ["Size"] = size.ToString()
+                }
             };
+        }
+
+        private string WritePayload(string fileName, string contents)
+        {
+            var path = Path.Combine(_testDirectory, fileName);
+            File.WriteAllText(path, contents);
+            return path;
         }
 
         private static (CompletedDownloadService Subject, TrackedDownload Download, RecordingEventAggregator Events) Create(
@@ -149,9 +196,12 @@ namespace Chaptarr.Core.Test.Download
         [Test, Platform(Exclude = "Win", Reason = "Test uses Unix paths")]
         public void should_mark_duplicate_of_book_imported_from_another_download_as_imported()
         {
+            var incomingPath = WritePayload("incoming.epub", "same payload");
+            var importedPath = WritePayload("imported.epub", "same payload");
+            var size = new FileInfo(incomingPath).Length;
             var (subject, download, events) = Create(
-                new List<ImportResult> { Rejected(10, OccupiedReason) },
-                new List<EntityHistory> { Imported(10, "other-download") });
+                new List<ImportResult> { RejectedWithPath(10, incomingPath, OccupiedReason) },
+                new List<EntityHistory> { Imported(10, "other-download", importedPath, size) });
 
             subject.Import(download);
 
@@ -164,9 +214,12 @@ namespace Chaptarr.Core.Test.Download
         [Test, Platform(Exclude = "Win", Reason = "Test uses Unix paths")]
         public void should_complete_duplicate_torrent_through_normal_completion_without_removing_it()
         {
+            var incomingPath = WritePayload("incoming-torrent.epub", "same torrent payload");
+            var importedPath = WritePayload("imported-torrent.epub", "same torrent payload");
+            var size = new FileInfo(incomingPath).Length;
             var (subject, download, events) = Create(
-                new List<ImportResult> { Rejected(10, OccupiedReason) },
-                new List<EntityHistory> { Imported(10, "other-download") },
+                new List<ImportResult> { RejectedWithPath(10, incomingPath, OccupiedReason) },
+                new List<EntityHistory> { Imported(10, "other-download", importedPath, size) },
                 DownloadProtocol.Torrent);
 
             subject.Import(download);
@@ -199,6 +252,90 @@ namespace Chaptarr.Core.Test.Download
             var (subject, download, events) = Create(
                 new List<ImportResult> { Rejected(10, OccupiedReason) },
                 new List<EntityHistory> { Imported(10, "DUP-DOWNLOAD") });
+
+            subject.Import(download);
+
+            Assert.That(download.State, Is.EqualTo(TrackedDownloadState.ImportBlocked));
+            Assert.That(events.Events, Has.None.InstanceOf<DownloadCompletedEvent>());
+        }
+
+        [Test, Platform(Exclude = "Win", Reason = "Test uses Unix paths")]
+        public void should_block_when_another_download_has_same_book_but_a_different_payload()
+        {
+            var incomingPath = WritePayload("incoming-different.epub", "new edition payload");
+            var importedPath = WritePayload("imported-different.epub", "previous edition payload");
+            var size = new FileInfo(incomingPath).Length;
+            File.WriteAllText(importedPath, new string('x', (int)size));
+            var (subject, download, events) = Create(
+                new List<ImportResult> { RejectedWithPath(10, incomingPath, OccupiedReason) },
+                new List<EntityHistory> { Imported(10, "other-download", importedPath, size) });
+
+            subject.Import(download);
+
+            Assert.That(download.State, Is.EqualTo(TrackedDownloadState.ImportBlocked));
+            Assert.That(events.Events, Has.None.InstanceOf<DownloadCompletedEvent>());
+        }
+
+        [Test, Platform(Exclude = "Win", Reason = "Test uses Unix paths")]
+        public void should_block_group_collision_when_only_one_multipart_file_was_previously_imported()
+        {
+            // ImportApprovedBooks reports the first occupied destination for the group on every result.
+            // A previous import of part 1 must not make a new, distinct part 2 look redundant.
+            var incomingPartOne = WritePayload("incoming-part-1.mp3", "part one");
+            var incomingPartTwo = WritePayload("incoming-part-2.mp3", "part two");
+            var importedPartOne = WritePayload("imported-part-1.mp3", "part one");
+            var size = new FileInfo(incomingPartOne).Length;
+            var (subject, download, events) = Create(
+                new List<ImportResult>
+                {
+                    RejectedWithPath(10, incomingPartOne, OccupiedReason),
+                    RejectedWithPath(10, incomingPartTwo, OccupiedReason)
+                },
+                new List<EntityHistory> { Imported(10, "other-download", importedPartOne, size) });
+
+            subject.Import(download);
+
+            Assert.That(download.State, Is.EqualTo(TrackedDownloadState.ImportBlocked));
+            Assert.That(events.Events, Has.None.InstanceOf<DownloadCompletedEvent>());
+        }
+
+        [Test, Platform(Exclude = "Win", Reason = "Test uses Unix paths")]
+        public void should_complete_multipart_duplicate_only_when_every_file_matches_a_prior_import()
+        {
+            var incomingPartOne = WritePayload("incoming-all-1.mp3", "part one");
+            var incomingPartTwo = WritePayload("incoming-all-2.mp3", "part two");
+            var importedPartOne = WritePayload("imported-all-1.mp3", "part one");
+            var importedPartTwo = WritePayload("imported-all-2.mp3", "part two");
+            var size = new FileInfo(incomingPartOne).Length;
+            var (subject, download, events) = Create(
+                new List<ImportResult>
+                {
+                    RejectedWithPath(10, incomingPartOne, OccupiedReason),
+                    RejectedWithPath(10, incomingPartTwo, OccupiedReason)
+                },
+                new List<EntityHistory>
+                {
+                    Imported(10, "other-download-1", importedPartOne, size),
+                    Imported(10, "other-download-2", importedPartTwo, size)
+                });
+
+            subject.Import(download);
+
+            Assert.That(download.State, Is.EqualTo(TrackedDownloadState.Imported));
+            Assert.That(events.Events, Has.One.InstanceOf<DownloadCompletedEvent>());
+        }
+
+        [Test, Platform(Exclude = "Win", Reason = "Test uses Unix paths")]
+        public void should_block_when_prior_import_is_for_a_different_edition()
+        {
+            var incomingPath = WritePayload("incoming-edition.epub", "same bytes");
+            var importedPath = WritePayload("imported-edition.epub", "same bytes");
+            var size = new FileInfo(incomingPath).Length;
+            var priorImport = Imported(10, "other-download", importedPath, size);
+            priorImport.EditionId++;
+            var (subject, download, events) = Create(
+                new List<ImportResult> { RejectedWithPath(10, incomingPath, OccupiedReason) },
+                new List<EntityHistory> { priorImport });
 
             subject.Import(download);
 
