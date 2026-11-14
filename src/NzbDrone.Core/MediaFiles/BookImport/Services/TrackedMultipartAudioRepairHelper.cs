@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using NLog;
 using NzbDrone.Core.Books;
 using NzbDrone.Core.Books.Services;
+using NzbDrone.Core.Datastore;
 using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.History;
 using NzbDrone.Core.MediaFiles;
@@ -158,8 +159,19 @@ namespace NzbDrone.Core.MediaFiles.BookImport.Services
 
                 if (historicalEditionId > 0)
                 {
-                    var historicalEdition = editionsForBook.FirstOrDefault(edition => edition.Id == historicalEditionId)
-                        ?? editionService.GetEdition(historicalEditionId);
+                    var historicalEdition = editionsForBook.FirstOrDefault(edition => edition.Id == historicalEditionId);
+                    if (historicalEdition == null)
+                    {
+                        try
+                        {
+                            historicalEdition = editionService.GetEdition(historicalEditionId);
+                        }
+                        catch (ModelNotFoundException)
+                        {
+                            // A provider refresh can remove the grabbed edition before the download imports.
+                            // Treat that stale history as no pinned edition and continue with current editions.
+                        }
+                    }
 
                     if (historicalEdition?.BookId == book.Id)
                     {
