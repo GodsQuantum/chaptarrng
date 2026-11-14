@@ -884,6 +884,48 @@ namespace Chaptarr.Core.Test.MediaFiles
                 expectSeparateCopy: true);
         }
 
+        [Test]
+        public void tracked_download_should_block_instead_of_copying_a_match_that_conflicts_with_the_pinned_edition()
+        {
+            AssertSelectedAudiobookEditionRemainsFinal(
+                anyEditionOk: false,
+                isManualImport: false,
+                selectedEditionInitiallyMonitored: false,
+                selectedNarrator: "Proven Narrator",
+                unrelatedNarrator: "Pinned Narrator",
+                trackedDownloadId: "tracked-download-1",
+                expectBlocked: true);
+        }
+
+        [Test]
+        public void manual_import_of_a_tracked_download_should_still_copy_a_match_that_conflicts_with_the_pinned_edition()
+        {
+            AssertSelectedAudiobookEditionRemainsFinal(
+                anyEditionOk: false,
+                isManualImport: true,
+                selectedEditionInitiallyMonitored: false,
+                selectedNarrator: "Proven Narrator",
+                unrelatedNarrator: "Pinned Narrator",
+                expectSeparateCopy: true,
+                trackedDownloadId: "tracked-download-2");
+        }
+
+        [Test]
+        public void tracked_pinned_mismatch_block_applies_only_to_automatic_tracked_downloads()
+        {
+            var automatic = new List<ImportDecision<LocalBook>> { new(new LocalBook { IsManualImport = false }) };
+            var manual = new List<ImportDecision<LocalBook>> { new(new LocalBook { IsManualImport = true }) };
+            var tracked = new NzbDrone.Core.Download.DownloadClientItem { DownloadId = "abc" };
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(ImportApprovedBooks.ShouldBlockTrackedPinnedEditionMismatch(tracked, automatic), Is.True);
+                Assert.That(ImportApprovedBooks.ShouldBlockTrackedPinnedEditionMismatch(tracked, manual), Is.False);
+                Assert.That(ImportApprovedBooks.ShouldBlockTrackedPinnedEditionMismatch(null, automatic), Is.False);
+                Assert.That(ImportApprovedBooks.ShouldBlockTrackedPinnedEditionMismatch(new NzbDrone.Core.Download.DownloadClientItem(), automatic), Is.False);
+            });
+        }
+
         private static void AssertSelectedAudiobookEditionRemainsFinal(
             bool anyEditionOk,
             bool isManualImport,
@@ -891,7 +933,9 @@ namespace Chaptarr.Core.Test.MediaFiles
             string selectedNarrator = null,
             string unrelatedNarrator = "Unrelated Narrator",
             bool expectSeparateCopy = false,
-            bool includeTrackedReleaseEvidence = false)
+            bool includeTrackedReleaseEvidence = false,
+            string trackedDownloadId = null,
+            bool expectBlocked = false)
         {
             var tempDir = Path.Combine(TestContext.CurrentContext.WorkDirectory, $"edition-finality-{Guid.NewGuid():N}");
             var sourcePath = Path.Combine(tempDir, "incoming.m4b");
@@ -1007,14 +1051,32 @@ namespace Chaptarr.Core.Test.MediaFiles
                     AudioProductionType = includeTrackedReleaseEvidence ? "Full Cast" : null
                 };
 
+                var downloadClientItem = trackedDownloadId == null
+                    ? null
+                    : new NzbDrone.Core.Download.DownloadClientItem { DownloadId = trackedDownloadId, Title = "Example Release" };
+
                 var results = service.Import(
                     new List<ImportDecision<LocalBook>> { new(localBook) },
                     replaceExisting: false,
-                    downloadClientItem: null,
+                    downloadClientItem: downloadClientItem,
                     importMode: ImportMode.Copy,
                     cancellationToken: CancellationToken.None);
 
                 Assert.That(results, Has.Count.EqualTo(1));
+                if (expectBlocked)
+                {
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(results[0].Result, Is.EqualTo(ImportResultType.Rejected));
+                        Assert.That(results[0].Errors.Single(), Does.Contain("could not verify the expected edition"));
+                        Assert.That(results[0].Errors.Single(), Does.Contain("EditionId 421").And.Contain("EditionId 420"));
+                        Assert.That(bookProxy.InsertedBooks, Is.Empty);
+                        Assert.That(editionProxy.InsertedEditions, Is.Empty);
+                        Assert.That(mediaFileService.FilesByBook, Is.Empty);
+                    });
+                    return;
+                }
+
                 Assert.That(results[0].Result, Is.EqualTo(ImportResultType.Imported));
                 var importedFile = mediaFileService.FilesByBook.Single();
                 if (expectSeparateCopy)

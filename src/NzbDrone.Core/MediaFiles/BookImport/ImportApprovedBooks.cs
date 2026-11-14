@@ -555,6 +555,27 @@ namespace NzbDrone.Core.MediaFiles.BookImport
                             allEditionsForBook,
                             firstMismatch.Item.Edition.Id);
 
+                        if (protectedEdition != null && ShouldBlockTrackedPinnedEditionMismatch(downloadClientItem, bookDecisions))
+                        {
+                            // A tracked download was grabbed for this book. Cloning the row here moves the file
+                            // onto the clone, and completed-download strict verification then blocks the
+                            // download anyway because the clone is not the grabbed book. Report the edition
+                            // mismatch instead, as the tracked-download edition gate does, so the files can be
+                            // imported onto the requested book (manual import) without a stray "_copy_" row.
+                            var mismatchReason = FormatTrackedPinnedEditionMismatch(protectedEdition, firstMismatch.Item.Edition);
+                            _logger.Warn("[MANUAL-EDITION-PROTECTION] {0} (BookId={1}); no copy row created", mismatchReason, book.Id);
+                            foreach (var decision in bookDecisions)
+                            {
+                                decision.Reject(new Rejection(mismatchReason));
+                                importResults.Add(new ImportResult(decision, mismatchReason));
+                            }
+
+                            CleanupConversionWorkFolder(conversionWorkFolder);
+                            __bookGroupSw.Stop();
+                            _logger.Debug("[BOOK-TIMING] BookGroup skipped route=tracked-pinned-edition-mismatch title='{0}' elapsed={1}ms", book.Title, __bookGroupSw.ElapsedMilliseconds);
+                            continue;
+                        }
+
                         if (protectedEdition != null)
                         {
                             _logger.Debug("[MANUAL-EDITION-PROTECTION] User pinned edition {0} ('{1}') but file(s) matched to different edition(s). Creating clone to preserve user's selection.",
@@ -4525,6 +4546,28 @@ namespace NzbDrone.Core.MediaFiles.BookImport
                 _logger.Debug(ex, "Unable to resolve root folder for {0}", author?.Path);
                 return false;
             }
+        }
+
+        // Automatic imports of a tracked download never clone a pinned book: the grab was for this book, so a
+        // file matching another edition is an edition mismatch to resolve, not a second copy to keep.
+        // Manual imports and imports without a download (library scans) keep the clone behavior.
+        internal static bool ShouldBlockTrackedPinnedEditionMismatch(DownloadClientItem downloadClientItem, IEnumerable<ImportDecision<LocalBook>> decisions)
+        {
+            if (downloadClientItem == null || string.IsNullOrWhiteSpace(downloadClientItem.DownloadId))
+            {
+                return false;
+            }
+
+            return decisions?.Any(decision => decision?.Item?.IsManualImport == true || decision?.Item?.IsLibraryConversion == true) != true;
+        }
+
+        internal static string FormatTrackedPinnedEditionMismatch(Edition pinnedEdition, Edition matchedEdition)
+        {
+            static string Label(Edition edition) => edition == null
+                ? "unknown edition"
+                : !string.IsNullOrWhiteSpace(edition.Title) ? $"'{edition.Title}' (EditionId {edition.Id})" : $"EditionId {edition.Id}";
+
+            return $"Completed download was grabbed for pinned edition {Label(pinnedEdition)}, but import matched edition {Label(matchedEdition)}. Chaptarr could not verify the expected edition.";
         }
 
         private BatchBookResult CreateNewBookInstanceForBatch(ImportDecision<LocalBook> decision, Book originalBook, Author author, bool anyEditionOk)
