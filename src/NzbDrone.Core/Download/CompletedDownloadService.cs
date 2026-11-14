@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using NLog;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Extensions;
@@ -212,6 +213,11 @@ namespace NzbDrone.Core.Download
                     return;
                 }
 
+                if (TryCompleteDuplicateOfImportedBook(trackedDownload, importResults))
+                {
+                    return;
+                }
+
                 if (importResults.Any(c => c.Result != ImportResultType.Imported))
                 {
                     // Nothing importable in the payload because every file is a format the profile
@@ -314,6 +320,110 @@ namespace NzbDrone.Core.Download
         private static bool IsUserForced(TrackedDownload trackedDownload)
         {
             return trackedDownload?.DownloadItem?.DownloadForced == true;
+        }
+
+        /// <summary>
+        /// A completed download whose every file was refused only because the managed destination is
+        /// already occupied, for a book that already has a file imported from a different download, is a
+        /// redundant copy rather than a failed import. Retrying can never succeed, so complete it like any
+        /// other imported download instead of blocking it forever. Nothing is moved or deleted here: the
+        /// normal DownloadCompletedEvent handling decides about client removal (RemoveCompletedDownloads,
+        /// seeding and preservation policies, never removing a torrent that is still seeding).
+        /// Any other rejection, or a missing import from another download, keeps the download blocked.
+        /// </summary>
+        private bool TryCompleteDuplicateOfImportedBook(TrackedDownload trackedDownload, List<ImportResult> importResults)
+        {
+            var downloadId = trackedDownload.DownloadItem.DownloadId;
+            if (downloadId.IsNullOrWhiteSpace() || importResults == null || importResults.Count == 0)
+            {
+                return false;
+            }
+
+            var duplicateBookIds = new List<int>();
+            foreach (var result in importResults)
+            {
+                var decision = result?.ImportDecision;
+                var bookId = decision?.Item?.Book?.Id ?? 0;
+                if (result?.Result != ImportResultType.Skipped ||
+                    decision == null ||
+                    !decision.Approved ||
+                    bookId <= 0 ||
+                    result.Errors == null ||
+                    result.Errors.Count != 1 ||
+                    result.Errors[0] == null ||
+                    !result.Errors[0].StartsWith(ImportApprovedBooks.AdditionalCopyDestinationOccupiedRejectionPrefix, StringComparison.Ordinal))
+                {
+                    return false;
+                }
+
+                var importedFromOtherDownload = _historyService.GetByBook(bookId, EntityHistoryEventType.BookFileImported)?
+                    .Any(history => !history.DownloadId.IsNullOrWhiteSpace() &&
+                                    !string.Equals(history.DownloadId, downloadId, StringComparison.OrdinalIgnoreCase) &&
+                                    IsSameImportedPayload(decision.Item, history)) == true;
+
+                if (!importedFromOtherDownload)
+                {
+                    return false;
+                }
+
+                duplicateBookIds.Add(bookId);
+            }
+
+            _logger.Info("Download {0} only duplicates book(s) {1} that were already imported from another download; marking it imported without importing a second copy.",
+                trackedDownload.DownloadItem.Title,
+                string.Join(", ", duplicateBookIds.Distinct()));
+
+            _downloadClientFileSnapshotService.Delete(trackedDownload.DownloadItem);
+            _downloadClientFileSnapshotService.Delete(trackedDownload.ImportItem);
+
+            var authorIds = importResults.Select(r => r.ImportDecision.Item.Author?.Id ?? r.ImportDecision.Item.Book?.AuthorId ?? 0);
+            _eventAggregator.PublishEvent(new DownloadCompletedEvent(trackedDownload, ResolveCompletedAuthorId(trackedDownload, authorIds)));
+
+            trackedDownload.ClearStatus();
+            trackedDownload.State = TrackedDownloadState.Imported;
+            PublishTrackedDownloadUpdated(trackedDownload);
+            return true;
+        }
+
+        private static bool IsSameImportedPayload(LocalBook incoming, EntityHistory imported)
+        {
+            if (incoming == null || incoming.Book == null || incoming.Book.Id <= 0 || incoming.Edition == null || incoming.Edition.Id <= 0 ||
+                incoming.Quality == null || incoming.Size <= 0 ||
+                imported == null || imported.BookId != incoming.Book.Id || imported.EditionId != incoming.Edition.Id ||
+                !incoming.Quality.Equals(imported.Quality) || imported.Data == null ||
+                !imported.Data.TryGetValue("ImportedPath", out var importedPath) || importedPath.IsNullOrWhiteSpace() ||
+                !imported.Data.TryGetValue("Size", out var importedSize) ||
+                !long.TryParse(importedSize, out var importedLength) || importedLength != incoming.Size ||
+                !File.Exists(incoming.Path) || !File.Exists(importedPath))
+            {
+                return false;
+            }
+
+            try
+            {
+                using var incomingStream = File.OpenRead(incoming.Path);
+                using var importedStream = File.OpenRead(importedPath);
+                if (incomingStream.Length != importedStream.Length || incomingStream.Length != incoming.Size)
+                {
+                    return false;
+                }
+
+                var incomingHash = SHA256.HashData(incomingStream);
+                var importedHash = SHA256.HashData(importedStream);
+                return CryptographicOperations.FixedTimeEquals(incomingHash, importedHash);
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return false;
+            }
+            catch (CryptographicException)
+            {
+                return false;
+            }
         }
 
         private void BlockImport(TrackedDownload trackedDownload, params TrackedDownloadStatusMessage[] statusMessages)
