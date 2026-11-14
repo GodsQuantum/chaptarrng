@@ -196,5 +196,22 @@ namespace Chaptarr.Core.Test.Books
             Assert.That(pinned.Monitored, Is.True);
             Assert.That(real.Monitored, Is.False);
         }
+
+        [Test]
+        public void should_not_treat_numbered_series_title_with_different_series_position_as_placeholder()
+        {
+            var book = NewBook();
+            book.SeriesName = "The Expanse";
+            book.SeriesPosition = "6";
+            var numberedTitle = NewEdition(book, 10, "hc:edition:1-audiobook", "The Expanse 2", true, true);
+            var real = NewEdition(book, 0, "hc:edition:2-audiobook", "Babylon's Ashes", false, false);
+
+            Run(new List<Edition> { numberedTitle }, new List<Edition> { real });
+
+            Assert.That(numberedTitle.Monitored, Is.True);
+            Assert.That(numberedTitle.ManualAdd, Is.True);
+            Assert.That(real.Monitored, Is.False);
+            Assert.That(real.ManualAdd, Is.False);
+        }
     }
 }

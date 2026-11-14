@@ -39,7 +39,13 @@ namespace NzbDrone.Core.Books.Services
                 if (match.Success)
                 {
                     var prefix = match.Groups["prefix"].Value.Trim();
-                    if (prefix.Length > 0 && series.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    // A shortened series name is only enough to recognize a preorder placeholder when
+                    // its number also matches the book's known series position. Otherwise a legitimate
+                    // title such as "The Expanse 2" could be mistaken for a placeholder for book 6.
+                    if (position.Length > 0 &&
+                        string.Equals(match.Groups["number"].Value, position, StringComparison.OrdinalIgnoreCase) &&
+                        prefix.Length > 0 &&
+                        series.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                     {
                         return true;
                     }
