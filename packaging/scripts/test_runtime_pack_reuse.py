@@ -1,5 +1,7 @@
 import contextlib
 import copy
+import base64
+import importlib.util
 import io
 import json
 import os
@@ -8,6 +10,12 @@ import runpy
 import tempfile
 import unittest
 from unittest.mock import patch
+
+
+SCRIPT = Path(__file__).with_name('verify-runtime-pack-reuse.py')
+SPEC = importlib.util.spec_from_file_location('runtime_pack_reuse', SCRIPT)
+VERIFY = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(VERIFY)
 
 
 class RuntimePackReuseTest(unittest.TestCase):
@@ -22,9 +30,17 @@ class RuntimePackReuseTest(unittest.TestCase):
         def response(argv, **kwargs):
             if argv[:2] == ['git', 'hash-object']:
                 return 'matching-blob\n'
+            if argv[:2] == ['git', 'show']:
+                return Path(argv[2].split(':', 1)[1]).read_text()
             self.assertEqual(argv[:2], ['gh', 'api'])
             endpoint = argv[2].removeprefix('repos/owner/repo/')
-            return json.dumps({'sha': 'matching-blob'} if endpoint.startswith('contents/') else self.responses[endpoint])
+            if endpoint.startswith('contents/'):
+                file = endpoint.split('?', 1)[0].removeprefix('contents/')
+                return json.dumps({
+                    'sha': 'matching-blob',
+                    'content': base64.b64encode(Path(file).read_bytes()).decode('ascii'),
+                })
+            return json.dumps(self.responses[endpoint])
 
         script = Path(__file__).with_name('verify-runtime-pack-reuse.py')
         with tempfile.TemporaryDirectory(prefix='chaptarr-runtime-reuse-') as directory:
@@ -66,7 +82,19 @@ class RuntimePackReuseTest(unittest.TestCase):
             self.run_verifier()
 
     def test_rejects_changed_producer_input(self):
-        with patch('subprocess.check_output', side_effect=lambda argv, **kwargs: 'changed-blob' if argv[:2] == ['git', 'hash-object'] else json.dumps({'sha': 'old-blob'} if '/contents/' in argv[2] else self.responses[argv[2].removeprefix('repos/owner/repo/')])):
+        def response(argv, **kwargs):
+            if argv[:2] == ['git', 'hash-object']:
+                return 'changed-blob'
+            endpoint = argv[2].removeprefix('repos/owner/repo/')
+            if endpoint.startswith('contents/'):
+                file = endpoint.split('?', 1)[0].removeprefix('contents/')
+                return json.dumps({
+                    'sha': 'old-blob',
+                    'content': base64.b64encode(Path(file).read_bytes()).decode('ascii'),
+                })
+            return json.dumps(self.responses[endpoint])
+
+        with patch('subprocess.check_output', side_effect=response):
             with tempfile.TemporaryDirectory(prefix='chaptarr-runtime-reuse-') as directory:
                 script = Path(__file__).with_name('verify-runtime-pack-reuse.py')
                 with patch.dict(os.environ, {'GITHUB_REPOSITORY': 'owner/repo'}), patch('sys.argv', [str(script), '123', str(Path(directory) / 'result.json')]), self.assertRaisesRegex(SystemExit, 'input changed'):
@@ -80,6 +108,46 @@ class RuntimePackReuseTest(unittest.TestCase):
     def test_rejects_non_numeric_id_before_network_access(self):
         with self.assertRaisesRegex(SystemExit, 'positive integer'):
             self.run_verifier('123;echo injected')
+
+    def test_reuses_when_only_pinned_version_preflight_changes(self):
+        common = 'readonly freebsd_vmr_commit="8e0f8ed2312954727f8919d7d1c2f78b483b4ee7"\n'
+        build = '    dotnet build runtime\n'
+        old = (
+            common
+            + 'verify_pinned_freebsd_source_versions() {\n    check_patch_version\n}\n'
+            + 'clone_sources() {\n'
+            + '    python3 - "$runtime_repo/eng/Versions.props" <<\'PY\'\ncheck_patch_version()\nPY\n'
+            + '}\nmain() {\n    verify_pinned_freebsd_source_versions\n}\n'
+            + build
+        )
+        current = (
+            common
+            + 'verify_pinned_freebsd_source_versions() {\n    check_full_version\n}\n'
+            + 'clone_sources() {\n'
+            + '    python3 "$repo_root/packaging/scripts/verify-pinned-dotnet-runtime-versions.py" \\\n'
+            + '        "$runtime_version" "$runtime_repo/eng/Versions.props"\n'
+            + '}\nmain() {\n    verify_pinned_freebsd_source_versions\n}\n'
+            + build
+        )
+
+        self.assertEqual(
+            VERIFY.normalize_runtime_pack_builder(current),
+            VERIFY.normalize_runtime_pack_builder(old),
+        )
+
+    def test_does_not_reuse_when_runtime_pack_build_commands_change(self):
+        common = 'readonly freebsd_vmr_commit="8e0f8ed2312954727f8919d7d1c2f78b483b4ee7"\n'
+        preflight = (
+            'verify_pinned_freebsd_source_versions() {\n    check_version\n}\n'
+            + 'clone_sources() {\n'
+            + '    python3 - "$runtime_repo/eng/Versions.props" <<\'PY\'\ncheck_version()\nPY\n'
+            + '}\nmain() {\n    verify_pinned_freebsd_source_versions\n}\n'
+        )
+
+        source = VERIFY.normalize_runtime_pack_builder(common + preflight + '    dotnet build runtime\n')
+        changed = VERIFY.normalize_runtime_pack_builder(common + preflight + '    dotnet build different-runtime\n')
+
+        self.assertNotEqual(source, changed)
 
 
 if __name__ == '__main__':
