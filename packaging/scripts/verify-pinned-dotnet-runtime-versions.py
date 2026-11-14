@@ -2,8 +2,9 @@
 
 from pathlib import Path
 import re
+import subprocess
 import sys
-from urllib.request import Request, urlopen
+from urllib.parse import urlsplit
 import xml.etree.ElementTree as ET
 
 
@@ -11,13 +12,50 @@ VERSION_PROPERTIES = {
     "runtime": ("MajorVersion", "MinorVersion", "PatchVersion"),
     "ASP.NET Core": ("AspNetCoreMajorVersion", "AspNetCoreMinorVersion", "AspNetCorePatchVersion"),
 }
+REMOTE_SOURCE = re.compile(
+    r"/dotnet/dotnet/(?P<commit>[0-9a-f]{40})/src/(?P<component>runtime|aspnetcore)/eng/Versions\.props"
+)
+
+
+def validate_remote_source(source):
+    parsed = urlsplit(source)
+    match = REMOTE_SOURCE.fullmatch(parsed.path)
+    if (
+        parsed.scheme != "https"
+        or parsed.netloc != "raw.githubusercontent.com"
+        or parsed.query
+        or parsed.fragment
+        or match is None
+    ):
+        raise ValueError("remote source must be a pinned .NET VMR Versions.props URL on raw.githubusercontent.com")
+
+    return match.group("commit"), match.group("component")
 
 
 def read_source(source):
-    if source.startswith(("https://", "http://")):
-        request = Request(source, headers={"User-Agent": "ChaptarrNG-runtime-pack-preflight"})
-        with urlopen(request, timeout=20) as response:
-            return response.read(2 * 1024 * 1024).decode("utf-8")
+    parsed = urlsplit(source)
+    if parsed.scheme:
+        validate_remote_source(source)
+        response = subprocess.run(
+            [
+                "curl",
+                "--fail",
+                "--silent",
+                "--show-error",
+                "--proto",
+                "=https",
+                "--max-time",
+                "20",
+                "--max-filesize",
+                str(2 * 1024 * 1024),
+                source,
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        return response.stdout
 
     return Path(source).read_text(encoding="utf-8")
 
@@ -66,6 +104,23 @@ def main(argv):
         raise SystemExit("Usage: verify-pinned-dotnet-runtime-versions.py <expected-version> <runtime-versions-props> <aspnet-versions-props>")
 
     expected, runtime_source, aspnet_source = argv[1:]
+    remote_sources = []
+    for source in (runtime_source, aspnet_source):
+        if urlsplit(source).scheme:
+            remote_sources.append(validate_remote_source(source))
+        else:
+            remote_sources.append(None)
+
+    if remote_sources[0] is not None or remote_sources[1] is not None:
+        if (
+            remote_sources[0] is None
+            or remote_sources[1] is None
+            or remote_sources[0][1] != "runtime"
+            or remote_sources[1][1] != "aspnetcore"
+            or remote_sources[0][0] != remote_sources[1][0]
+        ):
+            raise SystemExit("Remote runtime sources must use the same pinned .NET VMR commit and matching component paths")
+
     contents = []
     for component, source in (("runtime", runtime_source), ("ASP.NET Core", aspnet_source)):
         try:
