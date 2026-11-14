@@ -80,7 +80,11 @@ namespace NzbDrone.Common.Http
             EnsureHttpOrHttps(request.Url);
             if (IsCloudMetadataTarget(request.Url))
             {
-                throw new WebException($"Request target '{request.Url}' is not allowed.", WebExceptionStatus.ProtocolError);
+                throw new WebException(
+                    request.LogRequest
+                        ? $"Request target '{request.Url}' is not allowed."
+                        : "Request target is not allowed.",
+                    WebExceptionStatus.ProtocolError);
             }
 
             var cookieContainer = InitializeRequestCookies(request);
@@ -127,7 +131,7 @@ namespace NzbDrone.Common.Http
                         throw new WebException("Redirect target is invalid or unsupported.", WebExceptionStatus.ProtocolError);
                     }
 
-                    EnsureSafeRedirectTarget(nextUrl);
+                    EnsureSafeRedirectTarget(nextUrl, redirectRequest.LogRequest);
 
                     if (IsCrossOriginRedirect(sourceUrl, nextUrl) && HasSensitiveRequestData(redirectRequest, nextUrl, cookieContainer))
                     {
@@ -213,13 +217,17 @@ namespace NzbDrone.Common.Http
                    scheme.Equals(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static void EnsureSafeRedirectTarget(HttpUri url)
+        private static void EnsureSafeRedirectTarget(HttpUri url, bool logRequest)
         {
             EnsureHttpOrHttps(url);
 
             if (IsCloudMetadataTarget(url))
             {
-                throw new WebException($"Redirect target '{url}' is not allowed.", WebExceptionStatus.ProtocolError);
+                throw new WebException(
+                    logRequest
+                        ? $"Redirect target '{url}' is not allowed."
+                        : "Redirect target is not allowed.",
+                    WebExceptionStatus.ProtocolError);
             }
         }
 

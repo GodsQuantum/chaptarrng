@@ -49,9 +49,11 @@ namespace NzbDrone.Core.MetadataSource.Goodreads
                 httpRequest.LogRequest = false;
                 httpRequest.LogHttpError = false;
 
+                // The response cache stores the full URL as its record key. Do not persist
+                // user search terms in those keys, even though request logging is disabled.
                 var response = _cachedHttpClient.Get<List<SearchJsonResource>>(
                     httpRequest,
-                    true,
+                    false,
                     TimeSpan.FromDays(5),
                     candidate => Json.Deserialize<List<SearchJsonResource>>(candidate.Content)?.Any(result => result?.BookId > 0) == true);
 

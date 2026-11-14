@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,31 @@ namespace NzbDrone.Core.CustomFormats
     internal static class NarratorNameMatcher
     {
         private static readonly Regex RegexSyntax = new Regex(@"[\\\^\$\*\+\?\[\]\(\)\{\}\|]", RegexOptions.Compiled);
+        private static readonly string[] GenericNarratorLabels =
+        {
+            "various",
+            "various artists",
+            "various narrators",
+            "unknown",
+            "unknown narrator",
+            "uncredited",
+            "full cast",
+            "multiple narrators",
+            "multiple performers",
+            "various voices",
+            "not stated",
+            "not available",
+            "no narrator",
+            "none",
+            "n a"
+        };
+        private static readonly HashSet<string> GenericNarratorLabelKeys =
+            new HashSet<string>(GenericNarratorLabels.Select(NormalizeWords), StringComparer.Ordinal);
+
+        public static bool IsGenericNarratorLabel(string value)
+        {
+            return !string.IsNullOrWhiteSpace(value) && GenericNarratorLabelKeys.Contains(NormalizeWords(value));
+        }
 
         public static bool LooksLikeLiteralName(string value)
         {
