@@ -73,6 +73,12 @@ namespace NzbDrone.Host
                 Reuse.Singleton, ifAlreadyRegistered: IfAlreadyRegistered.Replace);
         }
 
+        internal static void RegisterUtilityModeRouter(IContainer container)
+        {
+            container.Register<IUtilityModeRouter, UtilityModeRouter>(
+                Reuse.Singleton, ifAlreadyRegistered: IfAlreadyRegistered.Replace);
+        }
+
         public static void Start(string[] args, Action<IHostBuilder> trayCallback = null)
         {
             var restoreAttempted = false;
@@ -187,6 +193,7 @@ namespace NzbDrone.Host
                                 // .AddHardcoverServices() // Removed - using V5 API via BookInfoProxy
                                 .AddStartupContext(startupContext);
 
+                            RegisterUtilityModeRouter(utilityContainer);
                             RegisterRealRemotePathMappingService(utilityContainer);
                             RegisterUpdatePackageProviders(utilityContainer);
 

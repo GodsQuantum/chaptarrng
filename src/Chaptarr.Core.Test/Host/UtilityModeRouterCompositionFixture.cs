@@ -37,9 +37,9 @@ namespace Chaptarr.Core.Test.Host
             container.RegisterInstance<IConfigFileProvider>(Mock.Of<IConfigFileProvider>());
             container.RegisterInstance<IStartupContext>(new StartupContext("-preview-bookshelf-migration"));
             container.RegisterInstance(LogManager.GetLogger(nameof(UtilityModeRouterCompositionFixture)));
-            container.Register<UtilityModeRouter>(Reuse.Singleton);
+            Bootstrap.RegisterUtilityModeRouter(container);
 
-            _ = container.Resolve<UtilityModeRouter>();
+            _ = container.Resolve<IUtilityModeRouter>();
 
             Assert.That(configServiceResolved, Is.False,
                 "Resolving utility mode dependencies must not instantiate the main database before the selected command runs.");

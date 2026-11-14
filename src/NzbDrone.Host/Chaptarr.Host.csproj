@@ -4,6 +4,7 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Chaptarr.Core.Test" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
     <PackageReference Include="DryIoc.dll" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" />
