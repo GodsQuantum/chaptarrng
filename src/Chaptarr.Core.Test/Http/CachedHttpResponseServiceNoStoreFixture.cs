@@ -18,6 +18,7 @@ namespace Chaptarr.Core.Test.Http
         private class RepositoryProxy : DispatchProxy
         {
             public CachedHttpResponse Cached { get; private set; }
+            public int FindCount { get; private set; }
             public int UpsertCount { get; private set; }
             public int DeleteCount { get; private set; }
 
@@ -25,12 +26,18 @@ namespace Chaptarr.Core.Test.Http
             {
                 return targetMethod?.Name switch
                 {
-                    "FindByUrl" => Cached,
+                    "FindByUrl" => RecordFind(),
                     "Upsert" => RecordUpsert((CachedHttpResponse)args[0]),
                     "UpsertByUrl" => RecordUpsert((CachedHttpResponse)args[0]),
                     "Delete" => RecordDelete((CachedHttpResponse)args[0]),
                     _ => throw new NotImplementedException($"Repository proxy does not implement {targetMethod?.Name}")
                 };
+            }
+
+            private CachedHttpResponse RecordFind()
+            {
+                FindCount++;
+                return Cached;
             }
 
             private CachedHttpResponse RecordUpsert(CachedHttpResponse response)
@@ -358,7 +365,7 @@ namespace Chaptarr.Core.Test.Http
             Assert.That(client.GetCount, Is.EqualTo(2));
         }
         [Test]
-        public void goodreads_positive_array_should_remain_cached()
+        public void goodreads_positive_search_should_not_persist_query_in_response_cache()
         {
             var repository = DispatchProxy.Create<ICachedHttpResponseRepository, RepositoryProxy>();
             var repositoryState = (RepositoryProxy)repository;
@@ -369,12 +376,13 @@ namespace Chaptarr.Core.Test.Http
 
             Assert.That(proxy.Search("positive"), Has.Count.EqualTo(1));
             Assert.That(proxy.Search("positive"), Has.Count.EqualTo(1));
-            Assert.That(repositoryState.UpsertCount, Is.EqualTo(1));
-            Assert.That(client.GetCount, Is.EqualTo(1));
+            Assert.That(repositoryState.FindCount, Is.Zero);
+            Assert.That(repositoryState.UpsertCount, Is.Zero);
+            Assert.That(client.GetCount, Is.EqualTo(2));
         }
 
         [Test]
-        public void audible_positive_products_should_remain_cached()
+        public void audible_positive_search_should_not_persist_query_in_response_cache()
         {
             var repository = DispatchProxy.Create<ICachedHttpResponseRepository, RepositoryProxy>();
             var repositoryState = (RepositoryProxy)repository;
@@ -383,10 +391,11 @@ namespace Chaptarr.Core.Test.Http
             var service = new CachedHttpResponseService(repository, client, LogManager.GetCurrentClassLogger());
             var proxy = new AudibleCatalogProxy(service, LogManager.GetCurrentClassLogger(), null);
 
-            Assert.That(proxy.SearchBooks("positive"), Has.Count.EqualTo(1));
-            Assert.That(proxy.SearchBooks("positive"), Has.Count.EqualTo(1));
-            Assert.That(repositoryState.UpsertCount, Is.EqualTo(1));
-            Assert.That(client.GetCount, Is.EqualTo(1));
+            Assert.That(proxy.SearchBooks("positive", useCache: true), Has.Count.EqualTo(1));
+            Assert.That(proxy.SearchBooks("positive", useCache: true), Has.Count.EqualTo(1));
+            Assert.That(repositoryState.FindCount, Is.Zero);
+            Assert.That(repositoryState.UpsertCount, Is.Zero);
+            Assert.That(client.GetCount, Is.EqualTo(2));
         }
 
         [Test]
