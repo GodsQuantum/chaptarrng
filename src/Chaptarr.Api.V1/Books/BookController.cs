@@ -925,10 +925,10 @@ namespace Chaptarr.Api.V1.Books
 
                 if (matches?.Any() == true)
                 {
-                    return matches
-                        .Where(book => book != null)
-                        .GroupBy(book => book.Id)
-                        .Select(group => _bookService.GetBook(group.Key))
+                    return _bookService.GetExistingBooks(matches
+                            .Where(book => book != null)
+                            .Select(book => book.Id)
+                            .Distinct())
                         .Where(book => book != null)
                         .OrderBy(book => book.Id)
                         .ToList();
@@ -953,7 +953,7 @@ namespace Chaptarr.Api.V1.Books
                 if (legacyMediaType.HasValue)
                 {
                     var resolvedBookIds = HttpContext.ResolveBookshelfLegacyBookIds(_bookshelfLegacyIdentityMapService, new[] { bookIdInt }, legacyMediaType);
-                    return _bookService.GetBooks(resolvedBookIds)
+                    return _bookService.GetExistingBooks(resolvedBookIds)
                         .Where(book => book.MediaType == legacyMediaType.Value)
                         .OrderBy(book => book.Id)
                         .FirstOrDefault();
@@ -965,15 +965,17 @@ namespace Chaptarr.Api.V1.Books
                     var legacyBookIds = _bookshelfLegacyIdentityMapService.ResolveBookIds(new[] { bookIdInt });
                     if (legacyBookIds.Count > 0)
                     {
-                        var legacyBooks = _bookService.GetBooks(legacyBookIds)
+                        var legacyBooks = _bookService.GetExistingBooks(legacyBookIds)
                             .Where(book => book != null)
                             .ToList();
                         var primaryBookId = SelectLegacyPrimaryBookId(legacyBooks);
-                        return primaryBookId > 0 ? _bookService.GetBook(primaryBookId) : null;
+                        return primaryBookId > 0
+                            ? _bookService.GetExistingBooks(new[] { primaryBookId }).FirstOrDefault()
+                            : null;
                     }
                 }
 
-                return _bookService.GetBook(bookIdInt);
+                return _bookService.GetExistingBooks(new[] { bookIdInt }).FirstOrDefault();
             }
 
             var scopedMediaType = MediaTypeParameterParser.ParseOptional(mediaType);
@@ -1035,7 +1037,9 @@ namespace Chaptarr.Api.V1.Books
                 .ThenBy(book => book.Id)
                 .FirstOrDefault();
 
-            return selected == null ? null : _bookService.GetBook(selected.Id);
+            return selected == null
+                ? null
+                : _bookService.GetExistingBooks(new[] { selected.Id }).FirstOrDefault();
         }
 
         private List<int> ResolveBookIdsForApi(IEnumerable<int> sourceIds, string mediaType = null)

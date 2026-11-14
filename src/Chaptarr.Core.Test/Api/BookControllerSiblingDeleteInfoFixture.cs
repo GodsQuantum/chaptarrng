@@ -5,6 +5,8 @@ using System.Reflection;
 using System.IO.Abstractions;
 using Chaptarr.Core.Test;
 using Chaptarr.Api.V1.Books;
+using Chaptarr.Http.Middleware;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NLog;
 using NUnit.Framework;
@@ -24,6 +26,8 @@ namespace Chaptarr.Core.Test.Api
         {
             private readonly Func<int, Book> _getBook;
             private readonly Func<int, List<Book>> _getBooksByAuthor;
+            private readonly Func<IEnumerable<int>, List<Book>> _getExistingBooks;
+            private readonly Func<string, string, BookMediaType, List<Book>> _findAllByProviderId;
             private readonly Func<BookMediaType, List<AuthorBookCount>> _getBookshelfAuthorCounts;
             private readonly Func<IEnumerable<int>, BookMediaType, List<Book>> _getBooksForBookshelf;
 
@@ -31,15 +35,20 @@ namespace Chaptarr.Core.Test.Api
                 Func<int, Book> getBook,
                 Func<int, List<Book>> getBooksByAuthor,
                 Func<BookMediaType, List<AuthorBookCount>> getBookshelfAuthorCounts = null,
-                Func<IEnumerable<int>, BookMediaType, List<Book>> getBooksForBookshelf = null)
+                Func<IEnumerable<int>, BookMediaType, List<Book>> getBooksForBookshelf = null,
+                Func<IEnumerable<int>, List<Book>> getExistingBooks = null,
+                Func<string, string, BookMediaType, List<Book>> findAllByProviderId = null)
             {
                 _getBook = getBook;
                 _getBooksByAuthor = getBooksByAuthor;
+                _getExistingBooks = getExistingBooks;
+                _findAllByProviderId = findAllByProviderId;
                 _getBookshelfAuthorCounts = getBookshelfAuthorCounts;
                 _getBooksForBookshelf = getBooksForBookshelf;
             }
 
             public Book GetBook(int bookId) => _getBook?.Invoke(bookId);
+            public List<Book> GetExistingBooks(IEnumerable<int> bookIds) => _getExistingBooks?.Invoke(bookIds) ?? GetBooks(bookIds);
             public List<Book> GetBooksByAuthor(int authorId) => _getBooksByAuthor?.Invoke(authorId) ?? new List<Book>();
             public List<AuthorBookCount> GetBookshelfAuthorCounts(BookMediaType mediaType) => _getBookshelfAuthorCounts?.Invoke(mediaType) ?? new List<AuthorBookCount>();
             public List<Book> GetBooksForBookshelf(IEnumerable<int> authorIds, BookMediaType mediaType) => _getBooksForBookshelf?.Invoke(authorIds, mediaType) ?? new List<Book>();
@@ -57,7 +66,8 @@ namespace Chaptarr.Core.Test.Api
             public Book FindByGoodreadsId(string goodreadsId) => throw new NotImplementedException();
             public Book FindByProviderId(string provider, string providerId) => throw new NotImplementedException();
             public Book FindByProviderId(string provider, string providerId, BookMediaType mediaType) => throw new NotImplementedException();
-            public List<Book> FindAllByProviderId(string provider, string providerId, BookMediaType mediaType) => throw new NotImplementedException();
+            public List<Book> FindAllByProviderId(string provider, string providerId, BookMediaType mediaType) =>
+                _findAllByProviderId?.Invoke(provider, providerId, mediaType) ?? throw new NotImplementedException();
             public Book FindByISBN(string isbn) => throw new NotImplementedException();
             public Book FindByASIN(string asin) => throw new NotImplementedException();
             public List<Book> GetCandidates(int authorId, string title) => throw new NotImplementedException();
@@ -101,7 +111,7 @@ namespace Chaptarr.Core.Test.Api
 
             public List<AuthorStatistics> AuthorStatistics() => throw new NotImplementedException();
             public AuthorStatistics AuthorStatistics(int authorId) => _getStats?.Invoke(authorId) ?? new AuthorStatistics();
-            public List<AuthorStatistics> AuthorStatistics(string mediaType) => throw new NotImplementedException();
+            public List<AuthorStatistics> AuthorStatistics(string mediaType) => new List<AuthorStatistics>();
             public AuthorStatistics AuthorStatistics(int authorId, string mediaType) => throw new NotImplementedException();
             public List<AuthorStatistics> AuthorStatistics(IEnumerable<int> authorIds, string mediaType) =>
                 _getStatsForAuthors?.Invoke(authorIds, mediaType) ?? new List<AuthorStatistics>();
@@ -333,6 +343,57 @@ namespace Chaptarr.Core.Test.Api
             Assert.That(result.Value.Formats.Single().MediaType, Is.EqualTo("ebook"));
             Assert.That(result.Value.Formats.Single().Title, Is.EqualTo("1984"));
             Assert.That(result.Value.Formats.Single().Disambiguation, Is.EqualTo("1949"));
+        }
+
+        [Test]
+        public void should_ignore_deleted_provider_match_when_resolving_numeric_title_slug()
+        {
+            var staleBook = new Book { Id = 53762, AuthorId = 10, Title = "Deleted book", MediaType = BookMediaType.Ebook };
+            var requestedIds = new List<int>();
+            var controller = new TestableBookController(
+                new StubBookService(
+                    getBook: _ => throw new ModelNotFoundException(typeof(Book), 53762),
+                    getBooksByAuthor: _ => new List<Book>(),
+                    getExistingBooks: ids =>
+                    {
+                        requestedIds.AddRange(ids);
+                        return new List<Book>();
+                    },
+                    findAllByProviderId: (provider, providerId, mediaType) => new List<Book> { staleBook }),
+                new StubAuthorStatisticsService(getStats: _ => new AuthorStatistics()),
+                LogManager.GetCurrentClassLogger());
+            controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
+            controller.HttpContext.Items[ReadarrFacadeContext.ItemKey] = new ReadarrFacadeContext("hc", "ebook", "/readarr/hc/ebook");
+
+            var result = controller.GetBooks(null, new List<int>(), null, titleSlug: "745029", mediaType: "ebook");
+
+            Assert.That(result, Is.Empty);
+            Assert.That(requestedIds, Is.EqualTo(new[] { staleBook.Id }));
+        }
+
+        [Test]
+        public void should_return_empty_for_numeric_title_slug_whose_local_book_row_was_deleted()
+        {
+            var requestedIds = new List<int>();
+            var controller = new TestableBookController(
+                new StubBookService(
+                    getBook: _ => throw new ModelNotFoundException(typeof(Book), 53762),
+                    getBooksByAuthor: _ => new List<Book>(),
+                    getExistingBooks: ids =>
+                    {
+                        requestedIds.AddRange(ids);
+                        return new List<Book>();
+                    },
+                    findAllByProviderId: (_, _, _) => new List<Book>()),
+                new StubAuthorStatisticsService(getStats: _ => new AuthorStatistics()),
+                LogManager.GetCurrentClassLogger());
+            controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
+            controller.HttpContext.Items[ReadarrFacadeContext.ItemKey] = new ReadarrFacadeContext("hc", "ebook", "/readarr/hc/ebook");
+
+            var result = controller.GetBooks(null, new List<int>(), null, titleSlug: "53762", mediaType: "ebook");
+
+            Assert.That(result, Is.Empty);
+            Assert.That(requestedIds, Is.EqualTo(new[] { 53762 }));
         }
 
         [Test]
