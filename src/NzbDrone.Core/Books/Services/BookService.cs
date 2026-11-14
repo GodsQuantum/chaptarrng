@@ -10,6 +10,7 @@ using NzbDrone.Common.Cache;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Books.Commands;
 using NzbDrone.Core.Books.Events;
+using NzbDrone.Core.CustomFormats;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.MetadataSource;
 using NzbDrone.Core.MediaFiles;
@@ -3128,9 +3129,9 @@ namespace NzbDrone.Core.Books
         internal static bool HaveSameNarration(Edition left, Edition right)
         {
             var names = GetEditionNarratorKeys(left).ToHashSet(StringComparer.OrdinalIgnoreCase);
-            // A shared cast member or a generic "Full Cast" label cannot identify a recording.
+            // Generic labels cannot identify a recording, even if both editions carry the same label.
             return left?.IsGraphicAudio == right?.IsGraphicAudio &&
-                   names.Count > 0 && !names.Contains("full cast") && !names.Contains("various") &&
+                   names.Count > 0 && names.All(name => !NarratorNameMatcher.IsGenericNarratorLabel(name)) &&
                    names.SetEquals(GetEditionNarratorKeys(right));
         }
 
@@ -3150,7 +3151,7 @@ namespace NzbDrone.Core.Books
             }
 
             var editionKeys = GetEditionNarratorKeys(edition).ToHashSet(StringComparer.OrdinalIgnoreCase);
-            if (editionKeys.Count == 0 || editionKeys.Contains("full cast") || editionKeys.Contains("various"))
+            if (editionKeys.Count == 0 || editionKeys.Any(NarratorNameMatcher.IsGenericNarratorLabel))
             {
                 return false;
             }

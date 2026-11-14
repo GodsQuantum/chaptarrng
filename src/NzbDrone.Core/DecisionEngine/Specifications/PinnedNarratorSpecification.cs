@@ -18,25 +18,6 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
     /// </summary>
     public class PinnedNarratorSpecification : IDecisionEngineSpecification
     {
-        private static readonly HashSet<string> GenericNarratorNames = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)
-        {
-            "various",
-            "various artists",
-            "various narrators",
-            "unknown",
-            "unknown narrator",
-            "uncredited",
-            "full cast",
-            "multiple narrators",
-            "multiple performers",
-            "various voices",
-            "not stated",
-            "not available",
-            "no narrator",
-            "none",
-            "n/a"
-        };
-
         private readonly Logger _logger;
 
         public PinnedNarratorSpecification(Logger logger)
@@ -86,9 +67,9 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
 
             var pinnedNarrators = targets.SelectMany(target => target).Distinct(System.StringComparer.OrdinalIgnoreCase).ToList();
             var everyPinnedNarratorMatches = pinnedNarrators.All(name =>
-                releaseNarrators.Any(narrator => PreferredNarratorMatcher.IsNarratorNameMatch(narrator, name)));
+                releaseNarrators.Any(narrator => NarratorNameMatcher.IsMatch(narrator, name)));
             var everyReleaseNarratorMatches = releaseNarrators.All(narrator =>
-                pinnedNarrators.Any(name => PreferredNarratorMatcher.IsNarratorNameMatch(narrator, name)));
+                pinnedNarrators.Any(name => NarratorNameMatcher.IsMatch(narrator, name)));
             if (everyPinnedNarratorMatches && everyReleaseNarratorMatches)
             {
                 return Decision.Accept();
@@ -155,13 +136,7 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
 
         private static bool IsSpecificNarratorName(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return false;
-            }
-
-            var normalized = string.Join(" ", name.Split((char[])null, System.StringSplitOptions.RemoveEmptyEntries));
-            return !GenericNarratorNames.Contains(normalized);
+            return !string.IsNullOrWhiteSpace(name) && !NarratorNameMatcher.IsGenericNarratorLabel(name);
         }
 
         private static BookMediaType? ResolveMediaType(RemoteBook subject, SearchCriteriaBase searchCriteria)

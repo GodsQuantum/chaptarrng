@@ -2799,6 +2799,39 @@ namespace Chaptarr.Core.Test.MediaFiles
             Assert.That(decision.Item.Edition.Id, Is.EqualTo(3));
         }
 
+        [TestCase("Unknown narrator")]
+        [TestCase("Various")]
+        [TestCase("Various artists")]
+        [TestCase("Various narrators")]
+        [TestCase("Uncredited")]
+        [TestCase("Multiple narrators")]
+        [TestCase("Not stated")]
+        [TestCase("N/A")]
+        [TestCase("Full Cast")]
+        [TestCase("Unknown")]
+        [TestCase("Not available")]
+        [TestCase("No narrator")]
+        [TestCase("Multiple performers")]
+        [TestCase("Various voices")]
+        [TestCase("None")]
+        public void should_not_use_generic_narrator_labels_as_recording_identity(string genericNarrator)
+        {
+            var matched = NarratorlessAudiobook();
+            matched.Narrator = genericNarrator;
+            matched.NarratorNames = new List<string> { genericNarrator };
+            var expected = NarratedAudiobook(genericNarrator);
+
+            var decision = ProcessStrictSiblingMatch(
+                "Onyx Storm.m4b",
+                matched,
+                expected,
+                "DOWNLOAD-GENERIC-NARRATOR",
+                genericNarrator);
+
+            Assert.That(decision.Approved, Is.False);
+            Assert.That(decision.Item.Edition.Id, Is.EqualTo(matched.Id));
+        }
+
         [Test]
         public void should_use_narrator_evidence_from_the_history_record_for_the_expected_edition()
         {
