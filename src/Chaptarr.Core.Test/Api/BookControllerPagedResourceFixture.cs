@@ -158,7 +158,7 @@ namespace Chaptarr.Core.Test.Api
 
             var bookService = new Mock<IBookService>();
             bookService
-                .Setup(service => service.GetBooks(It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(new[] { 31 }))))
+                .Setup(service => service.GetExistingBooks(It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(new[] { 31 }))))
                 .Returns(new List<Book>
                 {
                     new Book
@@ -220,6 +220,9 @@ namespace Chaptarr.Core.Test.Api
             };
 
             var bookService = new Mock<IBookService>();
+            bookService
+                .Setup(service => service.GetExistingBooks(It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(new[] { 31 }))))
+                .Returns(new List<Book> { migratedBook });
             bookService
                 .Setup(service => service.GetBooks(It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(new[] { 31 }))))
                 .Returns(new List<Book> { migratedBook });

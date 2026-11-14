@@ -297,7 +297,7 @@ namespace Chaptarr.Core.Test.MetadataSource.BookInfo
             HttpRequest capturedRequest = null;
             cached.Setup(service => service.Get<List<SearchJsonResource>>(
                     It.IsAny<HttpRequest>(),
-                    true,
+                    false,
                     It.IsAny<TimeSpan>(),
                     It.IsAny<Func<HttpResponse, bool>>()))
                 .Callback<HttpRequest, bool, TimeSpan, Func<HttpResponse, bool>>((request, _, _, _) => capturedRequest = request)
