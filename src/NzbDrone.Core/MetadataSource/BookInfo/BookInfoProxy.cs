@@ -856,7 +856,7 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
         {
             if (!_metadataServerHealthGate.TryBeginRequest(out var retryAfter))
             {
-                throw new BookInfoException("Metadata server is temporarily unavailable for {0}; retrying in {1}",
+                throw new MetadataServerUnavailableException("Metadata server is temporarily unavailable for {0}; retrying in {1}",
                     operation,
                     MetadataServerHealthGate.FormatRetryAfter(retryAfter));
             }
@@ -879,7 +879,7 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
         {
             if (!_metadataServerHealthGate.TryBeginRequest(out var retryAfter))
             {
-                throw new BookInfoException("Metadata server is temporarily unavailable for {0}; retrying in {1}",
+                throw new MetadataServerUnavailableException("Metadata server is temporarily unavailable for {0}; retrying in {1}",
                     operation,
                     MetadataServerHealthGate.FormatRetryAfter(retryAfter));
             }
@@ -901,7 +901,7 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
         {
             if (!_metadataServerHealthGate.TryBeginRequest(out var retryAfter))
             {
-                throw new BookInfoException("Metadata server is temporarily unavailable for {0}; retrying in {1}",
+                throw new MetadataServerUnavailableException("Metadata server is temporarily unavailable for {0}; retrying in {1}",
                     operation,
                     MetadataServerHealthGate.FormatRetryAfter(retryAfter));
             }
@@ -3605,7 +3605,16 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
 
         private List<Book> SearchByV5WorkId(string foreignWorkId)
         {
-            var lookup = PollV5WorkLookup(foreignWorkId);
+            V5WorkLookupResult lookup;
+            try
+            {
+                lookup = PollV5WorkLookup(foreignWorkId);
+            }
+            catch (Exception exception) when (IsMetadataServerOutage(exception) &&
+                                              TryGetHardcoverOutageWorkId(foreignWorkId, out var hardcoverWorkId))
+            {
+                return GetHardcoverOutageBookInstances(foreignWorkId, hardcoverWorkId);
+            }
 
             if (lookup.RedirectAuthor != null)
             {
@@ -4320,8 +4329,81 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
 
         private Tuple<string, Book, List<Author>> PollBook(string foreignBookId, BookMediaType mediaType, string authorHintProviderId = null)
         {
-            var lookup = PollV5WorkLookup(foreignBookId, authorHintProviderId);
+            V5WorkLookupResult lookup;
+            try
+            {
+                lookup = PollV5WorkLookup(foreignBookId, authorHintProviderId);
+            }
+            catch (Exception exception) when (IsMetadataServerOutage(exception) &&
+                                              TryGetHardcoverOutageWorkId(foreignBookId, out var hardcoverWorkId))
+            {
+                _logger.WarnSafe("Metadata server is unavailable; answering work lookup {0} from Hardcover", foreignBookId);
+                return GetHardcoverOutageBookInfo(hardcoverWorkId, mediaType);
+            }
+
             return MapLookupToBookTuple(lookup, foreignBookId, mediaType);
+        }
+
+        // The metadata server circuit opens after a single failed request and then refuses every
+        // work lookup for minutes, so book requests and narration lists fail even though Hardcover
+        // can answer a Hardcover work id. With a Hardcover token configured, answer those lookups
+        // natively while the circuit is open; nothing changes while the metadata server is healthy.
+        private bool IsMetadataServerOutage(Exception exception)
+        {
+            if (exception is MetadataServerUnavailableException)
+            {
+                return true;
+            }
+
+            // The request that just failed may itself have opened the circuit.
+            return _metadataServerHealthGate != null &&
+                   (exception is BookInfoException || exception is WebException || exception is HttpException ||
+                    exception is TaskCanceledException || exception is TimeoutException) &&
+                   !_metadataServerHealthGate.CanAttemptWithoutProbe(out _);
+        }
+
+        private bool TryGetHardcoverOutageWorkId(string value, out string hardcoverWorkId)
+        {
+            hardcoverWorkId = null;
+            if (_hardcoverMetadataProxy?.IsConfigured != true || string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            var candidate = value.Trim();
+            if (!candidate.StartsWith("hc:", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (!int.TryParse(candidate.Substring("hc:".Length), out var numericId) || numericId <= 0)
+            {
+                return false;
+            }
+
+            hardcoverWorkId = numericId.ToString();
+            return true;
+        }
+
+        private Tuple<string, Book, List<Author>> GetHardcoverOutageBookInfo(string hardcoverWorkId, BookMediaType mediaType)
+        {
+            var bookInfo = GetNativeHardcoverBookInfo(hardcoverWorkId);
+            bookInfo.Item2.MediaType = mediaType;
+            return bookInfo;
+        }
+
+        private List<Book> GetHardcoverOutageBookInstances(string foreignWorkId, string hardcoverWorkId)
+        {
+            _logger.WarnSafe("Metadata server is unavailable; answering work lookup {0} from Hardcover", foreignWorkId);
+
+            return new[] { BookMediaType.Audiobook, BookMediaType.Ebook }
+                .Select(mediaType =>
+                {
+                    var book = GetHardcoverOutageBookInfo(hardcoverWorkId, mediaType).Item2;
+                    book.AnyEditionOk = true;
+                    return book;
+                })
+                .ToList();
         }
 
         private Tuple<string, Book, List<Author>> PollEditionBook(string foreignBookId, BookMediaType mediaType)

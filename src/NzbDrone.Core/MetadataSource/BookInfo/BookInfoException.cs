@@ -21,4 +21,15 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
         {
         }
     }
+
+    /// <summary>
+    /// The metadata server circuit is open, so the request was refused without calling it.
+    /// </summary>
+    public class MetadataServerUnavailableException : BookInfoException
+    {
+        public MetadataServerUnavailableException(string message, params object[] args)
+            : base(message, args)
+        {
+        }
+    }
 }

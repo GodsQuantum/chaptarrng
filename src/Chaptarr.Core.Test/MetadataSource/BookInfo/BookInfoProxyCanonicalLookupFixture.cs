@@ -387,7 +387,7 @@ namespace Chaptarr.Core.Test.MetadataSource.BookInfo
                 cacheManager: new CacheManager(),
                 metadataServerHealthGate: healthGate);
 
-            var exception = Assert.Throws<BookInfoException>(() => proxy.GetAuthorInfo("hc:123", useCache: false));
+            var exception = Assert.Catch<BookInfoException>(() => proxy.GetAuthorInfo("hc:123", useCache: false));
 
             Assert.That(exception.Message, Does.Contain("temporarily unavailable"));
             Assert.That(httpClient.Requests, Is.Empty);
