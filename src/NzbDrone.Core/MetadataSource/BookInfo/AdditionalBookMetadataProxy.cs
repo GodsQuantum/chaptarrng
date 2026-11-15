@@ -814,6 +814,12 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
                 _logger.Warn(e, "Ignoring Library of Congress search result with an invalid record URL");
                 return null;
             }
+            catch (Exception e) when (e is ArgumentException or InvalidCastException or FormatException)
+            {
+                // One malformed record must not fail the whole search.
+                _logger.Warn(e, "Ignoring malformed Library of Congress search result");
+                return null;
+            }
         }
 
         private List<Book> SearchEuropeana(string query)
@@ -1055,7 +1061,9 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
 
         private Book MapLocRecord(JObject record)
         {
-            var idUrl = (string)record["id"];
+            // loc.gov returns several of these fields either as a string or as an array
+            // (image_url is a list of URLs), so read them with GetFirstString.
+            var idUrl = GetFirstString(record["id"]);
             var uri = SafeLocUri(idUrl);
             var author = (record["contributors"] as JArray)?.Values<string>().FirstOrDefault()
                 ?? (record["contributor"] as JArray)?.Values<string>().FirstOrDefault();
@@ -1065,14 +1073,14 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
             return BuildBook(
                 LibraryOfCongress,
                 Encode(uri.ToString()),
-                (string)record["title"],
+                GetFirstString(record["title"]),
                 author,
-                (record["description"] as JArray)?.Values<string>().FirstOrDefault() ?? (string)record["description"],
-                (record["publisher"] as JArray)?.Values<string>().FirstOrDefault(),
+                GetFirstString(record["description"]),
+                GetFirstString(record["publisher"]),
                 language,
-                (string)record["date"],
+                GetFirstString(record["date"]),
                 null,
-                (string)record["image_url"],
+                GetFirstString(record["image_url"]),
                 record["identifiers"] as JArray,
                 uri.ToString(),
                 GetGenreValues(record["subjects"] ?? record["subject"]));
