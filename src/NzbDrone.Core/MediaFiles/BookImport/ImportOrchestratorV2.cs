@@ -120,6 +120,29 @@ namespace NzbDrone.Core.MediaFiles.BookImport
             _configService = configService;
         }
 
+        private const string AlreadyLinkedDifferentBook = "ALREADY_LINKED_DIFFERENT_BOOK";
+        private const string AlreadyLinkedDifferentEdition = "ALREADY_LINKED_DIFFERENT_EDITION";
+
+        /// <summary>
+        /// A scanned file that is already linked to another book, or to another edition of the
+        /// matched book, keeps its link. Returns the reason, or null when destination resolution
+        /// may proceed.
+        /// </summary>
+        private static string GetExistingLinkConflict(Edition trackedEdition, Book canonicalBook, Edition canonicalEdition)
+        {
+            if (trackedEdition == null || canonicalBook == null || canonicalEdition == null)
+            {
+                return null;
+            }
+
+            if (trackedEdition.BookId != canonicalBook.Id)
+            {
+                return AlreadyLinkedDifferentBook;
+            }
+
+            return trackedEdition.Id != canonicalEdition.Id ? AlreadyLinkedDifferentEdition : null;
+        }
+
         public async Task<OrchestratorImportResult> ProcessFilesAsync(
             string path,
             RootFolder rootFolder = null, 
@@ -840,12 +863,27 @@ namespace NzbDrone.Core.MediaFiles.BookImport
                             if (trackedRow != null && trackedRow.EditionId > 0)
                             {
                                 var trackedEdition = _editionService.GetEdition(trackedRow.EditionId);
-                                if (trackedEdition != null && trackedEdition.BookId != canonicalBook.Id)
+                                var existingLinkConflict = GetExistingLinkConflict(trackedEdition, canonicalBook, canonicalEdition);
+                                if (existingLinkConflict != null)
                                 {
-                                    _logger.Warn("[SCAN] File {0} is already linked to BookId={1} but the matcher proposed BookId={2}; keeping the existing link and skipping destination resolution",
-                                        m.File.Path,
-                                        trackedEdition.BookId,
-                                        canonicalBook.Id);
+                                    if (existingLinkConflict == AlreadyLinkedDifferentBook)
+                                    {
+                                        _logger.Warn("[SCAN] File {0} is already linked to BookId={1} but the matcher proposed BookId={2}; keeping the existing link and skipping destination resolution",
+                                            m.File.Path,
+                                            trackedEdition.BookId,
+                                            canonicalBook.Id);
+                                    }
+                                    else
+                                    {
+                                        // Resolving a destination for another edition of the same book can
+                                        // create a "_copy_" book that the apply step then leaves empty.
+                                        _logger.Debug("[SCAN] File {0} is already linked to EditionId={1} on BookId={2} but the matcher proposed EditionId={3}; keeping the existing link and skipping destination resolution",
+                                            m.File.Path,
+                                            trackedEdition.Id,
+                                            canonicalBook.Id,
+                                            canonicalEdition.Id);
+                                    }
+
                                     _ingestQueue.CompleteItemWithResult(
                                         itemRef.Id,
                                         m.File.Path,
@@ -853,7 +891,7 @@ namespace NzbDrone.Core.MediaFiles.BookImport
                                         bookId: trackedEdition.BookId,
                                         authorId: m.AuthorId,
                                         quality: "Unknown",
-                                        errorMessage: "ALREADY_LINKED_DIFFERENT_BOOK",
+                                        errorMessage: existingLinkConflict,
                                         statusError: null);
                                     matchedPaths.Add(m.File.Path);
                                     continue;
