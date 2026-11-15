@@ -54,6 +54,70 @@ namespace Chaptarr.Core.Test.DecisionEngine
         }
 
         [Test]
+        public void should_reject_when_title_names_the_narrator_of_another_edition()
+        {
+            var remoteBook = BuildRemoteBook(title: "Jane.Doe-Some.Book.Michael.Kramer-PoF");
+            AddOtherEdition(remoteBook, "Michael Kramer");
+
+            var decision = CreateSubject().IsSatisfiedBy(remoteBook, new BookSearchCriteria());
+
+            Assert.That(decision.Accepted, Is.False);
+            Assert.That(decision.CanBypass, Is.True);
+            Assert.That(decision.Category, Is.EqualTo("Narrator"));
+            Assert.That(decision.Reason, Does.Contain("Michael Kramer"));
+            Assert.That(decision.Reason, Does.Contain("Roy Dotrice"));
+        }
+
+        [Test]
+        public void should_accept_when_title_names_the_pinned_narrator_too()
+        {
+            var remoteBook = BuildRemoteBook(title: "Jane Doe - Some Book (Roy Dotrice, Michael Kramer) M4B");
+            AddOtherEdition(remoteBook, "Michael Kramer");
+
+            Assert.That(CreateSubject().IsSatisfiedBy(remoteBook, new BookSearchCriteria()).Accepted, Is.True);
+        }
+
+        [Test]
+        public void should_accept_when_title_names_no_narrator_of_this_book()
+        {
+            var remoteBook = BuildRemoteBook(title: "Jane.Doe-Some.Book.Unabridged-PoF");
+            AddOtherEdition(remoteBook, "Michael Kramer");
+
+            Assert.That(CreateSubject().IsSatisfiedBy(remoteBook, new BookSearchCriteria()).Accepted, Is.True);
+        }
+
+        [Test]
+        public void should_not_treat_a_single_word_narrator_of_another_edition_as_evidence()
+        {
+            var remoteBook = BuildRemoteBook(title: "Some Book Unabridged Kramer M4B");
+            AddOtherEdition(remoteBook, "Kramer");
+
+            Assert.That(CreateSubject().IsSatisfiedBy(remoteBook, new BookSearchCriteria()).Accepted, Is.True);
+        }
+
+        [Test]
+        public void should_not_use_other_edition_narrators_when_the_book_is_not_pinned()
+        {
+            var remoteBook = BuildRemoteBook(title: "Jane.Doe-Some.Book.Michael.Kramer-PoF", anyEditionOk: true);
+            AddOtherEdition(remoteBook, "Michael Kramer");
+
+            Assert.That(CreateSubject().IsSatisfiedBy(remoteBook, new BookSearchCriteria()).Accepted, Is.True);
+        }
+
+        private static void AddOtherEdition(RemoteBook remoteBook, string narrator)
+        {
+            remoteBook.Books[0].Editions.Add(new Edition
+            {
+                Id = 9,
+                Title = "Some Book",
+                Monitored = false,
+                IsEbook = false,
+                Narrator = narrator,
+                NarratorNames = new List<string> { narrator }
+            });
+        }
+
+        [Test]
         public void should_accept_when_release_narrator_matches_pinned_narrator()
         {
             var remoteBook = BuildRemoteBook(releaseNarrator: "Roy Dotrice");
