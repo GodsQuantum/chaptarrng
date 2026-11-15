@@ -15,6 +15,7 @@ using NLog;
 using NzbDrone.Common;
 using NzbDrone.Common.Disk;
 using NzbDrone.Common.Extensions;
+using NzbDrone.Common.Instrumentation;
 using NzbDrone.Common.Instrumentation.Extensions;
 using NzbDrone.Core.Books;
 using NzbDrone.Core.Books.Calibre;
@@ -563,7 +564,7 @@ namespace NzbDrone.Core.MediaFiles.BookImport
                             // mismatch instead, as the tracked-download edition gate does, so the files can be
                             // imported onto the requested book (manual import) without a stray "_copy_" row.
                             var mismatchReason = FormatTrackedPinnedEditionMismatch(protectedEdition, firstMismatch.Item.Edition);
-                            _logger.Warn("[MANUAL-EDITION-PROTECTION] {0} (BookId={1}); no copy row created", mismatchReason, book.Id);
+                            _logger.WarnSafe("[MANUAL-EDITION-PROTECTION] {0} (BookId={1}); no copy row created", mismatchReason, book.Id);
                             foreach (var decision in bookDecisions)
                             {
                                 decision.Reject(new Rejection(mismatchReason));
