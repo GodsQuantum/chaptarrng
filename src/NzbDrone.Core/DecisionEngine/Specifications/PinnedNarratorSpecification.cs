@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NLog;
 using NzbDrone.Core.Books;
 using NzbDrone.Core.CustomFormats;
@@ -58,14 +60,24 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
                 return Decision.Accept();
             }
 
+            var pinnedNarrators = targets.SelectMany(target => target).Distinct(System.StringComparer.OrdinalIgnoreCase).ToList();
             var releaseNarrators = GetExplicitReleaseNarrators(subject);
+            if (releaseNarrators.Count == 0)
+            {
+                releaseNarrators = GetOtherEditionNarratorsNamedInTitle(books, release.Title, pinnedNarrators);
+                if (releaseNarrators.Count > 0)
+                {
+                    _logger.Debug("[PINNED_NARRATOR] Release title names the narrator of another edition of this book: {0}",
+                        CleanseLogMessage.Cleanse(string.Join(", ", releaseNarrators)));
+                }
+            }
+
             if (releaseNarrators.Count == 0)
             {
                 _logger.Trace("[PINNED_NARRATOR] No specific narrator found in release metadata, allowing");
                 return Decision.Accept();
             }
 
-            var pinnedNarrators = targets.SelectMany(target => target).Distinct(System.StringComparer.OrdinalIgnoreCase).ToList();
             var everyPinnedNarratorMatches = pinnedNarrators.All(name =>
                 releaseNarrators.Any(narrator => NarratorNameMatcher.IsMatch(narrator, name)));
             var everyReleaseNarratorMatches = releaseNarrators.All(narrator =>
@@ -132,6 +144,48 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
             }
 
             return new List<string>();
+        }
+
+        /// <summary>
+        /// An unlabelled name in a release title is weak evidence in general, but a full name (two or
+        /// more words) that is the narrator of another audiobook edition of the same book is specific:
+        /// "...The.Fellowship.of.the.Ring.Rob.Inglis-PoF" for a book pinned to Andy Serkis. Returns those
+        /// names, or nothing when the title also names a pinned narrator.
+        /// </summary>
+        private static List<string> GetOtherEditionNarratorsNamedInTitle(IEnumerable<Book> books, string title, List<string> pinnedNarrators)
+        {
+            var normalizedTitle = $" {NormalizeForNameSearch(title)} ";
+            if (normalizedTitle.Trim().Length == 0 ||
+                pinnedNarrators.Any(name => TitleContainsFullName(normalizedTitle, name)))
+            {
+                return new List<string>();
+            }
+
+            return books
+                .Where(book => book?.Editions != null)
+                .SelectMany(book => book.Editions)
+                .Where(PreferredNarratorMatcher.IsAudiobookEdition)
+                .SelectMany(edition => ReleaseNarratorEvidenceExtractor.ExtractNames(edition.NarratorNames, edition.Narrator).Names)
+                .Where(IsSpecificNarratorName)
+                .Where(name => !pinnedNarrators.Any(pinned => NarratorNameMatcher.IsMatch(name, pinned)))
+                .Where(name => TitleContainsFullName(normalizedTitle, name))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        private static bool TitleContainsFullName(string normalizedTitle, string name)
+        {
+            var normalizedName = NormalizeForNameSearch(name);
+            return normalizedName.Contains(' ') &&
+                   normalizedTitle.Contains($" {normalizedName} ", StringComparison.Ordinal);
+        }
+
+        // Scene titles separate words with dots, dashes or underscores ("Rob.Inglis-PoF").
+        private static string NormalizeForNameSearch(string text)
+        {
+            return string.IsNullOrWhiteSpace(text)
+                ? string.Empty
+                : Regex.Replace(text.ToLowerInvariant(), @"[^\p{L}\p{N}]+", " ").Trim();
         }
 
         private static bool IsSpecificNarratorName(string name)
