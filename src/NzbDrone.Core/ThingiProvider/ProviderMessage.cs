@@ -7,6 +7,10 @@ namespace NzbDrone.Core.ThingiProvider
         public string MessageId { get; set; }
         public object MessageParameters { get; set; }
 
+        public ProviderMessage()
+        {
+        }
+
         public ProviderMessage(string message, ProviderMessageType type)
         {
             Message = message;
