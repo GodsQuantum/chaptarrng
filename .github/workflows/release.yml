@@ -27,7 +27,7 @@ on:
         required: true
         type: string
       runtime_packs_run_id:
-        description: Optional successful trusted release run with unchanged runtime-pack inputs
+        description: Optional successful trusted standalone validation run with unchanged runtime-pack inputs
         required: false
         default: ''
         type: string

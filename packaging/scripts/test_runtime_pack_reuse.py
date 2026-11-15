@@ -55,16 +55,10 @@ class RuntimePackReuseTest(unittest.TestCase):
         self.assertEqual(result['sourceCommit'], 'source-sha')
         self.assertEqual(len(result['producerInputBlobs']), 3)
 
-    def test_matching_release_producer_records_original_identity(self):
+    def test_rejects_release_workflow_run_as_unapproved_producer(self):
         self.responses['actions/runs/123']['path'] = '.github/workflows/release.yml'
         self.responses['actions/runs/123/jobs?per_page=100']['jobs'][0]['name'] = 'Build Linux x86 and FreeBSD .NET 10 runtime packs'
-        result = self.run_verifier()
-        self.assertEqual(result['artifactId'], 42)
-        self.assertEqual(result['sourceCommit'], 'source-sha')
-
-    def test_rejects_wrong_release_producer_name(self):
-        self.responses['actions/runs/123']['path'] = '.github/workflows/release.yml'
-        with self.assertRaisesRegex(SystemExit, 'successfully'):
+        with self.assertRaisesRegex(SystemExit, 'trusted main'):
             self.run_verifier()
 
     def test_rejects_untrusted_or_different_workflow_sources(self):
