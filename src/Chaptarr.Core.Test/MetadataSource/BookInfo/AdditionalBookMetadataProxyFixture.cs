@@ -171,6 +171,66 @@ namespace Chaptarr.Core.Test.MetadataSource.BookInfo
         }
 
         [Test]
+        public void library_of_congress_search_should_read_fields_returned_as_arrays()
+        {
+            var cachedResponse = new CachedResponseStub(_ => new JObject
+            {
+                ["results"] = new JArray
+                {
+                    new JObject
+                    {
+                        ["id"] = "https://www.loc.gov/item/2001012345/",
+                        ["title"] = "A Fixture Book",
+                        ["contributors"] = new JArray("A Fixture Author"),
+                        ["date"] = "2001",
+                        ["image_url"] = new JArray("https://tile.loc.gov/image-services/fixture-1.jpg", "https://tile.loc.gov/image-services/fixture-2.jpg"),
+                        ["language"] = new JArray("english")
+                    },
+                    new JObject
+                    {
+                        ["id"] = new JArray("https://www.loc.gov/item/2001012346/"),
+                        ["title"] = new JArray("A Second Fixture Book"),
+                        ["contributors"] = new JArray("A Fixture Author"),
+                        ["date"] = new JArray("2002")
+                    }
+                }
+            }.ToString());
+            var proxy = CreateProxy(CreateConfig(), cachedResponse);
+
+            var results = proxy.SearchProvider("fixture query", "loc");
+
+            Assert.That(results.Select(x => x.Title), Is.EquivalentTo(new[] { "A Fixture Book", "A Second Fixture Book" }));
+        }
+
+        [Test]
+        public void library_of_congress_search_should_skip_only_a_malformed_record()
+        {
+            var cachedResponse = new CachedResponseStub(_ => new JObject
+            {
+                ["results"] = new JArray
+                {
+                    new JObject
+                    {
+                        ["id"] = "https://www.loc.gov/item/2001012345/",
+                        ["title"] = "A Malformed Record",
+                        ["contributors"] = new JArray(new JObject { ["name"] = "Not a string" })
+                    },
+                    new JObject
+                    {
+                        ["id"] = "https://www.loc.gov/item/2001012346/",
+                        ["title"] = "A Fixture Book",
+                        ["contributors"] = new JArray("A Fixture Author")
+                    }
+                }
+            }.ToString());
+            var proxy = CreateProxy(CreateConfig(), cachedResponse);
+
+            var results = proxy.SearchProvider("fixture query", "loc");
+
+            Assert.That(results.Select(x => x.Title), Is.EqualTo(new[] { "A Fixture Book" }));
+        }
+
+        [Test]
         public void metadata_publisher_preference_should_require_an_exact_isbn_match()
         {
             var config = CreateConfig();
