@@ -147,7 +147,10 @@ namespace Chaptarr.Api.V1.History
 
             if (downloadId.IsNotNullOrWhiteSpace())
             {
-                pagingSpec.FilterExpressions.Add(h => h.DownloadId == downloadId);
+                // History stores download ids upper-cased (HistoryService.NormalizeDownloadId), while
+                // download clients and the queue can report them in lower case.
+                var normalizedDownloadId = downloadId.Trim().ToUpperInvariant();
+                pagingSpec.FilterExpressions.Add(h => h.DownloadId == normalizedDownloadId);
             }
 
             var history = pagingSpec.ApplyToPage(spec => _historyService.Paged(spec, parsedMediaType), h => MapToResource(h, includeAuthor, includeBook));
