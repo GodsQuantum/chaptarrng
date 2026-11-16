@@ -121,9 +121,13 @@ namespace NzbDrone.Core.Indexers.DirectDownload
                 throw new DirectDownloadProbeException($"FlareSolverr returned HTTP {(int)response.StatusCode} {response.StatusCode}.");
             }
 
+            var responseBytes = response.ResponseData ?? buffer.ToArray();
+            var responseText = response.ResponseData == null
+                ? HttpHeader.GetEncodingFromContentType(response.Headers.ContentType).GetString(responseBytes)
+                : response.Content;
             try
             {
-                using var document = JsonDocument.Parse(response.Content);
+                using var document = JsonDocument.Parse(responseText);
                 var root = document.RootElement;
                 if (!root.TryGetProperty("status", out var status) || !string.Equals(status.GetString(), "ok", StringComparison.OrdinalIgnoreCase) ||
                     !root.TryGetProperty("solution", out var solution) ||
