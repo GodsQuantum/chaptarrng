@@ -774,6 +774,7 @@ jobs:
           ${{ runner.temp }}/standalone-handoff/evidence/**
           ${{ runner.temp }}/standalone-handoff/kernel-release.txt
           ${{ runner.temp }}/standalone-handoff/x86-fixture-provenance.txt
+        include-hidden-files: true
         retention-days: 30
         if-no-files-found: warn
 
