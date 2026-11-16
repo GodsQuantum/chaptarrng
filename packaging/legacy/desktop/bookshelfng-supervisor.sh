@@ -89,6 +89,20 @@ preview_migration() {
     run_utility -preview-bookshelf-migration "-data=$data_dir"
   fi
 }
+preview_migration_with_diagnostics() {
+  preview_log=$(mktemp "$data_dir/.chaptarrng-bookshelfng-preview.XXXXXX") || {
+    echo 'Could not create a private BookshelfNG migration preview diagnostic file.' >&2
+    return 1
+  }
+  chmod 0600 "$preview_log"
+  if preview_migration >"$preview_log" 2>&1; then
+    rm -f "$preview_log"
+    return 0
+  fi
+
+  echo "BookshelfNG migration preview diagnostics were retained at: $preview_log" >&2
+  return 1
+}
 state_file="$data_dir/.chaptarrng-bookshelfng-desktop-handoff"
 metadata_dir="$data_dir/.chaptarrng-bookshelfng-desktop-handoff-data"
 lock_dir="$data_dir/.chaptarrng-bookshelfng-desktop.lock"
@@ -214,7 +228,7 @@ restore_source_database() {
   fi
 
   select_sqlite_source
-  if preview_migration >/dev/null 2>&1; then
+  if preview_migration_with_diagnostics; then
     # The atomic converter left both BookshelfNG source databases untouched.
     return 0
   fi
@@ -460,7 +474,7 @@ if command -v setsid >/dev/null 2>&1 && setsid --help 2>&1 | grep -q -- '--wait'
 fi
 
 if [ "$resuming" != true ]; then
-  if ! preview_migration >/dev/null 2>&1; then
+  if ! preview_migration_with_diagnostics; then
     write_state intervention-required
     echo 'BookshelfNG migration preflight failed. The source database was not changed; inspect the ChaptarrNG migration journal before retrying.' >&2
     exit 1

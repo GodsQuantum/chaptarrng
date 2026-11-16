@@ -61,8 +61,11 @@ SH
   cat > "$app_dir/Chaptarr.Console" <<'SH'
 #!/bin/sh
 printf '%s\n' "$*" >> "$DESKTOP_CONSOLE_CALLS"
-case "$1" in
-  -preview-bookshelf-migration) exit 1 ;;
+case "$2" in
+  -preview-bookshelf-migration)
+    echo 'synthetic preview diagnostic' >&2
+    exit 1
+    ;;
   *) exit 2 ;;
 esac
 SH
@@ -102,6 +105,11 @@ SH
   test "$(cat "$state_file")" = intervention-required
   test "$(sha256sum "$data_dir/readarr.db" | cut -d' ' -f1)" = "$database_hash"
   grep -Fq 'BookshelfNG migration preflight failed' "$test_root/desktop-yes.log"
+  preview_log="$(find "$data_dir" -maxdepth 1 -type f -name '.chaptarrng-bookshelfng-preview.*' -print -quit)"
+  test -n "$preview_log"
+  test "$(stat -c '%a' "$preview_log")" = 600
+  grep -Fq 'synthetic preview diagnostic' "$preview_log"
+  grep -Fq "BookshelfNG migration preview diagnostics were retained at: $preview_log" "$test_root/desktop-yes.log"
 }
 
 check_deferred_container_stops_promptly() {

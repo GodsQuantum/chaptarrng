@@ -682,7 +682,11 @@ def save_evidence(work: Path, output: Path, predecessor: Path, candidate: Path,
         relative = path.relative_to(work)
         if relative.parts[0] in {"candidate", "predecessor"} or path.is_symlink() or not path.is_file():
             continue
-        if path.suffix not in {".log", ".json"} and not path.name.startswith("readarr.db"):
+        is_handoff_journal = ".chaptarrng-bookshelfng-journal" in relative.parts
+        is_handoff_state = relative.name == ".chaptarrng-bookshelfng-desktop-handoff"
+        is_preview_diagnostic = relative.name.startswith(".chaptarrng-bookshelfng-preview.")
+        if (path.suffix not in {".log", ".json"} and not path.name.startswith("readarr.db") and
+                not is_handoff_journal and not is_handoff_state and not is_preview_diagnostic):
             continue
         destination = output / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
