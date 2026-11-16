@@ -1,13 +1,15 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 import Alert from 'Components/Alert';
 import FieldSet from 'Components/FieldSet';
 import Form from 'Components/Form/Form';
 import FormGroup from 'Components/Form/FormGroup';
 import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
+import Button from 'Components/Link/Button';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import { inputTypes, kinds } from 'Helpers/Props';
+import HardcoverApiKeyModal from 'System/Quickstart/HardcoverApiKeyModal';
 import translate from 'Utilities/String/translate';
 
 const writeAudioTagOptions = [
@@ -120,8 +122,12 @@ function MetadataProvider(props) {
     hasSettings,
     onInputChange
   } = props;
+  const [isHardcoverModalOpen, setIsHardcoverModalOpen] = useState(false);
+  const [hasSavedHardcoverAuth, setHasSavedHardcoverAuth] = useState(false);
 
   const sourcesFromEnvironment = settings.sourcesFromEnvironment?.value;
+  const hasHardcoverAuth = settings.hasHardcoverAuth?.value || hasSavedHardcoverAuth;
+  const hardcoverAuthFromEnvironment = settings.hardcoverAuthFromEnvironment?.value;
   const googleBooksKeyFromEnvironment = settings.googleBooksApiKeyFromEnvironment?.value;
   const europeanaKeyFromEnvironment = settings.europeanaApiKeyFromEnvironment?.value;
   const apifyActorFromEnvironment = settings.apifyGoodreadsActorFromEnvironment?.value;
@@ -218,17 +224,38 @@ function MetadataProvider(props) {
               </p>
 
               {metadataCatalogSources.map((source) => (
-                <FormGroup key={source.name}>
-                  <FormLabel>{translate(source.label)}</FormLabel>
-                  <FormInputGroup
-                    type={inputTypes.CHECK}
-                    name={source.name}
-                    helpText={translate(source.help)}
-                    onChange={onInputChange}
-                    {...settings[source.name]}
-                    isDisabled={sourcesFromEnvironment}
-                  />
-                </FormGroup>
+                <React.Fragment key={source.name}>
+                  <FormGroup>
+                    <FormLabel>{translate(source.label)}</FormLabel>
+                    <FormInputGroup
+                      type={inputTypes.CHECK}
+                      name={source.name}
+                      helpText={translate(source.help)}
+                      onChange={onInputChange}
+                      {...settings[source.name]}
+                      isDisabled={sourcesFromEnvironment}
+                    />
+                  </FormGroup>
+
+                  {source.id === 'hardcover' && (
+                    <FormGroup>
+                      <FormLabel>{translate('ApiKey')}</FormLabel>
+                      <Button
+                        kind={kinds.DEFAULT}
+                        onPress={() => setIsHardcoverModalOpen(true)}
+                        isDisabled={hardcoverAuthFromEnvironment}
+                      >
+                        {translate(hasHardcoverAuth ? 'ConfigureHardcoverApi' : 'ConnectHardcover')}
+                      </Button>
+                      {hardcoverAuthFromEnvironment && (
+                        <p className="helpText">{environmentOverrideHelpText}</p>
+                      )}
+                      {!hardcoverAuthFromEnvironment && hasHardcoverAuth && (
+                        <p className="helpText">{translate('MetadataProviderKeySaved')}</p>
+                      )}
+                    </FormGroup>
+                  )}
+                </React.Fragment>
               ))}
 
               <FormGroup>
@@ -406,6 +433,12 @@ function MetadataProvider(props) {
             </FieldSet>
           </Form>
       }
+
+      <HardcoverApiKeyModal
+        isOpen={isHardcoverModalOpen}
+        onModalClose={() => setIsHardcoverModalOpen(false)}
+        onConnectionSuccess={() => setHasSavedHardcoverAuth(true)}
+      />
     </div>
 
   );

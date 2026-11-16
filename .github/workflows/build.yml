@@ -438,6 +438,7 @@ jobs:
         frontend/src/Bookshelf/BookshelfFooter.test.cjs
         frontend/src/Components/Form/ProfileSelectInputConnectors.test.cjs
         frontend/src/Settings/MediaManagement/MediaManagement.test.cjs
+        frontend/src/Settings/Metadata/MetadataProvider/MetadataProvider.test.cjs
         frontend/src/Settings/MediaManagement/RootFolder/RootFolders.test.cjs
         frontend/src/Store/Actions/createBookMonitoringFailureAction.test.cjs
         frontend/src/System/Updates/UpdateChanges.test.cjs
