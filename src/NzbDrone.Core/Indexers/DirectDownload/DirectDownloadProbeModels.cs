@@ -118,13 +118,26 @@ namespace NzbDrone.Core.Indexers.DirectDownload
     public sealed class DirectDownloadProbeException : Exception
     {
         public DirectDownloadProbeException(string message)
-            : base(message)
+            : this(message, null, true)
         {
         }
 
         public DirectDownloadProbeException(string message, Exception innerException)
-            : base(message, innerException)
+            : this(message, innerException, true)
         {
         }
+
+        public DirectDownloadProbeException(string message, bool isSourceFailure)
+            : this(message, null, isSourceFailure)
+        {
+        }
+
+        private DirectDownloadProbeException(string message, Exception innerException, bool isSourceFailure)
+            : base(message, innerException)
+        {
+            IsSourceFailure = isSourceFailure;
+        }
+
+        public bool IsSourceFailure { get; }
     }
 }

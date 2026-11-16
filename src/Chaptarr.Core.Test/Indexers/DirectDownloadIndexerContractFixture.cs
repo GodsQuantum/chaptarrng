@@ -10,8 +10,11 @@ using Chaptarr.Http.ClientSchema;
 using NUnit.Framework;
 using NzbDrone.Core.Localization;
 using NzbDrone.Core.Books;
+using NzbDrone.Core.Indexers;
 using NzbDrone.Core.IndexerSearch.Definitions;
 using NzbDrone.Core.Indexers.DirectDownload;
+using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.ThingiProvider.Status;
 
 namespace Chaptarr.Core.Test.Indexers
 {
@@ -19,6 +22,34 @@ namespace Chaptarr.Core.Test.Indexers
     [NonParallelizable]
     public class DirectDownloadIndexerContractFixture
     {
+        private sealed class RecordingIndexerStatusService : IIndexerStatusService
+        {
+            public int FailureCount { get; private set; }
+            public int SuccessCount { get; private set; }
+
+            public List<IndexerStatus> GetBlockedProviders() => new();
+
+            public void RecordSuccess(int providerId)
+            {
+                SuccessCount++;
+            }
+
+            public void RecordFailure(int providerId, TimeSpan minimumBackOff = default)
+            {
+                FailureCount++;
+            }
+
+            public void RecordConnectionFailure(int providerId)
+            {
+            }
+
+            public ReleaseInfo GetLastRssSyncReleaseInfo(int indexerId) => null;
+
+            public void UpdateRssSyncStatus(int indexerId, ReleaseInfo releaseInfo)
+            {
+            }
+        }
+
         private sealed class TestLocalizationService : ILocalizationService
         {
             private readonly Dictionary<string, string> _english;
@@ -172,6 +203,84 @@ namespace Chaptarr.Core.Test.Indexers
             Assert.That(releases.Single().IndexerId, Is.EqualTo(41));
             Assert.That(releases.Single().Indexer, Is.EqualTo("Direct Download Test"));
             Assert.That(transport.RequestedUrls.Any(url => url.Contains("q=9780441172719", StringComparison.Ordinal)), Is.True);
+        }
+
+        [TestCase(System.Net.HttpStatusCode.NotFound)]
+        [TestCase(System.Net.HttpStatusCode.Forbidden)]
+        public async Task should_record_source_http_failures_in_indexer_status(System.Net.HttpStatusCode statusCode)
+        {
+            var transport = new DirectDownloadTestHttp();
+            transport.AddRoute(
+                url => url.StartsWith("https://203.0.113.30/search", StringComparison.Ordinal),
+                request => Task.FromResult(DirectDownloadSourceProbeFixtureSupport.BuildResponse(
+                    request, statusCode, "source error", "text/plain; charset=utf-8")));
+            transport.AddRoute(
+                url => url.StartsWith("https://203.0.113.30/index.php", StringComparison.Ordinal),
+                request => Task.FromResult(DirectDownloadSourceProbeFixtureSupport.BuildResponse(
+                    request, statusCode, "source error", "text/plain; charset=utf-8")));
+            var statusService = new RecordingIndexerStatusService();
+            var probeService = new DirectDownloadSourceProbeService(transport.CreateClient(), NLog.LogManager.GetCurrentClassLogger());
+            var provider = new DirectDownloadIndexer(statusService, null, null, NLog.LogManager.GetCurrentClassLogger(), probeService)
+            {
+                Definition = new NzbDrone.Core.Indexers.IndexerDefinition
+                {
+                    Id = 42,
+                    Name = "Direct Download Test",
+                    Settings = new DirectDownloadSettings
+                    {
+                        Urls = "https://203.0.113.30",
+                        EnableSlowFallback = true
+                    }
+                }
+            };
+
+            var releases = await provider.Fetch(new BookSearchCriteria
+            {
+                Author = new Author { Name = "Frank Herbert" },
+                Books = new List<Book> { new() { MediaType = BookMediaType.Ebook } },
+                BookTitle = "Dune",
+                BookIsbn = "978-0-441-17271-9"
+            });
+
+            Assert.That(releases, Is.Empty);
+            Assert.That(statusService.FailureCount, Is.EqualTo(1));
+            Assert.That(statusService.SuccessCount, Is.Zero);
+        }
+
+        [Test]
+        public async Task should_not_record_empty_search_results_as_indexer_failures()
+        {
+            var transport = new DirectDownloadTestHttp();
+            transport.AddRoute(
+                _ => true,
+                request => Task.FromResult(DirectDownloadSourceProbeFixtureSupport.BuildResponse(
+                    request, System.Net.HttpStatusCode.OK, string.Empty, "text/html; charset=utf-8")));
+            var statusService = new RecordingIndexerStatusService();
+            var probeService = new DirectDownloadSourceProbeService(transport.CreateClient(), NLog.LogManager.GetCurrentClassLogger());
+            var provider = new DirectDownloadIndexer(statusService, null, null, NLog.LogManager.GetCurrentClassLogger(), probeService)
+            {
+                Definition = new NzbDrone.Core.Indexers.IndexerDefinition
+                {
+                    Id = 42,
+                    Name = "Direct Download Test",
+                    Settings = new DirectDownloadSettings
+                    {
+                        Urls = "https://203.0.113.30",
+                        EnableSlowFallback = true
+                    }
+                }
+            };
+
+            var releases = await provider.Fetch(new BookSearchCriteria
+            {
+                Author = new Author { Name = "Frank Herbert" },
+                Books = new List<Book> { new() { MediaType = BookMediaType.Ebook } },
+                BookTitle = "Dune"
+            });
+
+            Assert.That(releases, Is.Empty);
+            Assert.That(statusService.FailureCount, Is.Zero);
+            Assert.That(statusService.SuccessCount, Is.EqualTo(1));
         }
 
         [Test]

@@ -106,7 +106,9 @@ namespace NzbDrone.Core.Indexers.DirectDownload
                 }
             }
 
-            throw new DirectDownloadProbeException(failures.Length == 0 ? "No safe direct-download sources succeeded." : failures.ToString().Trim());
+            throw new DirectDownloadProbeException(
+                failures.Length == 0 ? "No safe direct-download sources succeeded." : failures.ToString().Trim(),
+                failures.Length > 0);
         }
 
         private IEnumerable<DirectDownloadSourceFamily> GetOrderedFamilies(string sourceUrl)

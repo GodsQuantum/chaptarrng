@@ -171,11 +171,34 @@ namespace NzbDrone.Core.Indexers.DirectDownload
             try
             {
                 var result = await _probeService.ProbeAsync(request);
+                if (_indexerStatusService != null && Definition?.Id > 0)
+                {
+                    _indexerStatusService.RecordSuccess(Definition.Id);
+                }
+
                 return CleanupReleases(result.Releases).ToList();
             }
             catch (DirectDownloadProbeException ex)
             {
-                _logger?.Debug(ex, "Direct download probe returned no releases for {0}", Definition?.Name ?? Name);
+                if (ex.IsSourceFailure)
+                {
+                    if (_indexerStatusService != null && Definition?.Id > 0)
+                    {
+                        _indexerStatusService.RecordFailure(Definition.Id);
+                    }
+
+                    _logger?.Warn(ex, "Direct download source search failed for {0}", Definition?.Name ?? Name);
+                }
+                else
+                {
+                    if (_indexerStatusService != null && Definition?.Id > 0)
+                    {
+                        _indexerStatusService.RecordSuccess(Definition.Id);
+                    }
+
+                    _logger?.Debug(ex, "Direct download probe returned no releases for {0}", Definition?.Name ?? Name);
+                }
+
                 return Array.Empty<ReleaseInfo>();
             }
         }

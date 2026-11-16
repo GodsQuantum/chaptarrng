@@ -50,6 +50,12 @@ namespace NzbDrone.Core.Indexers.DirectDownload
                         continue;
                     }
 
+                    if ((int)response.StatusCode >= (int)HttpStatusCode.BadRequest)
+                    {
+                        throw new DirectDownloadProbeException(
+                            $"Source '{CleanseLogMessage.Cleanse(currentUri.AbsoluteUri)}' returned HTTP {(int)response.StatusCode} {response.StatusCode}.");
+                    }
+
                     var responseBytes = response.ResponseData ?? buffer.ToArray();
                     var responseText = response.ResponseData == null
                         ? HttpHeader.GetEncodingFromContentType(response.Headers.ContentType).GetString(responseBytes)
