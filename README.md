@@ -758,8 +758,10 @@ Direct Download is an optional, built-in ebook indexer and download client. It d
 
 1. Add the **Direct Download** indexer.
 2. Enter one absolute `http://` or `https://` URL per line in **URLs**.
-3. Enter an **API Key** when the source supports fast downloads, or enable **Enable Slow-Download Browser Fallback** when you need browser-assisted links. At least one download method is required.
-4. Save the indexer and select the **Direct Download** client for it.
+3. If a source uses a different search path, optionally enter one search URL template per line. Use `catalog|URL` or `mirror|URL` and put `{query}` where the encoded search term belongs, for example `catalog|https://your-source.example/custom/search?q={query}`. The template must use the same origin as one of the URLs above, must not contain credentials, and its results must use the selected supported layout. The standard `/search` and `/index.php` paths remain the defaults when no matching template is configured.
+4. If a source uses browser verification, optionally enter its FlareSolverr `/v1` endpoint. Chaptarr tries the source directly first and uses FlareSolverr after HTTP 403/503 or a recognized challenge page. Run FlareSolverr yourself and connect it on a trusted network; this does not guarantee that every challenge can be solved.
+5. Enter an **API Key** when the source supports fast downloads, or enable **Enable Slow-Download Browser Fallback** when you need browser-assisted links. At least one download method is required.
+6. Save the indexer and select the **Direct Download** client for it.
 
 Blank lines are ignored. Duplicate URLs are removed case-insensitively, and trailing slashes are normalized. The first occurrence remains in the configured order. Chaptarr never reorders the list or stores probe health as part of the settings. The provider Test action validates the URL list and, when an API key is configured, checks it against the first source without requesting a real file. A successful Test does not search for a book or prove that a title is available.
 
@@ -791,6 +793,8 @@ for the behavior and safety limits.
 During an ebook search, Chaptarr checks the configured URLs from top to bottom. It prefers the book ISBN when one is available, then falls back to the monitored edition title. A URL is selected only after it returns a supported response with usable ebook results. Chaptarr moves to the next URL when the current one is unsafe, unavailable, times out, returns an unsupported response, or produces no usable result. It stops after the first successful URL and does not probe later entries for that search.
 
 Each request has a bounded timeout and response-size limit. Redirects are followed only after every destination passes the same URL safety checks, and redirect chains are bounded. Catalog searches request EPUB, KEPUB, MOBI, AZW3, and PDF results; mirror sources can provide other importer-supported ebook types. Search results carry the normalized title, format, size, ISBN when available, and a direct download URL. A search fails with an actionable error when every configured URL fails or returns no usable result.
+
+Custom templates change only the search URL; the corresponding catalog or mirror parser still expects its supported result layout. When FlareSolverr is configured, detected browser-verification challenges and HTTP 403/503 responses are retried through that service. Other anti-bot challenges remain source failures.
 
 #### Ebook-only limitation
 

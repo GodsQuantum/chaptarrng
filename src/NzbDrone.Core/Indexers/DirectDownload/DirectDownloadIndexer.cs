@@ -219,6 +219,8 @@ namespace NzbDrone.Core.Indexers.DirectDownload
             return new DirectDownloadProbeRequest
             {
                 SourceUrls = sourceUrls,
+                SearchUrlTemplates = DirectDownloadSettings.NormalizeSearchUrlTemplates(settings.SearchUrlTemplates),
+                FlareSolverrUrl = settings.FlareSolverrUrl,
                 ApiKey = settings.ApiKey,
                 Author = author,
                 Title = title,

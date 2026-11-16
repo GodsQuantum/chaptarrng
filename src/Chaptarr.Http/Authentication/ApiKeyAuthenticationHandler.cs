@@ -129,7 +129,8 @@ namespace Chaptarr.Http.Authentication
             {
                 if (!await SeerrApiKeyAccessPolicy.IsAllowedAsync(Request))
                 {
-                    return AuthenticateResult.Fail("The SeerrNG service credential cannot access this endpoint.");
+                    var path = Request.PathBase.Add(Request.Path).Value ?? "/";
+                    return AuthenticateResult.Fail($"The SeerrNG service credential cannot access {Request.Method} {path}.");
                 }
 
                 return CreateSuccess("seerrng");

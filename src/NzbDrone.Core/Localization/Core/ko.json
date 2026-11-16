@@ -4163,5 +4163,9 @@
   "ui.task.processPendingImports": "대기 중인 가져오기 처리",
   "ui.task.refreshMonitoredDownloads": "모니터링 중인 다운로드 새로 고침",
   "ui.task.refreshMyAnonaMouseAccountStatus": "My Anona Mouse 계정 상태 새로 고침",
-  "ui.task.repairAuthorMediaCovers": "저자 표지 이미지 복구"
+  "ui.task.repairAuthorMediaCovers": "저자 표지 이미지 복구",
+  "provider.field.f1345270f389d": "Search URL templates",
+  "provider.field.f58976fe1396bf": "Optional. Add one catalog|URL or mirror|URL template per line. Put {query} where the encoded search term belongs. Each template must use the same origin as a configured URL, and results must match its format. Browser-verification challenges can use the optional FlareSolverr service.",
+  "provider.field.fe9b8363486b09": "FlareSolverr URL",
+  "provider.field.f49b40e588f3d5": "Optional FlareSolverr /v1 endpoint. Direct requests run first; 403/503 responses and detected browser challenges are retried through this service."
 }

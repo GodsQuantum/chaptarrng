@@ -23,12 +23,14 @@ namespace NzbDrone.Core.Indexers.DirectDownload
             _reader = reader;
         }
 
-        internal async Task<DirectDownloadAdapterResult> SearchAsync(Uri baseUri, DirectDownloadProbeRequest request)
+        internal async Task<DirectDownloadAdapterResult> SearchAsync(Uri baseUri, DirectDownloadProbeRequest request, DirectDownloadSearchUrlTemplate searchUrlTemplate = null)
         {
             var supported = false;
             foreach (var searchTerm in DirectDownloadSearchTerms.Build(request))
             {
-                var searchUri = new Uri(baseUri, $"index.php?req={HttpUtility.UrlEncode(searchTerm)}&columns[]=t&objects[]=f&topics[]=l");
+                var searchUri = searchUrlTemplate == null
+                    ? new Uri(baseUri, $"index.php?req={HttpUtility.UrlEncode(searchTerm)}&columns[]=t&objects[]=f&topics[]=l")
+                    : searchUrlTemplate.BuildUri(baseUri, searchTerm, request.RequestTimeout);
                 var response = await _reader.GetAsync(searchUri, request);
                 if (response.Content.IndexOf("<table", StringComparison.OrdinalIgnoreCase) < 0)
                 {

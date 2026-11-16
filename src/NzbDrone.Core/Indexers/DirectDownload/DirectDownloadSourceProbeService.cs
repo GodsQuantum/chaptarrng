@@ -13,7 +13,7 @@ namespace NzbDrone.Core.Indexers.DirectDownload
     {
         private readonly Logger _logger;
         private readonly DirectDownloadSourceRuntimeCache _runtimeCache;
-        private readonly Dictionary<DirectDownloadSourceFamily, Func<Uri, DirectDownloadProbeRequest, Task<DirectDownloadAdapterResult>>> _adapters;
+        private readonly Dictionary<DirectDownloadSourceFamily, Func<Uri, DirectDownloadProbeRequest, DirectDownloadSearchUrlTemplate, Task<DirectDownloadAdapterResult>>> _adapters;
 
         public DirectDownloadSourceProbeService(IHttpClient httpClient, Logger logger)
             : this(httpClient, logger, new DirectDownloadSourceRuntimeCache())
@@ -29,7 +29,7 @@ namespace NzbDrone.Core.Indexers.DirectDownload
             var catalogAdapter = new DirectDownloadCatalogAdapter(reader);
             var mirrorAdapter = new DirectDownloadMirrorAdapter(reader);
 
-            _adapters = new Dictionary<DirectDownloadSourceFamily, Func<Uri, DirectDownloadProbeRequest, Task<DirectDownloadAdapterResult>>>
+            _adapters = new Dictionary<DirectDownloadSourceFamily, Func<Uri, DirectDownloadProbeRequest, DirectDownloadSearchUrlTemplate, Task<DirectDownloadAdapterResult>>>
             {
                 [DirectDownloadSourceFamily.CatalogPage] = catalogAdapter.SearchAsync,
                 [DirectDownloadSourceFamily.MirrorIndex] = mirrorAdapter.SearchAsync
@@ -49,6 +49,8 @@ namespace NzbDrone.Core.Indexers.DirectDownload
             }
 
             var failures = new StringBuilder();
+            var configuredTemplates = DirectDownloadSearchUrlTemplate.Parse(
+                string.Join("\n", request.SearchUrlTemplates ?? Array.Empty<string>()));
             foreach (var rawUrl in request.SourceUrls.Where(url => !string.IsNullOrWhiteSpace(url)))
             {
                 Uri baseUri;
@@ -62,20 +64,24 @@ namespace NzbDrone.Core.Indexers.DirectDownload
                     continue;
                 }
 
+                var matchingTemplates = configuredTemplates.Where(template => template.MatchesSource(baseUri)).ToList();
+                var endpointPlans = matchingTemplates.Count > 0
+                    ? matchingTemplates.Select(template => (Family: template.Family, Template: template))
+                    : GetOrderedFamilies(baseUri.AbsoluteUri).Select(family => (Family: family, Template: (DirectDownloadSearchUrlTemplate)null));
                 var attemptedFamily = false;
-                foreach (var family in GetOrderedFamilies(baseUri.AbsoluteUri))
+                foreach (var endpointPlan in endpointPlans)
                 {
                     attemptedFamily = true;
 
                     try
                     {
-                        var result = await _adapters[family](baseUri, request);
+                        var result = await _adapters[endpointPlan.Family](baseUri, request, endpointPlan.Template);
                         if (!result.Supported)
                         {
                             continue;
                         }
 
-                        _runtimeCache.Set(baseUri.AbsoluteUri, family);
+                        _runtimeCache.Set(baseUri.AbsoluteUri, endpointPlan.Family);
                         if (result.Releases.Count == 0)
                         {
                             continue;
@@ -84,7 +90,7 @@ namespace NzbDrone.Core.Indexers.DirectDownload
                         return new DirectDownloadProbeResult
                         {
                             SelectedSourceUrl = baseUri.AbsoluteUri,
-                            SelectedFamily = family,
+                            SelectedFamily = endpointPlan.Family,
                             Releases = result.Releases
                         };
                     }

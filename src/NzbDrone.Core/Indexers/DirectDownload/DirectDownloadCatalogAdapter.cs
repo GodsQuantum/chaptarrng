@@ -29,12 +29,14 @@ namespace NzbDrone.Core.Indexers.DirectDownload
             _reader = reader;
         }
 
-        internal async Task<DirectDownloadAdapterResult> SearchAsync(Uri baseUri, DirectDownloadProbeRequest request)
+        internal async Task<DirectDownloadAdapterResult> SearchAsync(Uri baseUri, DirectDownloadProbeRequest request, DirectDownloadSearchUrlTemplate searchUrlTemplate = null)
         {
             var supported = false;
             foreach (var searchTerm in DirectDownloadSearchTerms.Build(request))
             {
-                var searchUri = new Uri(baseUri, $"search?q={HttpUtility.UrlEncode(searchTerm)}&ext=epub,kepub,mobi,azw3,pdf&lang=en,de");
+                var searchUri = searchUrlTemplate == null
+                    ? new Uri(baseUri, $"search?q={HttpUtility.UrlEncode(searchTerm)}&ext=epub,kepub,mobi,azw3,pdf&lang=en,de")
+                    : searchUrlTemplate.BuildUri(baseUri, searchTerm, request.RequestTimeout);
                 var response = await _reader.GetAsync(searchUri, request);
                 var unwrapped = UnwrapHtmlComments(response.Content);
                 var matches = ResultRegex.Matches(unwrapped);

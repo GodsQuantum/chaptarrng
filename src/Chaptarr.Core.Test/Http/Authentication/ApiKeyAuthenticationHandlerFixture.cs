@@ -100,6 +100,22 @@ namespace Chaptarr.Core.Test.Http.Authentication
         }
 
         [Test]
+        public async Task should_identify_denied_seerr_endpoint_without_logging_query_values()
+        {
+            var context = new DefaultHttpContext();
+            context.Request.Method = "GET";
+            context.Request.PathBase = "/chaptarr";
+            context.Request.Path = "/api/v1/system/health";
+            context.Request.QueryString = new QueryString("?apikey=chaptarr-seerr-key&token=private-value");
+
+            var result = await Authenticate(context, "API", "apikey", new AuthOptions(), "chaptarr-seerr-key");
+
+            Assert.That(result.Succeeded, Is.False);
+            Assert.That(result.Failure?.Message, Is.EqualTo("The SeerrNG service credential cannot access GET /chaptarr/api/v1/system/health."));
+            Assert.That(result.Failure?.Message, Does.Not.Contain("private-value"));
+        }
+
+        [Test]
         public async Task should_not_fall_back_to_legacy_seerr_key_when_chaptarr_key_is_explicitly_empty()
         {
             Environment.SetEnvironmentVariable("BOOKSHELF_SEERRNG_API_KEY", "legacy-seerr-key");

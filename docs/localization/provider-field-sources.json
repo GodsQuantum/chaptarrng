@@ -51,7 +51,7 @@
         },
         {
           "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 90,
+          "line": 116,
           "kind": "Label",
           "sourceLine": "[FieldDefinition(1, Label = \"ApiKey\", Privacy = PrivacyLevel.ApiKey, HelpText = \"provider.field.f80cf5c07c14e\")]",
           "sourceLineSha256": "ab8917d5bd18b2e074d01583baa2fc5f46d82d46eae12550bc5c9c6d36c2d9fc"
@@ -985,7 +985,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 97,
+          "line": 123,
           "kind": "HelpText",
           "sourceLine": "[FieldDefinition(2, Label = \"provider.field.fcff0d77f9e68\", Type = FieldType.Checkbox, HelpText = \"provider.field.f0a31411d36c6\")]",
           "sourceLineSha256": "9d03c924c5b791dfd32d30de1b356635d619e143ff8f21d5004a5f1916533bf7"
@@ -1378,7 +1378,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 80,
+          "line": 106,
           "kind": "Label",
           "sourceLine": "[FieldDefinition(0, Type = FieldType.TextArea, Label = \"provider.field.f1240054e2040\", HelpText = \"provider.field.f5c8c10dd48e0\")]",
           "sourceLineSha256": "0ce024db03547268cccac1112031d6af31eb25b7e0912ea53a9523ccc0afd01c"
@@ -1419,6 +1419,21 @@
       "protectedLiterals": [
         "http://[host]:[port]/[urlBase]/rpc,"
       ]
+    },
+    {
+      "id": "provider.field.f1345270f389d",
+      "source": "Search URL templates",
+      "sourceFingerprint": "fa591eb601a22a301bf9153b7c2952db8ef31f4c8eb443c1c6a5efe840bc610c",
+      "callsites": [
+        {
+          "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
+          "line": 126,
+          "kind": "Label",
+          "sourceLine": "[FieldDefinition(3, Type = FieldType.TextArea, Label = \"provider.field.f1345270f389d\", HelpText = \"provider.field.f58976fe1396bf\")]",
+          "sourceLineSha256": "55686bdc82774d141eb114098c95607254cc7e5427f4dbed73869fbdfc3d69fe"
+        }
+      ],
+      "protectedLiterals": []
     },
     {
       "id": "provider.field.f14f23b87f76a",
@@ -3199,7 +3214,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 80,
+          "line": 106,
           "kind": "HelpText",
           "sourceLine": "[FieldDefinition(0, Type = FieldType.TextArea, Label = \"provider.field.f1240054e2040\", HelpText = \"provider.field.f5c8c10dd48e0\")]",
           "sourceLineSha256": "0ce024db03547268cccac1112031d6af31eb25b7e0912ea53a9523ccc0afd01c"
@@ -3997,7 +4012,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 90,
+          "line": 116,
           "kind": "HelpText",
           "sourceLine": "[FieldDefinition(1, Label = \"ApiKey\", Privacy = PrivacyLevel.ApiKey, HelpText = \"provider.field.f80cf5c07c14e\")]",
           "sourceLineSha256": "ab8917d5bd18b2e074d01583baa2fc5f46d82d46eae12550bc5c9c6d36c2d9fc"
@@ -4948,6 +4963,23 @@
       ],
       "protectedLiterals": [
         "Hardcover"
+      ]
+    },
+    {
+      "id": "provider.field.f58976fe1396bf",
+      "source": "Optional. Add one catalog|URL or mirror|URL template per line. Put {query} where the encoded search term belongs. Each template must use the same origin as a configured URL, and results must match its format. Browser-verification challenges can use the optional FlareSolverr service.",
+      "sourceFingerprint": "7b5759079ec870e96fa033f5d84f56990ad02aa4c542971098c0bae396ad95b3",
+      "callsites": [
+        {
+          "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
+          "line": 126,
+          "kind": "HelpText",
+          "sourceLine": "[FieldDefinition(3, Type = FieldType.TextArea, Label = \"provider.field.f1345270f389d\", HelpText = \"provider.field.f58976fe1396bf\")]",
+          "sourceLineSha256": "55686bdc82774d141eb114098c95607254cc7e5427f4dbed73869fbdfc3d69fe"
+        }
+      ],
+      "protectedLiterals": [
+        "{query}"
       ]
     },
     {
@@ -6591,7 +6623,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 97,
+          "line": 123,
           "kind": "Label",
           "sourceLine": "[FieldDefinition(2, Label = \"provider.field.fcff0d77f9e68\", Type = FieldType.Checkbox, HelpText = \"provider.field.f0a31411d36c6\")]",
           "sourceLineSha256": "9d03c924c5b791dfd32d30de1b356635d619e143ff8f21d5004a5f1916533bf7"
@@ -8161,14 +8193,44 @@
         }
       ],
       "protectedLiterals": []
+    },
+    {
+      "id": "provider.field.fe9b8363486b09",
+      "source": "FlareSolverr URL",
+      "sourceFingerprint": "5afda38f85f70fd074a7f50dd2c7234985b9d2fac857f50c1006fe9244e2de80",
+      "callsites": [
+        {
+          "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
+          "line": 129,
+          "kind": "Label",
+          "sourceLine": "[FieldDefinition(4, Type = FieldType.Textbox, Label = \"provider.field.fe9b8363486b09\", HelpText = \"provider.field.f49b40e588f3d5\")]",
+          "sourceLineSha256": "bf972b77536e3e102fe411220c6b9a0f3cd2aa3183eb5ffab221a42c280c33dd"
+        }
+      ],
+      "protectedLiterals": []
+    },
+    {
+      "id": "provider.field.f49b40e588f3d5",
+      "source": "Optional FlareSolverr /v1 endpoint. Direct requests run first; 403/503 responses and detected browser challenges are retried through this service.",
+      "sourceFingerprint": "88cd4f1054d9dd87d3820649a2f7682304b956912a32a1efd6c168db1d74c974",
+      "callsites": [
+        {
+          "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
+          "line": 129,
+          "kind": "HelpText",
+          "sourceLine": "[FieldDefinition(4, Type = FieldType.Textbox, Label = \"provider.field.fe9b8363486b09\", HelpText = \"provider.field.f49b40e588f3d5\")]",
+          "sourceLineSha256": "bf972b77536e3e102fe411220c6b9a0f3cd2aa3183eb5ffab221a42c280c33dd"
+        }
+      ],
+      "protectedLiterals": []
     }
   ],
   "counts": {
-    "total": 814,
+    "total": 818,
     "existingId": 168,
     "changedFiles": 69,
-    "mappedDistinctSources": 409,
-    "newSourceKeys": 393,
-    "mappedCallsites": 646
+    "mappedDistinctSources": 413,
+    "newSourceKeys": 397,
+    "mappedCallsites": 650
   }
 }

@@ -14,6 +14,10 @@ namespace NzbDrone.Core.Indexers.DirectDownload
     {
         public IReadOnlyList<string> SourceUrls { get; set; } = Array.Empty<string>();
 
+        public IReadOnlyList<string> SearchUrlTemplates { get; set; } = Array.Empty<string>();
+
+        public string FlareSolverrUrl { get; set; }
+
         public string ApiKey { get; set; }
 
         public string Author { get; set; }

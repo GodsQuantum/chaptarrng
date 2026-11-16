@@ -125,6 +125,57 @@ namespace Chaptarr.Core.Test.Indexers
         }
 
         [Test]
+        public void should_accept_custom_search_templates_for_configured_source_origins()
+        {
+            var settings = new DirectDownloadSettings
+            {
+                Urls = "https://203.0.113.18\nhttps://203.0.113.26",
+                SearchUrlTemplates = "catalog|https://203.0.113.18/search?query={query}\nmirror|https://203.0.113.26/library/index.php?req={query}",
+                EnableSlowFallback = true
+            };
+
+            var result = settings.Validate();
+
+            Assert.That(result.IsValid, Is.True, () => string.Join(" | ", result.Errors.Select(error => error.ErrorMessage)));
+            Assert.That(settings.SearchUrlTemplates, Is.EqualTo(
+                "catalog|https://203.0.113.18/search?query={query}\nmirror|https://203.0.113.26/library/index.php?req={query}"));
+        }
+
+        [TestCase("catalog|https://203.0.113.18/search?query=missing-token")]
+        [TestCase("unknown|https://203.0.113.18/search?query={query}")]
+        [TestCase("catalog|https://203.0.113.19/search?query={query}")]
+        [TestCase("mirror|https://user:pass@203.0.113.18/search?query={query}")]
+        [TestCase("catalog|https://203.0.113.18/search?token=private-value&query={query}")]
+        [TestCase("catalog|https://203.0.113.18/search?query={query}&copy={query}")]
+        public void should_reject_invalid_or_untrusted_custom_search_templates(string template)
+        {
+            var settings = new DirectDownloadSettings
+            {
+                Urls = "https://203.0.113.18",
+                SearchUrlTemplates = template,
+                EnableSlowFallback = true
+            };
+
+            Assert.That(settings.Validate().IsValid, Is.False);
+        }
+
+        [TestCase("file:///tmp/flaresolverr")]
+        [TestCase("http://user:pass@flaresolverr:8191/v1")]
+        [TestCase("http://flaresolverr:8191/v1#fragment")]
+        [TestCase("http://flaresolverr:8191/v1?token=secret")]
+        public void should_reject_invalid_flaresolverr_endpoints(string endpoint)
+        {
+            var settings = new DirectDownloadSettings
+            {
+                Urls = "https://203.0.113.18",
+                FlareSolverrUrl = endpoint,
+                EnableSlowFallback = true
+            };
+
+            Assert.That(settings.Validate().IsValid, Is.False);
+        }
+
+        [Test]
         public void should_omit_empty_api_key_from_json_and_preserve_normalized_urls_round_trip()
         {
             var settings = new DirectDownloadSettings

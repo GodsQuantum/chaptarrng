@@ -62,6 +62,32 @@ namespace NzbDrone.Core.Indexers.DirectDownload
                             return;
                         }
                     }
+
+                    foreach (var rawLine in DirectDownloadSettings.NormalizeSearchUrlTemplates(settings.SearchUrlTemplates))
+                    {
+                        if (!DirectDownloadSearchUrlTemplate.TryParse(rawLine, out var template))
+                        {
+                            context.AddFailure("Each custom search URL must use 'catalog|URL' or 'mirror|URL' and contain one {query} token.");
+                            return;
+                        }
+
+                        if (!normalizedUrls.Any(url =>
+                                Uri.TryCreate(url, UriKind.Absolute, out var sourceUri) && template.MatchesSource(sourceUri)))
+                        {
+                            context.AddFailure("Each custom search URL must use the same origin as one configured URL.");
+                            return;
+                        }
+                    }
+
+                    if (!settings.FlareSolverrUrl.IsNullOrWhiteSpace() &&
+                        (!Uri.TryCreate(settings.FlareSolverrUrl.Trim(), UriKind.Absolute, out var flareSolverrUri) ||
+                         (flareSolverrUri.Scheme != Uri.UriSchemeHttp && flareSolverrUri.Scheme != Uri.UriSchemeHttps) ||
+                         !string.IsNullOrEmpty(flareSolverrUri.UserInfo) || !string.IsNullOrEmpty(flareSolverrUri.Fragment) ||
+                         !string.IsNullOrEmpty(flareSolverrUri.Query)))
+                    {
+                        context.AddFailure("FlareSolverr URL must be an absolute http:// or https:// endpoint without credentials, query parameters, or a fragment.");
+                        return;
+                    }
                 });
         }
     }
@@ -97,6 +123,12 @@ namespace NzbDrone.Core.Indexers.DirectDownload
         [FieldDefinition(2, Label = "provider.field.fcff0d77f9e68", Type = FieldType.Checkbox, HelpText = "provider.field.f0a31411d36c6")]
         public bool EnableSlowFallback { get; set; }
 
+        [FieldDefinition(3, Type = FieldType.TextArea, Label = "provider.field.f1345270f389d", HelpText = "provider.field.f58976fe1396bf")]
+        public string SearchUrlTemplates { get; set; }
+
+        [FieldDefinition(4, Type = FieldType.Textbox, Label = "provider.field.fe9b8363486b09", HelpText = "provider.field.f49b40e588f3d5")]
+        public string FlareSolverrUrl { get; set; }
+
         public int? EarlyReleaseLimit { get; set; }
 
         [JsonIgnore]
@@ -110,12 +142,16 @@ namespace NzbDrone.Core.Indexers.DirectDownload
         {
             Urls = _urls;
             ApiKey = _apiKey;
+            SearchUrlTemplates = string.Join("\n", NormalizeSearchUrlTemplates(SearchUrlTemplates));
+            FlareSolverrUrl = NormalizeWhitespace(FlareSolverrUrl);
         }
 
         public NzbDroneValidationResult Validate()
         {
             Urls = _urls;
             ApiKey = _apiKey;
+            SearchUrlTemplates = string.Join("\n", NormalizeSearchUrlTemplates(SearchUrlTemplates));
+            FlareSolverrUrl = NormalizeWhitespace(FlareSolverrUrl);
             return new NzbDroneValidationResult(Validator.Validate(this));
         }
 
@@ -142,6 +178,35 @@ namespace NzbDrone.Core.Indexers.DirectDownload
                 }
 
                 var normalized = trimmed.TrimEnd('/');
+                if (normalized.IsNullOrWhiteSpace())
+                {
+                    continue;
+                }
+
+                if (seen.Add(normalized))
+                {
+                    results.Add(normalized);
+                }
+            }
+
+            return results;
+        }
+
+        public static IReadOnlyList<string> NormalizeSearchUrlTemplates(string templates)
+        {
+            if (templates.IsNullOrWhiteSpace())
+            {
+                return Array.Empty<string>();
+            }
+
+            var results = new List<string>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var rawLine in templates
+                         .Replace("\r\n", "\n", StringComparison.Ordinal)
+                         .Replace('\r', '\n')
+                         .Split('\n'))
+            {
+                var normalized = NormalizeWhitespace(rawLine);
                 if (normalized.IsNullOrWhiteSpace())
                 {
                     continue;

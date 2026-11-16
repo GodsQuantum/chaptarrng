@@ -40,6 +40,105 @@ namespace Chaptarr.Core.Test.Indexers
         }
 
         [Test]
+        public async Task should_use_operator_catalog_search_url_template_instead_of_fixed_path()
+        {
+            const string baseUrl = "https://203.0.113.30";
+            var transport = new DirectDownloadTestHttp();
+            transport.AddRoute(
+                url => url.StartsWith(baseUrl + "/custom/find?term=The+Left+Hand", StringComparison.Ordinal),
+                request => Task.FromResult(DirectDownloadSourceProbeFixtureSupport.BuildResponse(
+                    request,
+                    HttpStatusCode.OK,
+                    "<div><a class=\"js-vim-focus\" href=\"/md5/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\">The Left Hand of Darkness</a><div class=\"text-gray-800 font-semibold\">English · EPUB · 1.2 MB · 1969</div><div class=\"font-mono\">Le Guin - Left Hand.epub</div></div>",
+                    "text/html; charset=utf-8")));
+            var subject = new DirectDownloadSourceProbeService(transport.CreateClient(), LogManager.GetCurrentClassLogger());
+
+            var result = await subject.ProbeAsync(new DirectDownloadProbeRequest
+            {
+                SourceUrls = new[] { baseUrl },
+                SearchUrlTemplates = new[] { "catalog|" + baseUrl + "/custom/find?term={query}" },
+                Author = "Ursula Le Guin",
+                Title = "The Left Hand",
+                RequestTimeout = TimeSpan.FromMilliseconds(50),
+                MaxResponseBytes = 16 * 1024
+            });
+
+            Assert.That(result.SelectedFamily, Is.EqualTo(DirectDownloadSourceFamily.CatalogPage));
+            Assert.That(result.Releases, Has.Count.EqualTo(1));
+            Assert.That(transport.RequestedUrls.Single(), Does.Contain("/custom/find?term=The+Left+Hand"));
+        }
+
+        [Test]
+        public async Task should_retry_browser_challenge_through_configured_flaresolverr()
+        {
+            const string baseUrl = "https://203.0.113.30";
+            const string solverUrl = "http://flaresolverr:8191/v1";
+            const string html = "<div><a class=\"js-vim-focus\" href=\"/md5/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\">The Left Hand of Darkness</a><div class=\"text-gray-800 font-semibold\">English · EPUB · 1.2 MB · 1969</div></div>";
+            var transport = new DirectDownloadTestHttp();
+            transport.AddRoute(
+                url => url.StartsWith(baseUrl + "/search?q=The+Left+Hand", StringComparison.Ordinal),
+                request => Task.FromResult(DirectDownloadSourceProbeFixtureSupport.BuildResponse(request, HttpStatusCode.Forbidden, "DDoS-Guard", "text/html")));
+            transport.AddRoute(
+                url => url == solverUrl,
+                request =>
+                {
+                    Assert.That(request.Method, Is.EqualTo(System.Net.Http.HttpMethod.Post));
+                    Assert.That(System.Text.Encoding.UTF8.GetString(request.ContentData), Does.Contain("request.get"));
+                    using var requestBody = System.Text.Json.JsonDocument.Parse(request.ContentData);
+                    Assert.That(requestBody.RootElement.GetProperty("url").GetString(), Is.EqualTo(baseUrl + "/search?q=The+Left+Hand"));
+                    return Task.FromResult(DirectDownloadSourceProbeFixtureSupport.BuildResponse(
+                        request,
+                        HttpStatusCode.OK,
+                        "{\"status\":\"ok\",\"solution\":{\"status\":200,\"response\":" + System.Text.Json.JsonSerializer.Serialize(html) + "}}",
+                        "application/json"));
+                });
+            var subject = new DirectDownloadSourceProbeService(transport.CreateClient(), LogManager.GetCurrentClassLogger());
+
+            var result = await subject.ProbeAsync(new DirectDownloadProbeRequest
+            {
+                SourceUrls = new[] { baseUrl },
+                SearchUrlTemplates = new[] { "catalog|" + baseUrl + "/search?q={query}" },
+                FlareSolverrUrl = solverUrl,
+                Title = "The Left Hand",
+                RequestTimeout = TimeSpan.FromMilliseconds(50),
+                MaxResponseBytes = 16 * 1024
+            });
+
+            Assert.That(result.Releases, Has.Count.EqualTo(1));
+            Assert.That(transport.RequestedUrls.Count(url => url.StartsWith(solverUrl, StringComparison.Ordinal)), Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task should_use_operator_mirror_search_url_template_and_matching_parser()
+        {
+            const string baseUrl = "https://203.0.113.33";
+            var transport = new DirectDownloadTestHttp();
+            transport.AddRoute(
+                url => url.StartsWith(baseUrl + "/reader/query?title=9780441172719", StringComparison.Ordinal),
+                request => Task.FromResult(DirectDownloadSourceProbeFixtureSupport.BuildResponse(
+                    request,
+                    HttpStatusCode.OK,
+                    "<table></table><table><tr><th>Title</th></tr><tr><td><a href=\"ignored\">x</a><a href=\"book/index.php?md5=1\">Dune</a></td><td>Frank Herbert</td><td>Chilton</td><td>1965</td><td>English</td><td>412</td><td>1 MB</td><td>EPUB</td><td><a href=\"/mirror1\">Mirror 1</a></td></tr></table>",
+                    "text/html; charset=utf-8")));
+            var subject = new DirectDownloadSourceProbeService(transport.CreateClient(), LogManager.GetCurrentClassLogger());
+
+            var result = await subject.ProbeAsync(new DirectDownloadProbeRequest
+            {
+                SourceUrls = new[] { baseUrl },
+                SearchUrlTemplates = new[] { "mirror|" + baseUrl + "/reader/query?title={query}" },
+                Author = "Frank Herbert",
+                Title = "Dune",
+                Isbn = "9780441172719",
+                RequestTimeout = TimeSpan.FromMilliseconds(50),
+                MaxResponseBytes = 16 * 1024
+            });
+
+            Assert.That(result.SelectedFamily, Is.EqualTo(DirectDownloadSourceFamily.MirrorIndex));
+            Assert.That(result.Releases, Has.Count.EqualTo(1));
+            Assert.That(transport.RequestedUrls.Single(), Does.Contain("/reader/query?title=9780441172719"));
+        }
+
+        [Test]
         public async Task should_fail_over_to_secondary_source_after_primary_timeout()
         {
             var transport = new DirectDownloadTestHttp();
