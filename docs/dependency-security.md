@@ -65,6 +65,10 @@ the fork to upstream Picomatch. The scanner exception applies only to that
 alias and exact version in `yarn.lock`. Remove the overrides and scanner
 exception together after validating a compatible upstream fix.
 
+The Docker builders also replace the separate copy bundled inside npm
+12.2.2 with the same verified tarball. Their browser stages inherit that
+installation so installing Chromium cannot restore the bundled copy.
+
 ## Dependency audit — November 13, 2026
 
 The current `yarn.lock` audit reported zero informational, low, moderate, high,

@@ -3,6 +3,7 @@
 ###### node stage ######
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0.404-resolute@sha256:f685dd6b5a970778b53cead9a11cf54206c4b4fc3c97e4424a59b8bff9aa43d7 AS node
 ARG BUILDARCH
+COPY packaging/scripts/patch-npm-picomatch.sh /tmp/patch-npm-picomatch.sh
 RUN set -eux; \
     case "$BUILDARCH" in \
         amd64) node_arch=x64; node_sha=518674de2b621728a5e4486f5fb3b7d2900bb3cc4aa97969edaa463db99f9778; go_arch=amd64; go_sha=7226736c2339719cda28fbf3a54d71aa63bcefe376e98cef00034268dab24840 ;; \
@@ -19,14 +20,15 @@ RUN set -eux; \
     rm /tmp/go.tar.gz; \
     export PATH="/usr/local/go/bin:$PATH"; \
     npm install -g npm@12.2.2 yarn@1.22.22 --force; \
+    bash /tmp/patch-npm-picomatch.sh; \
+    rm /tmp/patch-npm-picomatch.sh; \
     node --version; npm --version; yarn --version; go version
 ENV PATH="/usr/local/go/bin:${PATH}"
 
 ###### browser stage ######
 FROM node AS browser
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-RUN npm install -g npm@12.2.2 --force \
-    && npx --yes playwright@1.64.1 install --no-shell chromium
+RUN npx --yes playwright@1.64.1 install --no-shell chromium
 
 ###### mp4v2 stage ######
 FROM alpine:3.24.4@sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf AS mp4v2
