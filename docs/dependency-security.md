@@ -51,6 +51,20 @@ successful install alone does not establish that every intended override applied
 The production frontend build, all 193 CJS tests, TypeScript checks and focused
 application lint pass against the resolved graph. No minimatch 7–10 remains.
 
+
+## Picomatch ReDoS — November 17, 2026
+
+Both JavaScript lockfiles resolve Picomatch to the integrity-pinned
+`@ryotsu/picomatch@4.0.7-a` fork for
+[CVE-2026-112366](https://github.com/advisories/GHSA-fc5q-39xc-vjpf).
+The package has no runtime dependencies or install scripts. The reviewed
+parser restricts a repeated wildcard branch to a single equivalent match
+or treats it literally if it cannot safely simplify it. The frontend's Yarn
+Classic lockfile describes the dependency by its alias, so Trivy attributes
+the fork to upstream Picomatch. The scanner exception applies only to that
+alias and exact version in `yarn.lock`. Remove the overrides and scanner
+exception together after validating a compatible upstream fix.
+
 ## Dependency audit — November 13, 2026
 
 The current `yarn.lock` audit reported zero informational, low, moderate, high,

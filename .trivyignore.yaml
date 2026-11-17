@@ -1,5 +1,13 @@
-# Narrow, reviewed deployment findings. No vulnerability or secret exceptions.
+# Narrow, reviewed scanner findings. No secret exceptions.
 # The PR gate reads this policy from the trusted base revision, never the PR.
+vulnerabilities:
+  - id: CVE-2026-112366
+    paths:
+      - yarn.lock
+    purls:
+      - pkg:npm/picomatch@4.0.7-a
+    statement: Yarn Classic records the dependency alias as picomatch. Its integrity-pinned tarball is the patched @ryotsu/picomatch 4.0.7-a, whose parser prevents the vulnerable repetition of wildcard branches.
+    expired_at: 2026-12-15
 misconfigurations:
   - id: AVD-DS-0002
     paths:
