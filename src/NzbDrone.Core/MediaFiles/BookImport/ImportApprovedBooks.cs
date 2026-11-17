@@ -573,7 +573,7 @@ namespace NzbDrone.Core.MediaFiles.BookImport
 
                             CleanupConversionWorkFolder(conversionWorkFolder);
                             __bookGroupSw.Stop();
-                            _logger.Debug("[BOOK-TIMING] BookGroup skipped route=tracked-pinned-edition-mismatch title='{0}' elapsed={1}ms", book.Title, __bookGroupSw.ElapsedMilliseconds);
+                            _logger.DebugSafe("[BOOK-TIMING] BookGroup skipped route=tracked-pinned-edition-mismatch title='{0}' elapsed={1}ms", book.Title, __bookGroupSw.ElapsedMilliseconds);
                             continue;
                         }
 

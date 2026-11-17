@@ -22,6 +22,7 @@ using NzbDrone.Core.RootFolders;
 using NzbDrone.Common;
 using NzbDrone.Common.Disk;
 using NzbDrone.Common.Extensions;
+using NzbDrone.Common.Instrumentation;
 using System.IO;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Qualities;
@@ -868,7 +869,7 @@ namespace NzbDrone.Core.MediaFiles.BookImport
                                 {
                                     if (existingLinkConflict == AlreadyLinkedDifferentBook)
                                     {
-                                        _logger.Warn("[SCAN] File {0} is already linked to BookId={1} but the matcher proposed BookId={2}; keeping the existing link and skipping destination resolution",
+                                        _logger.WarnSafe("[SCAN] File {0} is already linked to BookId={1} but the matcher proposed BookId={2}; keeping the existing link and skipping destination resolution",
                                             m.File.Path,
                                             trackedEdition.BookId,
                                             canonicalBook.Id);
@@ -877,7 +878,7 @@ namespace NzbDrone.Core.MediaFiles.BookImport
                                     {
                                         // Resolving a destination for another edition of the same book can
                                         // create a "_copy_" book that the apply step then leaves empty.
-                                        _logger.Debug("[SCAN] File {0} is already linked to EditionId={1} on BookId={2} but the matcher proposed EditionId={3}; keeping the existing link and skipping destination resolution",
+                                        _logger.DebugSafe("[SCAN] File {0} is already linked to EditionId={1} on BookId={2} but the matcher proposed EditionId={3}; keeping the existing link and skipping destination resolution",
                                             m.File.Path,
                                             trackedEdition.Id,
                                             canonicalBook.Id,
