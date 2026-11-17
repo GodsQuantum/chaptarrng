@@ -32,8 +32,8 @@ local bound if the package changes or its callers change, then regenerate
 
 ## .NET cryptography package
 
-The solution centrally pins `System.Security.Cryptography.Pkcs` to `10.0.15`
-in `src/Directory.Packages.props`. That is the current .NET 10 patch for
+The solution centrally pins `System.Security.Cryptography.Pkcs` to `11.0.0`
+in `src/Directory.Packages.props`. That is the current .NET 11 patch for
 [GHSA-846f-f764-76mx](https://github.com/advisories/GHSA-846f-f764-76mx) and
 [GHSA-2fmv-rv2c-59x7](https://github.com/advisories/GHSA-2fmv-rv2c-59x7).
 Keep the central pin current when updating packages that bring Pkcs

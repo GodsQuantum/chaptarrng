@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-FRAMEWORK="net10.0"
+FRAMEWORK="net11.0"
 PLATFORM="${1:-}"
 ARCHITECTURE="${2:-x64}"
 SWAGGER_WAIT_SECONDS="${SWAGGER_WAIT_SECONDS:-45}"

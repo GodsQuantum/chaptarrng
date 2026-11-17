@@ -57,7 +57,7 @@ class RuntimePackReuseTest(unittest.TestCase):
 
     def test_rejects_release_workflow_run_as_unapproved_producer(self):
         self.responses['actions/runs/123']['path'] = '.github/workflows/release.yml'
-        self.responses['actions/runs/123/jobs?per_page=100']['jobs'][0]['name'] = 'Build Linux x86 and FreeBSD .NET 10 runtime packs'
+        self.responses['actions/runs/123/jobs?per_page=100']['jobs'][0]['name'] = 'Build Linux x86 and FreeBSD .NET 11 runtime packs'
         with self.assertRaisesRegex(SystemExit, 'trusted main'):
             self.run_verifier()
 
@@ -104,7 +104,7 @@ class RuntimePackReuseTest(unittest.TestCase):
             self.run_verifier('123;echo injected')
 
     def test_reuses_when_only_pinned_version_preflight_changes(self):
-        common = 'readonly freebsd_vmr_commit="8e0f8ed2312954727f8919d7d1c2f78b483b4ee7"\n'
+        common = 'readonly freebsd_vmr_commit="297acf930fb0f5c07fd4e51d78e521b4ad2e5d1f"\n'
         build = '    dotnet build runtime\n'
         old = (
             common
@@ -130,7 +130,7 @@ class RuntimePackReuseTest(unittest.TestCase):
         )
 
     def test_does_not_reuse_when_runtime_pack_build_commands_change(self):
-        common = 'readonly freebsd_vmr_commit="8e0f8ed2312954727f8919d7d1c2f78b483b4ee7"\n'
+        common = 'readonly freebsd_vmr_commit="297acf930fb0f5c07fd4e51d78e521b4ad2e5d1f"\n'
         preflight = (
             'verify_pinned_freebsd_source_versions() {\n    check_version\n}\n'
             + 'clone_sources() {\n'

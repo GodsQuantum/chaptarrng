@@ -75,7 +75,7 @@ jobs:
       env:
         DOTNET_INSTALL_DIR: ${{ runner.temp }}/dotnet
       with:
-        dotnet-version: 10.0.404
+        dotnet-version: 11.0.100
 
     - name: Build frontend
       run: |

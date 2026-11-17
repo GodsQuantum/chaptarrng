@@ -16,7 +16,7 @@ RUN set -eux; \
     apk del .mp4v2-build-deps; \
     /usr/local/bin/mp4tags --version
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:10.0.15-resolute@sha256:b5e72aa3bc183d98a0fc5739c583201a4b97bdbaadcb9dcd1b69d428a8bd172b AS hardened-tools
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:11.0.0-resolute@sha256:bc0d6653979efba491ab3d6f589d691f96c309c3c3ef81325efa6978e7b7f242 AS hardened-tools
 ARG M4B_TOOL_URL=https://github.com/sandreas/m4b-tool/releases/download/v0.5.2/m4b-tool.phar
 ARG M4B_TOOL_SHA256=a3ea9b81a4e8ce10ecc85c1fc712c982ba2622f2ed0318fb558dadfad4a590fa
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
@@ -28,7 +28,7 @@ RUN M4B_TOOL_URL="$M4B_TOOL_URL" M4B_TOOL_SHA256="$M4B_TOOL_SHA256" bash /tmp/bu
 COPY packaging/scripts/build-hardened-expat-package.sh /tmp/build-hardened-expat-package.sh
 RUN bash /tmp/build-hardened-expat-package.sh && rm /tmp/build-hardened-expat-package.sh
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0.404-resolute@sha256:f685dd6b5a970778b53cead9a11cf54206c4b4fc3c97e4424a59b8bff9aa43d7
+FROM mcr.microsoft.com/dotnet/sdk:11.0.100-resolute@sha256:65f3c7c6a25a239ab3e6719f2896147e7b68242ff2d8818dd70498bde6ef8bea
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
         ca-certificates php-cli php-mbstring php-xml php-json php-curl php-zip \

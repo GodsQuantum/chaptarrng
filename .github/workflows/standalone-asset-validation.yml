@@ -139,13 +139,12 @@ jobs:
         DOTNET_INSTALL_DIR: ${{ runner.temp }}/dotnet
       with:
         dotnet-version: |
-          10.0.115
-          10.0.404
+          11.0.100
 
     - name: Build pinned extra-platform runtime packs
       if: inputs.runtime_packs_run_id == ''
       env:
-        DOTNETVERSION: 10.0.404
+        DOTNETVERSION: 11.0.100
         DOTNET_ROOT: ${{ runner.temp }}/dotnet
         PLATFORM_RUNTIME_WORK_DIR: ${{ runner.temp }}/chaptarrng-platform-runtime-work
         PLATFORM_RUNTIME_PACKS_OUTPUT: ${{ runner.temp }}/chaptarrng-platform-runtime-packs
@@ -177,7 +176,7 @@ jobs:
       env:
         DOTNET_INSTALL_DIR: ${{ runner.temp }}/dotnet
       with:
-        dotnet-version: 10.0.404
+        dotnet-version: 11.0.100
 
     - name: Qualify native x86 delegates, exception collection and nullable validation
       run: |
@@ -257,7 +256,7 @@ jobs:
 
     - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73
       with:
-        dotnet-version: 10.0.404
+        dotnet-version: 11.0.100
 
     # Extra runtime packs must go into an owned copy of the runner-managed SDK.
     - name: Prepare writable .NET SDK root for extra platform packs
@@ -273,7 +272,7 @@ jobs:
       env:
         CUSTOM_RUNTIME_PACKS_DIR: ${{ runner.temp }}/platform-runtime-packs/packages
         DOTNET_ROOT: ${{ runner.temp }}/chaptarrng-dotnet
-        DOTNETVERSION: 10.0.404
+        DOTNETVERSION: 11.0.100
       run: bash packaging/scripts/build-standalone.sh 0.0.0 "${{ matrix.rid }}" "$RUNNER_TEMP/release-assets"
 
     - name: Verify archive and checksum sidecar
@@ -341,7 +340,7 @@ jobs:
 
     - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73
       with:
-        dotnet-version: 10.0.404
+        dotnet-version: 11.0.100
 
     - name: Build standalone application archive
       run: bash packaging/scripts/build-standalone.sh 0.0.0 "${{ matrix.rid }}" "$RUNNER_TEMP/release-assets"

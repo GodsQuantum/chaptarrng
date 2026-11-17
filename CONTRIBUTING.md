@@ -37,7 +37,7 @@ Thanks for your interest in contributing to ChaptarrNG.
 ## Development setup
 
 ### Prerequisites
-- .NET SDK compatible with the repo targets (currently `net10.0`)
+- .NET SDK compatible with the repo targets (currently `net11.0`)
 - Node.js + Yarn (see `package.json` `volta` section for recommended versions)
 - FFmpeg and FFprobe on `PATH` when running or testing ChaptarrNG's native media features
 - Git
@@ -59,7 +59,7 @@ yarn build
 dotnet build src/Chaptarr.sln -c Release
 
 # Run (development output)
-dotnet _output/net10.0/Chaptarr.dll
+dotnet _output/net11.0/Chaptarr.dll
 ```
 
 If you prefer `dotnet publish`:

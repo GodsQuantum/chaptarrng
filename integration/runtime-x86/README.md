@@ -1,6 +1,6 @@
 # Native x86 runtime qualification
 
-The custom .NET 10.0.12 CoreCLR pack must execute this probe before its producer
+The custom .NET 11 CoreCLR pack must execute this probe before its producer
 job succeeds. The archive workflow compiles it with the pinned SDK, then runs it
 in a native 32-bit Debian container with the candidate runtime, no network,
 read-only inputs and no additional capabilities. Direct, compiled and interpreted

@@ -5,7 +5,7 @@
 
 ###### node stage ######
 # Use a pinned Node image instead of curl|bash installers.
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0.404-resolute@sha256:f685dd6b5a970778b53cead9a11cf54206c4b4fc3c97e4424a59b8bff9aa43d7 AS node
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0.100-resolute@sha256:65f3c7c6a25a239ab3e6719f2896147e7b68242ff2d8818dd70498bde6ef8bea AS node
 ARG BUILDARCH
 COPY packaging/scripts/patch-npm-picomatch.sh /tmp/patch-npm-picomatch.sh
 RUN set -eux; \
@@ -63,7 +63,7 @@ RUN set -eux; \
     /usr/local/bin/mp4tags --version
 
 ###### hardened media and sandbox tools stage ######
-FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:10.0.15-resolute@sha256:b5e72aa3bc183d98a0fc5739c583201a4b97bdbaadcb9dcd1b69d428a8bd172b AS hardened-tools
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:11.0.0-resolute@sha256:bc0d6653979efba491ab3d6f589d691f96c309c3c3ef81325efa6978e7b7f242 AS hardened-tools
 ARG M4B_TOOL_URL=https://github.com/sandreas/m4b-tool/releases/download/v0.5.2/m4b-tool.phar
 ARG M4B_TOOL_SHA256=a3ea9b81a4e8ce10ecc85c1fc712c982ba2622f2ed0318fb558dadfad4a590fa
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
@@ -77,7 +77,7 @@ RUN bash /tmp/build-hardened-expat-package.sh && rm /tmp/build-hardened-expat-pa
 
 ###### deps stage ######
 # Always build on the native architecture for speed
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0.404-resolute@sha256:f685dd6b5a970778b53cead9a11cf54206c4b4fc3c97e4424a59b8bff9aa43d7 AS deps
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0.100-resolute@sha256:65f3c7c6a25a239ab3e6719f2896147e7b68242ff2d8818dd70498bde6ef8bea AS deps
 WORKDIR /src
 RUN apt-get update && apt-get upgrade -y && apt-get purge -y wget \
     && rm -f /usr/bin/pebble \
@@ -126,7 +126,7 @@ RUN --mount=type=cache,target=/root/.nuget/packages,sharing=locked \
         *) echo "Unsupported platform: $TARGETPLATFORM" && exit 1 ;; \
     esac; \
     dotnet restore src/Chaptarr.NoTests.sln --locked-mode -m:1; \
-    dotnet publish src/NzbDrone.Console/Chaptarr.Console.csproj -c Release -f net10.0 -r "$RUNTIME_ID" --self-contained false -o /app --no-restore /p:EnableWindowsTargeting=true /p:RunAnalyzersDuringBuild=false /p:RunCodeAnalysis=false /p:PublishSingleFile=false
+    dotnet publish src/NzbDrone.Console/Chaptarr.Console.csproj -c Release -f net11.0 -r "$RUNTIME_ID" --self-contained false -o /app --no-restore /p:EnableWindowsTargeting=true /p:RunAnalyzersDuringBuild=false /p:RunCodeAnalysis=false /p:PublishSingleFile=false
 
 RUN --mount=type=cache,target=/root/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
@@ -137,10 +137,10 @@ RUN mkdir -p /app/UI && cp -r _output/UI/* /app/UI/
 RUN test -s /app/UI/index.html
 
 ###### runtime stage ######
-# Pin the cross-platform runtime to .NET 10.0.15 on the current Ubuntu LTS.
-FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:10.0.15-resolute@sha256:b5e72aa3bc183d98a0fc5739c583201a4b97bdbaadcb9dcd1b69d428a8bd172b AS chaptarrng-standard
-RUN dotnet --list-runtimes | grep -Fq 'Microsoft.NETCore.App 10.0.15' \
-    && dotnet --list-runtimes | grep -Fq 'Microsoft.AspNetCore.App 10.0.15'
+# Pin the cross-platform runtime to .NET 11.0.0 on the current Ubuntu LTS.
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:11.0.0-resolute@sha256:bc0d6653979efba491ab3d6f589d691f96c309c3c3ef81325efa6978e7b7f242 AS chaptarrng-standard
+RUN dotnet --list-runtimes | grep -Fq 'Microsoft.NETCore.App 11.0.0' \
+    && dotnet --list-runtimes | grep -Fq 'Microsoft.AspNetCore.App 11.0.0'
 
 # Copy Playwright Chromium from the browser stage
 COPY --from=browser /ms-playwright /ms-playwright

@@ -11,21 +11,21 @@ from check_dotnet_sdk_pins import docker_sdk_versions
 class DockerSdkPinTests(unittest.TestCase):
     def test_distro_suffix_is_not_part_of_sdk_version(self) -> None:
         text = (
-            "FROM mcr.microsoft.com/dotnet/sdk:10.0.404-resolute"
+            "FROM mcr.microsoft.com/dotnet/sdk:11.0.100-resolute"
             "@sha256:0123456789abcdef AS build"
         )
 
-        self.assertEqual(docker_sdk_versions(text), ["10.0.404"])
+        self.assertEqual(docker_sdk_versions(text), ["11.0.100"])
 
     def test_exact_tag_and_digest_are_parsed(self) -> None:
-        text = "FROM mcr.microsoft.com/dotnet/sdk:10.0.404@sha256:abcdef"
+        text = "FROM mcr.microsoft.com/dotnet/sdk:11.0.100@sha256:abcdef"
 
-        self.assertEqual(docker_sdk_versions(text), ["10.0.404"])
+        self.assertEqual(docker_sdk_versions(text), ["11.0.100"])
 
     def test_extended_numeric_version_is_not_truncated(self) -> None:
-        text = "FROM mcr.microsoft.com/dotnet/sdk:10.0.4040-resolute"
+        text = "FROM mcr.microsoft.com/dotnet/sdk:11.0.1000-resolute"
 
-        self.assertEqual(docker_sdk_versions(text), ["10.0.4040"])
+        self.assertEqual(docker_sdk_versions(text), ["11.0.1000"])
 
 
 if __name__ == "__main__":

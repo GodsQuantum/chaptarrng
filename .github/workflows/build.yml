@@ -457,7 +457,7 @@ jobs:
       env:
         DOTNET_INSTALL_DIR: ${{ runner.temp }}/dotnet
       with:
-        dotnet-version: 10.0.404
+        dotnet-version: 11.0.100
 
     - name: Cache NuGet packages
       # Manual release dispatch can select a branch; do not let those builds write shared cache entries.
@@ -493,7 +493,7 @@ jobs:
       run: |
         docker run --rm --network none \
           --volume "$GITHUB_WORKSPACE:/workspace" \
-          --workdir /workspace/_tests/net10.0 \
+          --workdir /workspace/_tests/net11.0 \
           chaptarrng-m4b-test:ci \
           dotnet vstest Chaptarr.Core.Test.dll \
             --TestCaseFilter:"FullyQualifiedName~real_m4b_tool_should_" \
@@ -503,7 +503,7 @@ jobs:
       if: matrix.platform == 'linux-x64'
       run: >-
         python3 integration/test-m4b-whole-app-recovery.py
-        --candidate-directory _output/net10.0
+        --candidate-directory _output/net11.0
         --candidate-revision "$GITHUB_SHA"
         --image chaptarrng-m4b-test:ci
         --work-dir "${{ runner.temp }}/m4b-whole-app-recovery"
@@ -530,7 +530,7 @@ jobs:
       shell: bash
       run: |
         set -euo pipefail
-        driver=./_tests/net10.0/.playwright
+        driver=./_tests/net11.0/.playwright
         test -x "$driver/node/linux-x64/node"
         test -f "$driver/package/cli.js"
         sudo apt-get update
@@ -592,16 +592,16 @@ jobs:
     - name: Publish non-Windows application
       if: matrix.platform != 'windows-x64'
       run: |
-        dotnet publish src/NzbDrone.Console/Chaptarr.Console.csproj -c Release -f net10.0 -o ./publish/Chaptarr
-        dotnet publish src/NzbDrone.Update/Chaptarr.Update.csproj -c Release -f net10.0 -o ./publish/Chaptarr/Chaptarr.Update
+        dotnet publish src/NzbDrone.Console/Chaptarr.Console.csproj -c Release -f net11.0 -o ./publish/Chaptarr
+        dotnet publish src/NzbDrone.Update/Chaptarr.Update.csproj -c Release -f net11.0 -o ./publish/Chaptarr/Chaptarr.Update
 
     - name: Publish self-contained Windows application and updater
       if: matrix.platform == 'windows-x64'
       shell: pwsh
       run: |
-        dotnet publish src/NzbDrone.Console/Chaptarr.Console.csproj -c Release -f net10.0 -r win-x64 --self-contained true -p:UseAppHost=true -o ./publish/Chaptarr
+        dotnet publish src/NzbDrone.Console/Chaptarr.Console.csproj -c Release -f net11.0 -r win-x64 --self-contained true -p:UseAppHost=true -o ./publish/Chaptarr
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-        dotnet publish src/NzbDrone.Update/Chaptarr.Update.csproj -c Release -f net10.0 -r win-x64 --self-contained true -p:UseAppHost=true -o ./publish/Chaptarr/Chaptarr.Update
+        dotnet publish src/NzbDrone.Update/Chaptarr.Update.csproj -c Release -f net11.0 -r win-x64 --self-contained true -p:UseAppHost=true -o ./publish/Chaptarr/Chaptarr.Update
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     - name: Include and verify frontend in artifact
@@ -877,7 +877,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73
       with:
-        dotnet-version: 10.0.404
+        dotnet-version: 11.0.100
 
     - name: Use the service image for PostgreSQL clients
       run: bash scripts/setup-postgres-test-tools.sh

@@ -5,8 +5,8 @@ the final BookshelfNG archive workflow:
 
 | Runtime identifiers | Runtime pack source |
 | --- | --- |
-| `linux-x64`, `linux-arm64`, `linux-musl-x64`, `linux-musl-arm64`, `osx-x64`, `osx-arm64`, `win-x64`, `win-x86` | .NET 10 SDK 10.0.404 |
-| `linux-x86`, `freebsd-x64` | Pinned .NET 10 runtime packs built by `packaging/scripts/build-extra-platform-runtime-packs.sh` |
+| `linux-x64`, `linux-arm64`, `linux-musl-x64`, `linux-musl-arm64`, `osx-x64`, `osx-arm64`, `win-x64`, `win-x86` | .NET 11 SDK 11.0.100 |
+| `linux-x86`, `freebsd-x64` | Pinned .NET 11 runtime packs built by `packaging/scripts/build-extra-platform-runtime-packs.sh` |
 
 ## Validate without publishing
 
@@ -19,15 +19,15 @@ assets can be considered for a future release.
 
 ## Build the custom runtime packs
 
-The Linux x86 and FreeBSD build uses Docker, .NET SDK `10.0.115` for the runtime
-and ASP.NET source builds, SDK `10.0.404` for ChaptarrNG, and the pinned
-`v10.0.15` runtime and ASP.NET source. FreeBSD packs are built from the .NET VMR
-tag `v10.0.115` at commit
-`8e0f8ed2312954727f8919d7d1c2f78b483b4ee7` in the pinned Azure Linux 3.0
+The Linux x86 and FreeBSD build uses Docker, .NET SDK `11.0.100` for the runtime
+and ASP.NET source builds, SDK `11.0.100` for ChaptarrNG, and the pinned
+`v11.0.0` runtime and ASP.NET source. FreeBSD packs are built from the .NET VMR
+tag `v11.0.100` at commit
+`297acf930fb0f5c07fd4e51d78e521b4ad2e5d1f` in the pinned Azure Linux 3.0
 FreeBSD cross-build image recorded in
 `packaging/scripts/build-extra-platform-runtime-packs.sh`. Before cloning the
 large VMR tree, the script verifies over HTTPS that the immutable pinned commit
-contains .NET and ASP.NET Core 10.0.15 source-version markers. The source build
+contains .NET and ASP.NET Core 11.0.0 source-version markers. The source build
 must then generate the required FreeBSD runtime packages and archive; each
 generated package version and runtime archive is checked before the output is
 assembled. The script does not consume the obsolete `v10.0.113` archive or
@@ -38,7 +38,7 @@ FreeBSD archive. Use two unique, absolute, task-scoped directories that do not
 already exist:
 
 ```sh
-DOTNETVERSION=10.0.404 \
+DOTNETVERSION=11.0.100 \
 PLATFORM_RUNTIME_WORK_DIR=/tmp/chaptarrng-platform-runtime-work-task-id \
 PLATFORM_RUNTIME_PACKS_OUTPUT=/tmp/chaptarrng-platform-runtime-packs-task-id \
 bash packaging/scripts/build-extra-platform-runtime-packs.sh
@@ -53,7 +53,7 @@ their consumers finish.
 The SDK's reference packs can have a newer servicing version than the pinned
 runtime sources. The pack builder copies the SDK's installed reference-pack
 versions, while the Linux x86 and FreeBSD standalone publish explicitly targets
-runtime `10.0.15` to match the custom runtime packages.
+runtime `11.0.0` to match the custom runtime packages.
 
 The runtime-pack installer merges files into the SDK already installed on the
 runner. It preserves file modes and symlinks but deliberately does not restore
@@ -64,13 +64,13 @@ overlapping pack file so the copy path is checked against a preexisting SDK.
 ## Build a standalone archive
 
 Build the frontend first so `_output/UI/index.html` exists. The archive builder
-requires .NET SDK `10.0.404` and an output directory.
+requires .NET SDK `11.0.100` and an output directory.
 For Linux x86 and FreeBSD, download or build the custom runtime-pack artifact,
 then set `CUSTOM_RUNTIME_PACKS_DIR` to its `packages` directory:
 
 ```sh
 CUSTOM_RUNTIME_PACKS_DIR=/path/to/platform-runtime-packs/packages \
-DOTNETVERSION=10.0.404 \
+DOTNETVERSION=11.0.100 \
 bash packaging/scripts/build-standalone.sh 0.0.0 freebsd-x64 /path/to/task-output
 ```
 

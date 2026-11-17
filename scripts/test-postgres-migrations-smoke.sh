@@ -39,7 +39,7 @@ if curl -fsS --max-time 2 "http://127.0.0.1:$port/ping" >/dev/null 2>&1; then
 fi
 
 dotnet run --project src/NzbDrone.Console/Chaptarr.Console.csproj \
-  -c "$configuration" --no-build --no-restore --framework net10.0 -- \
+  -c "$configuration" --no-build --no-restore --framework net11.0 -- \
   /nobrowser "/data=$data_dir" >"$app_log" 2>&1 &
 app_pid=$!
 

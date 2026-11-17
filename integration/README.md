@@ -231,7 +231,7 @@ above and mounts the supplied application directory read-only:
 
 ```sh
 python3 integration/test-m4b-whole-app-recovery.py \
-  --candidate-directory _output/net10.0 \
+  --candidate-directory _output/net11.0 \
   --candidate-revision "$(git rev-parse HEAD)" \
   --image chaptarrng-m4b-test:ci \
   --work-dir /var/tmp/chaptarrng-m4b-full-process-unique
@@ -262,7 +262,7 @@ docker build -f integration/Dockerfile.m4b-test \
   -t chaptarrng-m4b-test:local integration
 docker run --rm --network none \
   --volume "$PWD:/workspace" \
-  --workdir /workspace/_tests/net10.0 \
+  --workdir /workspace/_tests/net11.0 \
   chaptarrng-m4b-test:local \
   dotnet vstest Chaptarr.Core.Test.dll \
     --TestCaseFilter:"FullyQualifiedName~real_m4b_tool_should_"

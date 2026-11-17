@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly runtime_version="10.0.15"
-readonly runtime_sdk="10.0.115"
-readonly aspnet_sdk="10.0.115"
-readonly app_sdk="${DOTNETVERSION:-10.0.404}"
-readonly cross_image="mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net10.0-cross-x86@sha256:ecc9c107cd33f8303cba2280eb1537f045acaa88fc0f00780ea6232d19e942b8"
-readonly freebsd_vmr_tag="v10.0.115"
-readonly freebsd_vmr_commit="8e0f8ed2312954727f8919d7d1c2f78b483b4ee7"
-readonly freebsd_vmr_image="mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net10.0-cross-freebsd-14-amd64@sha256:4ca96ef731e1466924d62d0fb6d2649cfc117bd98faedede5879ba98530e219b"
+readonly runtime_version="11.0.0"
+readonly runtime_sdk="11.0.100"
+readonly aspnet_sdk="11.0.100"
+readonly app_sdk="${DOTNETVERSION:-11.0.100}"
+readonly cross_image="mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-x86@sha256:efd21070248f3e6cd728b069e6708de2a5188162bd3a7e2fe357732f4f78b848"
+readonly freebsd_vmr_tag="v11.0.100"
+readonly freebsd_vmr_commit="297acf930fb0f5c07fd4e51d78e521b4ad2e5d1f"
+readonly freebsd_vmr_image="mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-freebsd-14-amd64@sha256:23c1ac03617c161b81db551669482fa78044627d061af34c2180b9b47b6c8542"
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 work_root="${PLATFORM_RUNTIME_WORK_DIR:?Set PLATFORM_RUNTIME_WORK_DIR to a task-scoped scratch directory}"
@@ -65,7 +65,7 @@ content = path.read_text(encoding="utf-8-sig")
 
 def patch(match):
     block = match.group(0)
-    if 'TargetFramework="net10.0"' not in block:
+    if 'TargetFramework="net11.0"' not in block:
         return block
     include = re.search(r'Include="([^"]+)"', block)
     if not include:
@@ -90,9 +90,9 @@ def patch(match):
 pattern = re.compile(r'<(?:KnownFrameworkReference|KnownAppHostPack)\s+Include="[^"]+"[\s\S]*?/>')
 updated = pattern.sub(patch, content)
 for framework in ("Microsoft.NETCore.App", "Microsoft.AspNetCore.App"):
-    match = re.search(rf'<KnownFrameworkReference\s+Include="{re.escape(framework)}"[\s\S]*?TargetFramework="net10\.0"[\s\S]*?RuntimePackRuntimeIdentifiers="([^"]*)', updated)
+    match = re.search(rf'<KnownFrameworkReference\s+Include="{re.escape(framework)}"[\s\S]*?TargetFramework="net11\.0"[\s\S]*?RuntimePackRuntimeIdentifiers="([^"]*)', updated)
     if not match or not {"linux-x86", "freebsd-x64"}.issubset(set(match.group(1).split(";"))):
-        raise SystemExit(f"SDK metadata is missing custom .NET 10 runtime identifiers for {framework}")
+        raise SystemExit(f"SDK metadata is missing custom .NET 11 runtime identifiers for {framework}")
 path.write_text(updated, encoding="utf-8")
 PY
 }
@@ -121,15 +121,15 @@ build_freebsd_runtime_packs() {
 
     local package
     for package in \
-        runtime/Microsoft.NETCore.App.Host.freebsd-x64.10.0.15.nupkg \
-        runtime/Microsoft.NETCore.App.Runtime.freebsd-x64.10.0.15.nupkg \
-        aspnetcore/Microsoft.AspNetCore.App.Runtime.freebsd-x64.10.0.15.nupkg; do
+        runtime/Microsoft.NETCore.App.Host.freebsd-x64.11.0.0.nupkg \
+        runtime/Microsoft.NETCore.App.Runtime.freebsd-x64.11.0.0.nupkg \
+        aspnetcore/Microsoft.AspNetCore.App.Runtime.freebsd-x64.11.0.0.nupkg; do
         [ -s "$freebsd_vmr_shipping/$package" ] || die "The pinned .NET VMR source build did not produce $package"
     done
 
     local runtime_archive
-    runtime_archive="$(find "$freebsd_vmr_repo/artifacts/assets/Release/Runtime" -type f -name 'dotnet-runtime-10.0.15-freebsd-x64.tar.gz' -print -quit)"
-    [ -n "$runtime_archive" ] && [ -s "$runtime_archive" ] || die "The pinned .NET VMR source build did not produce the FreeBSD .NET 10.0.15 runtime archive"
+    runtime_archive="$(find "$freebsd_vmr_repo/artifacts/assets/Release/Runtime" -type f -name 'dotnet-runtime-11.0.0-freebsd-x64.tar.gz' -print -quit)"
+    [ -n "$runtime_archive" ] && [ -s "$runtime_archive" ] || die "The pinned .NET VMR source build did not produce the FreeBSD .NET 11.0.0 runtime archive"
 }
 
 patch_runtime_sources() {
@@ -398,51 +398,51 @@ collect_platform_artifacts() {
     mkdir -p "$output_root/packages" "$output_root/runtimes" "$output_root/sdk/sdk" "$output_root/sdk/packs"
 
     for package in \
-        Microsoft.NETCore.App.Host.linux-x86.10.0.15.nupkg \
-        Microsoft.NETCore.App.Runtime.linux-x86.10.0.15.nupkg; do
+        Microsoft.NETCore.App.Host.linux-x86.11.0.0.nupkg \
+        Microsoft.NETCore.App.Runtime.linux-x86.11.0.0.nupkg; do
         [ -s "$runtime_shipping/$package" ] || die "The .NET runtime build did not produce $package"
         verify_nupkg_version "$runtime_shipping/$package"
         cp "$runtime_shipping/$package" "$output_root/packages/"
     done
 
     local aspnet_package
-    aspnet_package="$(find "$aspnet_shipping" -maxdepth 1 -type f -name 'Microsoft.AspNetCore.App.Runtime.linux-x86.10.0.15.nupkg' -print -quit)"
+    aspnet_package="$(find "$aspnet_shipping" -maxdepth 1 -type f -name 'Microsoft.AspNetCore.App.Runtime.linux-x86.11.0.0.nupkg' -print -quit)"
     [ -n "$aspnet_package" ] || die "ASP.NET Core did not produce the Linux x86 runtime pack"
     verify_nupkg_version "$aspnet_package"
     cp "$aspnet_package" "$output_root/packages/"
 
-    runtime_archive="$(find "$runtime_shipping" -maxdepth 1 -type f -name 'dotnet-runtime-10.0.15-linux-x86.tar.gz' -print -quit)"
+    runtime_archive="$(find "$runtime_shipping" -maxdepth 1 -type f -name 'dotnet-runtime-11.0.0-linux-x86.tar.gz' -print -quit)"
     [ -n "$runtime_archive" ] && [ -s "$runtime_archive" ] || die "The .NET runtime build did not produce the Linux x86 runtime archive"
     verify_runtime_archive_version "$runtime_archive"
     cp "$runtime_archive" "$output_root/runtimes/linux-x86-runtime.tar.gz"
 
     for package in \
-        "$freebsd_vmr_shipping/runtime/Microsoft.NETCore.App.Host.freebsd-x64.10.0.15.nupkg" \
-        "$freebsd_vmr_shipping/runtime/Microsoft.NETCore.App.Runtime.freebsd-x64.10.0.15.nupkg" \
-        "$freebsd_vmr_shipping/aspnetcore/Microsoft.AspNetCore.App.Runtime.freebsd-x64.10.0.15.nupkg"; do
+        "$freebsd_vmr_shipping/runtime/Microsoft.NETCore.App.Host.freebsd-x64.11.0.0.nupkg" \
+        "$freebsd_vmr_shipping/runtime/Microsoft.NETCore.App.Runtime.freebsd-x64.11.0.0.nupkg" \
+        "$freebsd_vmr_shipping/aspnetcore/Microsoft.AspNetCore.App.Runtime.freebsd-x64.11.0.0.nupkg"; do
         [ -s "$package" ] || die "Pinned .NET VMR build did not produce $(basename "$package")"
         verify_nupkg_version "$package"
         cp "$package" "$output_root/packages/"
     done
-    freebsd_runtime_archive="$(find "$freebsd_vmr_repo/artifacts/assets/Release/Runtime" -type f -name 'dotnet-runtime-10.0.15-freebsd-x64.tar.gz' -print -quit)"
+    freebsd_runtime_archive="$(find "$freebsd_vmr_repo/artifacts/assets/Release/Runtime" -type f -name 'dotnet-runtime-11.0.0-freebsd-x64.tar.gz' -print -quit)"
     [ -n "$freebsd_runtime_archive" ] && [ -s "$freebsd_runtime_archive" ] || die "The pinned .NET VMR build did not produce the FreeBSD .NET $runtime_version runtime archive"
     verify_runtime_archive_version "$freebsd_runtime_archive"
     cp "$freebsd_runtime_archive" "$output_root/runtimes/freebsd-x64-runtime.tar.gz"
 
     for rid in linux-x86 freebsd-x64; do
-        local source_package="$output_root/packages/Microsoft.AspNetCore.App.Runtime.$rid.10.0.15.nupkg"
+        local source_package="$output_root/packages/Microsoft.AspNetCore.App.Runtime.$rid.11.0.0.nupkg"
         local shared_folder="$work_root/aspnet-shared/$rid"
         mkdir -p "$shared_folder"
-        unzip -q -j "$source_package" "runtimes/$rid/lib/net10.0/*" -d "$shared_folder"
+        unzip -q -j "$source_package" "runtimes/$rid/lib/net11.0/*" -d "$shared_folder"
         tar -czf "$output_root/runtimes/$rid-aspnetcore-shared.tar.gz" -C "$shared_folder" .
     done
 
     cp -a "$dotnet_root/sdk/$app_sdk" "$output_root/sdk/sdk/"
     bash "$repo_root/packaging/scripts/copy-dotnet-sdk-reference-packs.sh" \
         "$dotnet_root" "$output_root/sdk/packs"
-    if [ -d "$dotnet_root/sdk-manifests/10.0.400" ]; then
+    if [ -d "$dotnet_root/sdk-manifests/11.0.100" ]; then
         mkdir -p "$output_root/sdk/sdk-manifests"
-        cp -a "$dotnet_root/sdk-manifests/10.0.400" "$output_root/sdk/sdk-manifests/"
+        cp -a "$dotnet_root/sdk-manifests/11.0.100" "$output_root/sdk/sdk-manifests/"
     fi
 
     {

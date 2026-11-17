@@ -6,6 +6,8 @@ history grouped from conventional commits.
 
 ## [Unreleased]
 
+- Build ChaptarrNG and its Windows installer on .NET 11. Standalone archives include the runtime, and Docker builds use the pinned ASP.NET Core 11 image.
+
 - Keep explicitly requested audiobooks and ebooks when the author's metadata profile is None, including pending requests retried after metadata becomes available. [@bthornton191](https://github.com/bthornton191) reported the related stuck-add symptom to Chaptarr in [issue #276](https://github.com/Chaptarr/chaptarr/issues/276). ChaptarrNG independently addressed the local profile-filtering cause.
 
 ## [0.9.1001](https://github.com/snapetech-org/chaptarrng/compare/v0.9.1000..v0.9.1001) - 2026-11-13

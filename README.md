@@ -7,7 +7,7 @@
 A Snapetech-maintained Chaptarr fork for audiobook and eBook libraries.
 
 [![License](https://img.shields.io/github/license/snapetech-org/chaptarrng)](https://github.com/snapetech-org/chaptarrng/blob/main/LICENSE)
-[![.NET 10 LTS](https://img.shields.io/badge/.NET-10%20LTS-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/en-us/platform/support/policy)
+[![.NET 11](https://img.shields.io/badge/.NET-11-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/en-us/platform/support/policy)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/5PyXBfvS6T)
 
 </div>
@@ -568,8 +568,8 @@ for the current release and acceptance gates.
 
 ChaptarrNG is independently maintained and is not affiliated with the Servarr team or the Readarr, Sonarr, Radarr, Lidarr, or Prowlarr projects.
 
-The backend is built on .NET 10 LTS. Docker images include the ASP.NET Core
-runtime, while source builds require the .NET 10 SDK.
+The backend is built on .NET 11. Docker images include the ASP.NET Core
+runtime, while source builds require the .NET 11 SDK.
 
 ### What makes this fork different
 
@@ -833,7 +833,7 @@ in this repository. The `latest` GHCR tag remains available for stable Docker
 installs; the Unraid template follows the validated `main` image.
 
 ## Building from Source
-Building from source requires the .NET 10 SDK, Node.js, and Yarn. When running ChaptarrNG natively, install FFmpeg for your operating system and make sure both `ffmpeg` and `ffprobe` are available on the `PATH` used to start the application. Normal source builds do not bundle them automatically; the ChaptarrNG Docker image already includes them.
+Building from source requires the .NET 11 SDK, Node.js, and Yarn. When running ChaptarrNG natively, install FFmpeg for your operating system and make sure both `ffmpeg` and `ffprobe` are available on the `PATH` used to start the application. Normal source builds do not bundle them automatically; the ChaptarrNG Docker image already includes them.
 
 **Linux / macOS:**
 ```bash
@@ -842,7 +842,7 @@ git clone https://github.com/snapetech-org/chaptarrng.git
 cd chaptarrng
 
 # Build the backend
-dotnet publish src/NzbDrone.Console/Chaptarr.Console.csproj -c Release -f net10.0 -o _output/publish
+dotnet publish src/NzbDrone.Console/Chaptarr.Console.csproj -c Release -f net11.0 -o _output/publish
 
 # Build the frontend
 yarn install
@@ -860,7 +860,7 @@ git clone https://github.com/snapetech-org/chaptarrng.git
 cd chaptarrng
 
 :: Build the backend
-dotnet publish src/NzbDrone.Console/Chaptarr.Console.csproj -c Release -f net10.0 -o _output/publish
+dotnet publish src/NzbDrone.Console/Chaptarr.Console.csproj -c Release -f net11.0 -o _output/publish
 
 :: Build the frontend
 yarn install

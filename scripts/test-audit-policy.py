@@ -57,7 +57,7 @@ class AuditPolicyTests(unittest.TestCase):
             suppression.check(self.base, self.source)
 
     def dependency(self, version="1.0.0", digest="reviewed-hash"):
-        return {"dependencies": {"net10.0": {"Example": {"type": "Direct", "resolved": version, "contentHash": digest}}}}
+        return {"dependencies": {"net11.0": {"Example": {"type": "Direct", "resolved": version, "contentHash": digest}}}}
 
     def lock_fixture(self):
         (self.base / "Example.csproj").write_text("<Project />")
