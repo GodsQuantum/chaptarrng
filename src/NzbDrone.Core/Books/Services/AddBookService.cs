@@ -487,14 +487,14 @@ namespace NzbDrone.Core.Books
             ApplyRequestedEditionToCatalogBook(localBook, requestedEditionProviderIds);
             localBook.SetMonitored(true);
             localBook.Monitored = true;
+            localBook.AddOptions ??= new AddBookOptions();
+            localBook.AddOptions.AddType = BookAddType.Manual;
+            localBook.AddOptions.SearchForNewBook |= searchRequested;
             _bookService.UpdateBook(localBook);
+            _bookService.SetAddOptions(new[] { localBook });
 
             if (searchRequested)
             {
-                localBook.AddOptions ??= new AddBookOptions();
-                localBook.AddOptions.AddType = BookAddType.Manual;
-                localBook.AddOptions.SearchForNewBook = true;
-                _bookService.SetAddOptions(new[] { localBook });
                 _bookAddedService.SearchForRecentlyAdded(author.Id);
             }
 

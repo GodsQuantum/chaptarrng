@@ -792,8 +792,10 @@ namespace Chaptarr.Core.Test.Books
         // Declined community PR #37 substituted the None profile here and the full suite stayed
         // green — the sibling assertions above cannot see a profile swap, because the stub returns
         // every book regardless of profile. These two pin the profile that actually filtered.
-        [Test]
-        public async Task add_author_with_only_this_book_should_keep_siblings_and_the_configured_audiobook_profile()
+        [TestCase(false, false)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        public async Task add_author_with_only_this_book_should_keep_siblings_and_the_configured_audiobook_profile(bool manualAdd, bool restoredRequest)
         {
             var remoteAuthor = new Author
             {
@@ -832,6 +834,8 @@ namespace Chaptarr.Core.Test.Books
             var addedAuthor = await service.AddAuthorAsync("hc:author-1", new MonitoringConfig
             {
                 AuthorName = remoteAuthor.Name,
+                IsManualAddition = manualAdd,
+                RestoreManualWorkRequests = restoredRequest,
                 CreateAudiobook = true,
                 CreateEbook = false,
                 AudiobookQualityProfileId = 2,
@@ -850,6 +854,9 @@ namespace Chaptarr.Core.Test.Books
                 Assert.That(bookService.InsertedBooks, Has.Count.EqualTo(2));
                 Assert.That(bookService.InsertedBooks.Single(b => b.HardcoverBookId == "hc:1001").AudiobookMonitored, Is.True);
                 Assert.That(bookService.InsertedBooks.Single(b => b.HardcoverBookId == "hc:1002").AudiobookMonitored, Is.False);
+                Assert.That(bookService.InsertedBooks.Single(b => b.HardcoverBookId == "hc:1001").AddOptions?.AddType == BookAddType.Manual,
+                    Is.EqualTo(manualAdd || restoredRequest));
+                Assert.That(bookService.InsertedBooks.Single(b => b.HardcoverBookId == "hc:1002").AddOptions?.AddType, Is.Not.EqualTo(BookAddType.Manual));
 
                 // The CONFIGURED profile is what filtered, never a substituted None profile.
                 Assert.That(metadataProfileService.FilterProfileIds, Is.Not.Empty);

@@ -68,6 +68,7 @@ namespace NzbDrone.Core.Books.Services
     {
         // Flag to indicate this is a manual addition from modal (not disc scan)
         public bool IsManualAddition { get; set; } = false;
+        public bool RestoreManualWorkRequests { get; set; }
 
         // Author-side monitoring gates are intentionally separate from the policy for
         // newly discovered catalog rows. The per-side MonitorExistingMode is the
@@ -367,6 +368,7 @@ namespace NzbDrone.Core.Books.Services
             if (config != null)
             {
                 ApplyMonitoringConfig(author, config);
+                MarkExplicitlyRequestedWorks(author, config);
             }
 
             // Feed the full server catalog into the canonical add/refresh normalizer. CreateAudiobook/CreateEbook
@@ -520,6 +522,29 @@ namespace NzbDrone.Core.Books.Services
             finally
             {
                 writeGate?.Release();
+            }
+        }
+
+        private static void MarkExplicitlyRequestedWorks(Author author, MonitoringConfig config)
+        {
+            if (!(config.IsManualAddition || config.RestoreManualWorkRequests) || author.Books?.Any() != true)
+            {
+                return;
+            }
+
+            foreach (var (mediaType, providerIds) in GetRequestedBookProviderIdsByMediaType(config))
+            {
+                foreach (var providerId in providerIds)
+                {
+                    var matches = author.Books.Where(book => book?.MediaType == mediaType &&
+                        BookIdentity.GetStableWorkProviderIdentityTokens(book).Contains(providerId)).Take(2).ToList();
+                    if (matches.Count == 1)
+                    {
+                        // Preserve the user's explicit selection through None-profile filtering and future refreshes.
+                        matches[0].AddOptions ??= new AddBookOptions();
+                        matches[0].AddOptions.AddType = BookAddType.Manual;
+                    }
+                }
             }
         }
 

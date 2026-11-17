@@ -399,6 +399,7 @@ namespace NzbDrone.Core.Books.Commands
             var ebookSearchTargets = DeserializeProviderIds(item.EbookBooksToSearch, nameof(item.EbookBooksToSearch));
             var config = new MonitoringConfig
             {
+                RestoreManualWorkRequests = string.Equals(item.SourceApplication, "UserInterface", StringComparison.OrdinalIgnoreCase),
                 AudiobookMonitored = item.AudiobookMonitored,
                 AudiobookMonitorNewItems = item.AudiobookMonitorNewItems,
                 AudiobookMonitorExistingMode = item.AudiobookMonitorExistingMode,

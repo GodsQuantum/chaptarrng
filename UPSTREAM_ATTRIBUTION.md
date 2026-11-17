@@ -10,6 +10,8 @@ The linked people contributed reports, suggestions, discussions, or code to the 
 
 ## Implemented; final validation pending
 
+- [Issue #276](https://github.com/Chaptarr/chaptarr/issues/276) — [@bthornton191](https://github.com/bthornton191) reported stalled metadata imports to upstream Chaptarr. ChaptarrNG independently addressed a local cause by preserving explicitly requested works through None-profile filtering on initial and pending adds. Upstream catalog availability remains a separate issue.
+
 The historical fork audit recorded implementation evidence but still required final validation.
 
 - [issue #2](https://github.com/Chaptarr/chaptarr/issues/2) — “\[BUG\] error when using unpackerr, something that could be solved in chaptarr?,” opened upstream by [@nmbrg](https://github.com/nmbrg). Historical audit status: **implemented-awaiting-final-validation**.

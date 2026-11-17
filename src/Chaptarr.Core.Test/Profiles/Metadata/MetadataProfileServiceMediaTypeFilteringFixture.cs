@@ -353,6 +353,22 @@ namespace Chaptarr.Core.Test.Profiles.Metadata
         }
 
         [Test]
+        public void none_profile_should_keep_only_the_explicitly_requested_work()
+        {
+            var profile = CreateProfile(id: 1);
+            profile.MinPopularity = MetadataProfileService.NONE_PROFILE_MIN_POPULARITY;
+            var requested = CreateSeriesBook("Requested", "gr:1001", BookMediaType.Audiobook);
+            requested.AddOptions = new AddBookOptions { AddType = BookAddType.Manual };
+            var sibling = CreateSeriesBook("Sibling", "gr:1002", BookMediaType.Audiobook);
+
+            var result = CreateService(profile).FilterBooks(
+                new Author { Books = new List<Book> { requested, sibling } }, profile.Id);
+
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result.Single(), Is.SameAs(requested));
+        }
+
+        [Test]
         public void should_filter_value_equal_remote_pockets_independently()
         {
             var profile = CreateProfile(id: 1);

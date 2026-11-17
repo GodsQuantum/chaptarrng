@@ -561,7 +561,7 @@ namespace NzbDrone.Core.Profiles.Metadata
             // hack for the 'none' metadata profile
             if (p.MinPopularity == NONE_PROFILE_MIN_POPULARITY)
             {
-                return false;
+                return b.AddOptions?.AddType == BookAddType.Manual;
             }
 
             return (b.Ratings.Popularity >= p.MinPopularity) || b.ReleaseDate > DateTime.UtcNow;
