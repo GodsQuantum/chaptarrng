@@ -201,9 +201,10 @@ import zipfile
 root = pathlib.Path(sys.argv[1])
 archive = pathlib.Path(sys.argv[2])
 rid = sys.argv[3]
-with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as output_zip:
+with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as output_zip:
     for path in sorted(root.rglob("*")):
-        if path.name == "libSkiaSharp.pdb":
+        # Preserve the build's symbols for diagnostics without shipping them in the Windows ZIP.
+        if path.is_file() and path.suffix.lower() == ".pdb":
             continue
         output_zip.write(path, path.relative_to(root).as_posix())
 
