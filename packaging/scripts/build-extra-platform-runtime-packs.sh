@@ -364,7 +364,7 @@ build_linux_x86_aspnetcore() {
             "/p:SdkVersion=$aspnet_sdk" \
             "/p:MicrosoftNETCoreAppRefVersion=$runtime_version" \
             /p:RuntimeIdentifier=linux-x86 \
-            /p:StabilizePackageVersion=true \
+            /p:DotNetFinalVersionKind=release \
             /p:CrossgenOutput=false \
             /p:PublishReadyToRun=false
     )
