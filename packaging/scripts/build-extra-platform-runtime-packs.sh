@@ -340,11 +340,6 @@ build_linux_x86_aspnetcore() {
     official_build_id="$(get_official_build_id)"
     (
         cd "$aspnet_repo"
-        npm ci --no-audit --no-fund
-        npm run build
-    )
-    (
-        cd "$aspnet_repo"
         DOTNET_INSTALL_DIR="$dotnet_root" DOTNET_ROOT="$dotnet_root" DOTNET_SDK_VERSION="$aspnet_sdk" \
             DOTNET_MULTILEVEL_LOOKUP=0 PATH="$dotnet_root:$PATH" ./eng/build.sh -c Release --restore --build --no-build-nodejs \
             --projects "$aspnet_repo/eng/tools/RepoTasks/RepoTasks.csproj" \
