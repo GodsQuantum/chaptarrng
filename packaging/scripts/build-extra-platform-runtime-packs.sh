@@ -5,7 +5,6 @@ readonly runtime_version="11.0.0"
 readonly runtime_sdk="11.0.100"
 readonly aspnet_sdk="11.0.100"
 readonly app_sdk="${DOTNETVERSION:-11.0.100}"
-readonly cross_image="mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-x86@sha256:efd21070248f3e6cd728b069e6708de2a5188162bd3a7e2fe357732f4f78b848"
 readonly runtime_source_commit="deae2e32bf0e018e09d64597b7c59b62b73bb3ce"
 readonly aspnet_source_commit="1def4cdc07dc10fc267136060e3ef5c1a96d4a99"
 readonly freebsd_vmr_tag="v11.0.100"
@@ -533,6 +532,9 @@ command -v docker >/dev/null || die "Docker is required to build the Linux x86 r
 command -v python3 >/dev/null || die "Python 3 is required to patch the pinned .NET build metadata"
 command -v npm >/dev/null || die "npm is required to build the ASP.NET Core shared framework assets"
 command -v unzip >/dev/null || die "unzip is required to assemble the ASP.NET shared runtime"
+
+cross_image="$(docker build --load --quiet - < "$repo_root/packaging/scripts/dotnet-linux-x86.Dockerfile")"
+readonly cross_image
 
 verify_pinned_freebsd_source_versions
 
