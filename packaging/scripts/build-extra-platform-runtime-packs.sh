@@ -173,6 +173,17 @@ def add_rid_attributes(content):
     return re.sub(r'<(?:KnownFrameworkReference|KnownAppHostPack)\s+Include="Microsoft\.NETCore\.App"[\s\S]*?/>', update, content)
 
 edit("eng/targetingpacks.targets", add_rid_attributes)
+
+# The SysV C helper returns the allocation context in EAX. The shared
+# Unix x86 allocation stubs consume it in EDX and restore their saved EAX.
+tls_macros = root / "src/coreclr/pal/inc/unixasmmacrosx86.inc"
+tls_source = tls_macros.read_text()
+tls_call = "    call  C_FUNC(GetThreadEEAllocContext)\n    pop   eax"
+if tls_source.count(tls_call) != 1:
+    raise SystemExit("Unrecognized Unix x86 allocation context macro; review the runtime patch")
+tls_macros.write_text(tls_source.replace(tls_call, tls_call.replace(
+    "    pop   eax", "    mov   edx, eax\n    pop   eax"), 1))
+
 # Unix x86 uses ECX/EDX for managed this/return-buffer arguments, matching
 # i386/asmhelpers.asm. The upstream .S worker swaps callee-saved EDI/ESI,
 # corrupting closed static delegates that return structs (including nullable
