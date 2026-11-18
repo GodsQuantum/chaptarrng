@@ -353,7 +353,7 @@ build_linux_x86_runtime() {
         -v "$runtime_repo:/runtime" \
         -w /runtime \
         "$cross_image" \
-        bash -lc "export PATH=/usr/share/dotnet:\$PATH; ./eng/build.sh -ci -c Release -cross -os Linux -arch x86 /m:1 /p:OfficialBuildId=$official_build_id /p:SdkVersion=$runtime_sdk /p:AppHostSourcePath=/runtime/artifacts/obj/linux-x86.Release/apphost/standalone/apphost /p:SelfContained=false /p:UseAppHost=false /p:PublishTrimmed=false /p:UseNativeAotForComponents=false /p:PublishAot=false /p:PublishReadyToRun=false /p:PublishSingleFile=false /p:StabilizePackageVersion=true /p:UseRuntimeAsync=false -subset clr.runtime+clr.jit+clr.hosts+clr.iltools+clr.corelib+libs.native+libs.sfx+libs.oob+host.native+host.pkg+packs.product -pack"
+        bash -c "export PATH=/usr/share/dotnet:\$PATH; ./eng/build.sh -ci -c Release -cross -os Linux -arch x86 /m:1 /p:OfficialBuildId=$official_build_id /p:SdkVersion=$runtime_sdk /p:AppHostSourcePath=/runtime/artifacts/obj/linux-x86.Release/apphost/standalone/apphost /p:SelfContained=false /p:UseAppHost=false /p:PublishTrimmed=false /p:UseNativeAotForComponents=false /p:PublishAot=false /p:PublishReadyToRun=false /p:PublishSingleFile=false /p:StabilizePackageVersion=true /p:UseRuntimeAsync=false -subset clr.runtime+clr.jit+clr.hosts+clr.iltools+clr.corelib+libs.native+libs.sfx+libs.oob+host.native+host.pkg+packs.product -pack"
 }
 
 patch_aspnet_sources() {
@@ -533,7 +533,7 @@ command -v python3 >/dev/null || die "Python 3 is required to patch the pinned .
 command -v npm >/dev/null || die "npm is required to build the ASP.NET Core shared framework assets"
 command -v unzip >/dev/null || die "unzip is required to assemble the ASP.NET shared runtime"
 
-cross_image="$(docker build --load --quiet - < "$repo_root/packaging/scripts/dotnet-linux-x86.Dockerfile")"
+cross_image="$(docker build --build-arg "BUILD_UID=$(id -u)" --load --quiet - < "$repo_root/packaging/scripts/dotnet-linux-x86.Dockerfile")"
 readonly cross_image
 
 verify_pinned_freebsd_source_versions
