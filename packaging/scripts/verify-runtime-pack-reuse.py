@@ -57,6 +57,7 @@ def verify_runtime_pack_reuse(run_id, output, repository):
     current_inputs = {}
     for file in [
         'packaging/scripts/build-extra-platform-runtime-packs.sh',
+        'packaging/scripts/dotnet-linux-x86.Dockerfile',
         'packaging/scripts/copy-dotnet-sdk-reference-packs.sh',
         'packaging/scripts/install-extra-platform-runtime-packs.sh',
     ]:

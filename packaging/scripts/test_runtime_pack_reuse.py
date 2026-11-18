@@ -53,7 +53,7 @@ class RuntimePackReuseTest(unittest.TestCase):
         result = self.run_verifier()
         self.assertEqual(result['artifactId'], 42)
         self.assertEqual(result['sourceCommit'], 'source-sha')
-        self.assertEqual(len(result['producerInputBlobs']), 3)
+        self.assertIn('packaging/scripts/dotnet-linux-x86.Dockerfile', result['producerInputBlobs'])
 
     def test_rejects_release_workflow_run_as_unapproved_producer(self):
         self.responses['actions/runs/123']['path'] = '.github/workflows/release.yml'
