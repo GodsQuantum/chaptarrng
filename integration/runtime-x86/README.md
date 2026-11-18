@@ -56,3 +56,11 @@ frame. The pack builder enables `-mstackrealign` for Linux i386 C and C++
 targets so both CoreCLR and the native libraries handle four-byte-aligned
 managed callers. Keep the installed HTTP health and rollback checks in
 addition to the runtime probe.
+
+The HTTP case binds a loopback port without listening, then verifies that a
+refused connection propagates through the socket handler and its retry callback.
+The runtime-async build terminated during that continuation. The debugger
+showed CoreCLR trying to execute a stack address, which its signal handler
+reported as a stack overflow. The Linux x86 runtime pack uses compiler-generated
+async state machines in the framework libraries while this runtime path remains
+unqualified.

@@ -1,6 +1,8 @@
 using System.Linq.Expressions;
-using System.Runtime.InteropServices;
+using System.Net;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using FluentValidation;
 
 if (RuntimeInformation.ProcessArchitecture != Architecture.X86)
@@ -20,6 +22,20 @@ catch (Exception error)
 {
     Console.Error.WriteLine($"FAIL exception/collection qualification: {error}");
     return 1;
+}
+
+using var unusedPort = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+unusedPort.Bind(new IPEndPoint(IPAddress.Loopback, 0));
+using var client = new HttpClient(new SocketsHttpHandler { UseProxy = false, ConnectCallback = ConnectWithRetry });
+var endpoint = (IPEndPoint)unusedPort.LocalEndPoint!;
+try
+{
+    using var response = await client.GetAsync($"http://{endpoint}/");
+    throw new InvalidOperationException("A socket that was never listening accepted the connection.");
+}
+catch (HttpRequestException error) when (error.InnerException is SocketException { SocketErrorCode: SocketError.ConnectionRefused })
+{
+    Console.WriteLine("PASS async HTTP connection failure propagated to the caller");
 }
 
 var sample = new Sample { Score = 1.5 };
@@ -79,6 +95,33 @@ if (nestedValidator.Validate(new ParentSample { Child = new ChildSample { Ratio 
 
 Console.WriteLine("PASS nested validation: 1,000,000 valid results; negative and missing values rejected");
 return 0;
+
+static async ValueTask<Stream> ConnectWithRetry(SocketsHttpConnectionContext context, CancellationToken cancellationToken)
+{
+    try
+    {
+        return await ConnectSocket(context, cancellationToken).ConfigureAwait(false);
+    }
+    catch (SocketException)
+    {
+        return await ConnectSocket(context, cancellationToken).ConfigureAwait(false);
+    }
+}
+
+static async ValueTask<Stream> ConnectSocket(SocketsHttpConnectionContext context, CancellationToken cancellationToken)
+{
+    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+    try
+    {
+        await socket.ConnectAsync(context.DnsEndPoint, cancellationToken).ConfigureAwait(false);
+        return new NetworkStream(socket, ownsSocket: true);
+    }
+    catch
+    {
+        socket.Dispose();
+        throw;
+    }
+}
 
 static class ExceptionCollectionProbe
 {

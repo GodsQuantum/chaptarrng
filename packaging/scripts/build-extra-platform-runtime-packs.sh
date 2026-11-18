@@ -340,6 +340,9 @@ PY
 }
 
 build_linux_x86_runtime() {
+    # Linux x86 faults while dispatching runtime-async continuations on a
+    # failed socket connection. Compile the libraries with compiler-generated
+    # async state machines on this runtime until the upstream path is corrected.
     local official_build_id
     official_build_id="$(get_official_build_id)"
     docker run --rm --init \
@@ -351,7 +354,7 @@ build_linux_x86_runtime() {
         -v "$runtime_repo:/runtime" \
         -w /runtime \
         "$cross_image" \
-        bash -lc "export PATH=/usr/share/dotnet:\$PATH; ./eng/build.sh -ci -c Release -cross -os Linux -arch x86 /m:1 /p:OfficialBuildId=$official_build_id /p:SdkVersion=$runtime_sdk /p:AppHostSourcePath=/runtime/artifacts/obj/linux-x86.Release/apphost/standalone/apphost /p:SelfContained=false /p:UseAppHost=false /p:PublishTrimmed=false /p:UseNativeAotForComponents=false /p:PublishAot=false /p:PublishReadyToRun=false /p:PublishSingleFile=false /p:StabilizePackageVersion=true -subset clr.runtime+clr.jit+clr.hosts+clr.iltools+clr.corelib+libs.native+libs.sfx+libs.oob+host.native+host.pkg+packs.product -pack"
+        bash -lc "export PATH=/usr/share/dotnet:\$PATH; ./eng/build.sh -ci -c Release -cross -os Linux -arch x86 /m:1 /p:OfficialBuildId=$official_build_id /p:SdkVersion=$runtime_sdk /p:AppHostSourcePath=/runtime/artifacts/obj/linux-x86.Release/apphost/standalone/apphost /p:SelfContained=false /p:UseAppHost=false /p:PublishTrimmed=false /p:UseNativeAotForComponents=false /p:PublishAot=false /p:PublishReadyToRun=false /p:PublishSingleFile=false /p:StabilizePackageVersion=true /p:UseRuntimeAsync=false -subset clr.runtime+clr.jit+clr.hosts+clr.iltools+clr.corelib+libs.native+libs.sfx+libs.oob+host.native+host.pkg+packs.product -pack"
 }
 
 patch_aspnet_sources() {
