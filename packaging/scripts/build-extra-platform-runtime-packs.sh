@@ -340,6 +340,11 @@ build_linux_x86_aspnetcore() {
     official_build_id="$(get_official_build_id)"
     (
         cd "$aspnet_repo"
+        npm ci --no-audit --no-fund
+        npm run build
+    )
+    (
+        cd "$aspnet_repo"
         DOTNET_INSTALL_DIR="$dotnet_root" DOTNET_ROOT="$dotnet_root" DOTNET_SDK_VERSION="$aspnet_sdk" \
             DOTNET_MULTILEVEL_LOOKUP=0 PATH="$dotnet_root:$PATH" ./eng/build.sh -c Release --restore --build --no-build-nodejs \
             --projects "$aspnet_repo/eng/tools/RepoTasks/RepoTasks.csproj" \
@@ -352,6 +357,11 @@ build_linux_x86_aspnetcore() {
     patch_sdk_runtime_ids "$aspnet_sdk" "$dotnet_root"
     (
         cd "$aspnet_repo"
+        # The targeted runtime pack build consumes Blazor assets without building the npm workspaces.
+        npm ci --ignore-scripts --no-audit
+        npm run build
+        test -s src/Components/Web.JS/dist/Release/_framework/blazor.web.js
+        test -s src/Components/Web.JS/dist/Release/_framework/blazor.server.js
         DOTNET_INSTALL_DIR="$dotnet_root" DOTNET_ROOT="$dotnet_root" DOTNET_SDK_VERSION="$aspnet_sdk" \
             DOTNET_MULTILEVEL_LOOKUP=0 PATH="$dotnet_root:$PATH" ./eng/build.sh -c Release -ci -arch x86 -pack \
             --projects "$aspnet_repo/src/Framework/App.Runtime/src/Microsoft.AspNetCore.App.Runtime.sfxproj" /m:1 \
@@ -475,6 +485,7 @@ collect_platform_artifacts() {
 [[ ! -e "$output_root" ]] || die "Task-scoped runtime-pack output path already exists: $output_root"
 command -v docker >/dev/null || die "Docker is required to build the Linux x86 runtime in the pinned cross-build image"
 command -v python3 >/dev/null || die "Python 3 is required to patch the pinned .NET build metadata"
+command -v npm >/dev/null || die "npm is required to build the ASP.NET Core shared framework assets"
 command -v unzip >/dev/null || die "unzip is required to assemble the ASP.NET shared runtime"
 
 verify_pinned_freebsd_source_versions

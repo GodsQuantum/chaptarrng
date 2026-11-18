@@ -1,6 +1,6 @@
 {
   "name": "chaptarrng",
-  "version": "0.9.1017",
+  "version": "0.9.1018",
   "description": "ChaptarrNG, the SeerrNG-maintained Chaptarr fork",
   "scripts": {
     "release-notes:preview": "node scripts/preview-release-notes.mjs",
