@@ -6,6 +6,8 @@ readonly runtime_sdk="11.0.100"
 readonly aspnet_sdk="11.0.100"
 readonly app_sdk="${DOTNETVERSION:-11.0.100}"
 readonly cross_image="mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-x86@sha256:efd21070248f3e6cd728b069e6708de2a5188162bd3a7e2fe357732f4f78b848"
+readonly runtime_source_commit="deae2e32bf0e018e09d64597b7c59b62b73bb3ce"
+readonly aspnet_source_commit="1def4cdc07dc10fc267136060e3ef5c1a96d4a99"
 readonly freebsd_vmr_tag="v11.0.100"
 readonly freebsd_vmr_commit="297acf930fb0f5c07fd4e51d78e521b4ad2e5d1f"
 readonly freebsd_vmr_image="mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-freebsd-14-amd64@sha256:23c1ac03617c161b81db551669482fa78044627d061af34c2180b9b47b6c8542"
@@ -15,8 +17,8 @@ work_root="${PLATFORM_RUNTIME_WORK_DIR:?Set PLATFORM_RUNTIME_WORK_DIR to a task-
 output_root="${PLATFORM_RUNTIME_PACKS_OUTPUT:?Set PLATFORM_RUNTIME_PACKS_OUTPUT to a task-scoped output directory}"
 dotnet_root="${DOTNET_ROOT:-$(dirname "$(readlink -f "$(command -v dotnet)")")}"
 freebsd_vmr_repo="$work_root/dotnet-vmr"
-runtime_repo="$freebsd_vmr_repo/src/runtime"
-aspnet_repo="$freebsd_vmr_repo/src/aspnetcore"
+runtime_repo="$work_root/runtime"
+aspnet_repo="$work_root/aspnetcore"
 freebsd_vmr_shipping="$freebsd_vmr_repo/artifacts/packages/Release/Shipping"
 runtime_shipping="$runtime_repo/artifacts/packages/Release/Shipping"
 aspnet_shipping="$aspnet_repo/artifacts/packages/Release/Shipping"
@@ -97,16 +99,26 @@ path.write_text(updated, encoding="utf-8")
 PY
 }
 
-clone_sources() {
+clone_linux_x86_sources() {
+    # Component tags carry publicly available Arcade SDK pins for standalone builds.
+    git clone --depth 1 --branch "v$runtime_version" https://github.com/dotnet/runtime.git "$runtime_repo"
+    [ "$(git -C "$runtime_repo" rev-parse HEAD)" = "$runtime_source_commit" ] || die "Unexpected .NET runtime source commit"
+
+    git clone --depth 1 --branch "v$runtime_version" --recurse-submodules --shallow-submodules \
+        https://github.com/dotnet/aspnetcore.git "$aspnet_repo"
+    [ "$(git -C "$aspnet_repo" rev-parse HEAD)" = "$aspnet_source_commit" ] || die "Unexpected ASP.NET Core source commit"
+}
+
+clone_freebsd_sources() {
     git clone --depth 1 --branch "$freebsd_vmr_tag" https://github.com/dotnet/dotnet.git "$freebsd_vmr_repo"
     local actual_commit
     actual_commit="$(git -C "$freebsd_vmr_repo" rev-parse HEAD)"
     [ "$actual_commit" = "$freebsd_vmr_commit" ] || die "Pinned .NET VMR tag resolved to unexpected commit $actual_commit"
-    [ -f "$runtime_repo/eng/Versions.props" ] || die "Pinned .NET VMR is missing its runtime source tree"
-    [ -f "$aspnet_repo/eng/Versions.props" ] || die "Pinned .NET VMR is missing its ASP.NET Core source tree"
+    [ -f "$freebsd_vmr_repo/src/runtime/eng/Versions.props" ] || die "Pinned .NET VMR is missing its runtime source tree"
+    [ -f "$freebsd_vmr_repo/src/aspnetcore/eng/Versions.props" ] || die "Pinned .NET VMR is missing its ASP.NET Core source tree"
 
     python3 "$repo_root/packaging/scripts/verify-pinned-dotnet-runtime-versions.py" \
-        "$runtime_version" "$runtime_repo/eng/Versions.props" "$aspnet_repo/eng/Versions.props"
+        "$runtime_version" "$freebsd_vmr_repo/src/runtime/eng/Versions.props" "$freebsd_vmr_repo/src/aspnetcore/eng/Versions.props"
 }
 
 build_freebsd_runtime_packs() {
@@ -288,10 +300,10 @@ build_linux_x86_runtime() {
         -e DOTNET_SDK_VERSION="$runtime_sdk" \
         -e ROOTFS_DIR=/crossrootfs/x86 \
         -v "$dotnet_root:/usr/share/dotnet" \
-        -v "$freebsd_vmr_repo:/vmr" \
-        -w /vmr \
+        -v "$runtime_repo:/runtime" \
+        -w /runtime \
         "$cross_image" \
-        bash -lc "cd /vmr/src/runtime && export PATH=/usr/share/dotnet:\$PATH; ./eng/build.sh -ci -c Release -cross -os Linux -arch x86 /m:1 /p:OfficialBuildId=$official_build_id /p:SdkVersion=$runtime_sdk /p:AppHostSourcePath=/vmr/src/runtime/artifacts/obj/linux-x86.Release/apphost/standalone/apphost /p:SelfContained=false /p:UseAppHost=false /p:PublishTrimmed=false /p:UseNativeAotForComponents=false /p:PublishAot=false /p:PublishReadyToRun=false /p:PublishSingleFile=false /p:StabilizePackageVersion=true -subset clr.runtime+clr.jit+clr.hosts+clr.iltools+clr.corelib+libs.native+libs.sfx+libs.oob+host.native+host.pkg+packs.product -pack"
+        bash -lc "export PATH=/usr/share/dotnet:\$PATH; ./eng/build.sh -ci -c Release -cross -os Linux -arch x86 /m:1 /p:OfficialBuildId=$official_build_id /p:SdkVersion=$runtime_sdk /p:AppHostSourcePath=/runtime/artifacts/obj/linux-x86.Release/apphost/standalone/apphost /p:SelfContained=false /p:UseAppHost=false /p:PublishTrimmed=false /p:UseNativeAotForComponents=false /p:PublishAot=false /p:PublishReadyToRun=false /p:PublishSingleFile=false /p:StabilizePackageVersion=true -subset clr.runtime+clr.jit+clr.hosts+clr.iltools+clr.corelib+libs.native+libs.sfx+libs.oob+host.native+host.pkg+packs.product -pack"
 }
 
 patch_aspnet_sources() {
@@ -470,12 +482,13 @@ mkdir -p "$work_root"
 require_sdk "$runtime_sdk"
 require_sdk "$aspnet_sdk"
 require_sdk "$app_sdk"
-clone_sources
-build_freebsd_runtime_packs
+clone_linux_x86_sources
 patch_sdk_runtime_ids "$runtime_sdk"
 patch_sdk_runtime_ids "$app_sdk"
 patch_runtime_sources
 build_linux_x86_runtime
 patch_aspnet_sources
 build_linux_x86_aspnetcore
+clone_freebsd_sources
+build_freebsd_runtime_packs
 collect_platform_artifacts

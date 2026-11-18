@@ -20,8 +20,9 @@ assets can be considered for a future release.
 ## Build the custom runtime packs
 
 The Linux x86 and FreeBSD build uses Docker, .NET SDK `11.0.100` for the runtime
-and ASP.NET source builds, SDK `11.0.100` for ChaptarrNG, and the pinned
-`v11.0.0` runtime and ASP.NET source. FreeBSD packs are built from the .NET VMR
+and ASP.NET source builds and for ChaptarrNG. Linux x86 uses the pinned .NET and
+ASP.NET Core `v11.0.0` component tags to restore the public Arcade SDK.
+FreeBSD packs are built from the .NET VMR
 tag `v11.0.100` at commit
 `297acf930fb0f5c07fd4e51d78e521b4ad2e5d1f` in the pinned Azure Linux 3.0
 FreeBSD cross-build image recorded in
