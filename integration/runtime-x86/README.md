@@ -46,3 +46,13 @@ Acceptance still requires the source-built runtime pack and the complete native
 x86 installed migration, target health and rollback workflow. Keep the public
 predecessor's separate fresh-log failure and explicit existing auxiliary-database
 fixture visible in the handoff evidence.
+
+The .NET 11 application startup also exercises two native stack-alignment
+boundaries absent from the nullable and collection probe. In a Linux x86
+diagnostic build, CoreCLR's `GenericHandleWorker` faulted on an aligned SSE
+load from its incoming arguments. After realigning QCalls alone,
+`GlobalizationNative_ToAscii` faulted on an aligned SSE store to its stack
+frame. The pack builder enables `-mstackrealign` for Linux i386 C and C++
+targets so both CoreCLR and the native libraries handle four-byte-aligned
+managed callers. Keep the installed HTTP health and rollback checks in
+addition to the runtime probe.

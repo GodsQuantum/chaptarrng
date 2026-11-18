@@ -193,6 +193,19 @@ if pinvoke_source.count(pinvoke_call) != 1:
     raise SystemExit("Unrecognized Unix x86 P/Invoke import thunk")
 pinvoke.write_text(pinvoke_source.replace(pinvoke_call, pinvoke_call + "    add     esp, 4\n", 1))
 
+# Managed transitions on Linux x86 can enter CoreCLR QCalls and native
+# library exports with four-byte alignment. Realign the native stack and
+# avoid aligned loads from incoming arguments on both sides of that boundary.
+compiler = root / "eng/native/configurecompiler.cmake"
+compiler_source = compiler.read_text()
+x86_target = '    set(ARCH_TARGET_NAME x86)\n    set(ARCH_SOURCES_DIR i386)\n'
+if compiler_source.count(x86_target) != 1:
+    raise SystemExit("Unrecognized Linux x86 native compiler configuration")
+compiler.write_text(compiler_source.replace(x86_target, x86_target +
+    '    if (CLR_CMAKE_TARGET_LINUX)\n'
+    '      add_compile_options($<$<COMPILE_LANGUAGE:C,CXX>:-mstackrealign>)\n'
+    '    endif ()\n', 1))
+
 # These QCalls return native MethodDesc pointers. A managed struct return
 # inserts a hidden return-buffer argument on Unix x86, shifting every argument.
 handles = root / "src/coreclr/System.Private.CoreLib/src/System/RuntimeHandles.cs"
