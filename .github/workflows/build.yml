@@ -491,7 +491,7 @@ jobs:
     - name: Test real M4B merge, fallback, and restart recovery
       if: matrix.platform == 'linux-x64'
       run: |
-        docker run --rm --network none \
+        docker run --rm --init --network none \
           --volume "$GITHUB_WORKSPACE:/workspace" \
           --workdir /workspace/_tests/net11.0 \
           chaptarrng-m4b-test:ci \

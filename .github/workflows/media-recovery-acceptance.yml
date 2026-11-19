@@ -44,7 +44,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p media-results
-          docker run --rm --network none --user "$(id -u):$(id -g)" -e HOME=/tmp -e DOTNET_CLI_HOME=/tmp \
+          docker run --rm --init --network none --user "$(id -u):$(id -g)" -e HOME=/tmp -e DOTNET_CLI_HOME=/tmp \
             --cap-drop ALL --security-opt no-new-privileges \
             --pids-limit 1024 --memory 4g --cpus 2 \
             --volume "$GITHUB_WORKSPACE:/workspace" --workdir /workspace/_tests/net11.0 \
