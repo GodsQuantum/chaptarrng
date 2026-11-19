@@ -10,8 +10,11 @@ namespace NzbDrone.Core.Notifications.BookOrbit
         public BookOrbitSettingsValidator()
         {
             RuleFor(c => c.BaseUrl).ValidRootUrl();
-            RuleFor(c => c.Username).NotEmpty();
-            RuleFor(c => c.Password).NotEmpty();
+            When(c => string.IsNullOrWhiteSpace(c.ApiKey), () =>
+            {
+                RuleFor(c => c.Username).NotEmpty();
+                RuleFor(c => c.Password).NotEmpty();
+            });
         }
     }
 
@@ -32,6 +35,9 @@ namespace NzbDrone.Core.Notifications.BookOrbit
 
         [FieldDefinition(2, Label = "Password", Type = FieldType.Password, Privacy = PrivacyLevel.Password, HelpText = "BookOrbitPasswordHelpText")]
         public string Password { get; set; }
+
+        [FieldDefinition(3, Label = "ApiKey", Type = FieldType.Password, Privacy = PrivacyLevel.ApiKey, HelpText = "BookOrbitApiKeyHelpText")]
+        public string ApiKey { get; set; }
 
         public NzbDroneValidationResult Validate()
         {

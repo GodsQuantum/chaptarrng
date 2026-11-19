@@ -2758,6 +2758,7 @@
   "BookNotAddableMissingProviderIdsHelpText": "फ़ॉर्मैट जोड़ने के लिए पुस्तक/कार्य ID और लेखक ID आवश्यक हैं। कैटलॉग का कोई दूसरा परिणाम या स्रोत आज़माएँ।",
   "BookOrbitBaseUrlHelpText": "आपके BookOrbit सर्वर का आधार URL, जैसे http://bookorbit:3000। BookOrbit को अलग से जोड़ें; BookLore के लॉगिन विवरण दोबारा उपयोग नहीं किए जाते।",
   "BookOrbitPasswordHelpText": "BookOrbit खाते का पासवर्ड। इस खाते के लिए पासवर्ड से लॉगिन सक्षम होना चाहिए।",
+  "BookOrbitApiKeyHelpText": "BookOrbit 3.8 या बाद के संस्करण में वैकल्पिक है। उपयोगकर्ता नाम और पासवर्ड की जगह ऐसी API कुंजी इस्तेमाल करें जिसमें पढ़ने और लिखने का अधिकार और Book Dock Access की अनुमति हो।",
   "BookOrbitUsernameHelpText": "Book Dock Access अनुमति वाला BookOrbit खाता।",
   "BookshelfAllFormatsMonitoringHelpText": "चयनित कार्रवाई चुने गए लेखकों की ईबुक और ऑडियोबुक रिकॉर्ड पर लागू होती है। इससे लेखक की निगरानी स्थिति या भविष्य की पुस्तकों की निगरानी का तरीका नहीं बदलता।",
   "BookshelfFormatGroupingHelpText": "दोनों फ़ॉर्मैट वाले मोड में ChaptarrNG ईबुक और ऑडियोबुक रिकॉर्ड को तभी समूहित करता है जब उनमें Hardcover, Goodreads या Open Library का एक ही कार्य ID हो। साझा ID न होने पर रिकॉर्ड अलग रहते हैं। ID अपडेट करने के लिए पुस्तक और लेखक पृष्ठों पर “ताज़ा करें” चुनें।",

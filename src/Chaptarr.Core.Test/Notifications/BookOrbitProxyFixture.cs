@@ -51,13 +51,16 @@ namespace Chaptarr.Core.Test.Notifications
             Assert.That(transport.RequestedUrls.Count, Is.EqualTo(2));
         }
 
-        [Test]
-        public void should_stream_a_duplicate_file_once_with_a_bearer_token_and_preserve_the_source()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void should_stream_a_duplicate_file_once_with_a_bearer_token_and_preserve_the_source(bool useApiKey)
         {
             var path = Path.Combine(Path.GetTempPath(), $"bookorbit-{Guid.NewGuid():N}.epub");
             File.WriteAllText(path, "test-book-content");
             try
             {
+                var settings = Settings;
+                settings.ApiKey = useApiKey ? "test-dock-key" : null;
                 var transport = new DirectDownloadTestHttp();
                 transport.AddRoute(url => url.EndsWith("/auth/login"), request =>
                     Task.FromResult(new HttpResponse(request, new HttpHeader(), "{\"accessToken\":\"test-token\"}")));
@@ -69,7 +72,7 @@ namespace Chaptarr.Core.Test.Notifications
                     {
                         Assert.That(request.AllowAutoRedirect, Is.False);
                         Assert.That(request.LogHttpError, Is.False);
-                        Assert.That(request.Headers.GetSingleValue("Authorization"), Is.EqualTo("Bearer test-token"));
+                        Assert.That(request.Headers.GetSingleValue("Authorization"), Is.EqualTo(useApiKey ? "Bearer test-dock-key" : "Bearer test-token"));
                         Assert.That(request.ContentData, Is.Null);
                         Assert.That(request.Content.Headers.ContentType.MediaType, Is.EqualTo("multipart/form-data"));
                     });
@@ -79,9 +82,9 @@ namespace Chaptarr.Core.Test.Notifications
                     return new HttpResponse(request, new HttpHeader(), "{}", HttpStatusCode.Created);
                 });
 
-                Create(transport).UploadFiles(Settings, new[] { path, path });
+                Create(transport).UploadFiles(settings, new[] { path, path });
 
-                Assert.That(transport.RequestedUrls.Count, Is.EqualTo(2));
+                Assert.That(transport.RequestedUrls.Count, Is.EqualTo(useApiKey ? 1 : 2));
                 Assert.That(File.ReadAllText(path), Is.EqualTo("test-book-content"));
             }
             finally
@@ -96,6 +99,41 @@ namespace Chaptarr.Core.Test.Notifications
             var transport = new DirectDownloadTestHttp();
             Create(transport).UploadFiles(Settings, Array.Empty<string>());
             Assert.That(transport.RequestedUrls, Is.Empty);
+        }
+
+        [Test]
+        public void should_test_book_dock_with_an_api_key_and_no_password_login()
+        {
+            var settings = new BookOrbitSettings { BaseUrl = Settings.BaseUrl, ApiKey = "test-dock-key" };
+            var transport = new DirectDownloadTestHttp();
+            transport.AddRoute(url => url.EndsWith("/book-dock/summary"), request =>
+            {
+                Assert.That(request.Headers.GetSingleValue("Authorization"), Is.EqualTo("Bearer test-dock-key"));
+                Assert.That(request.AllowAutoRedirect, Is.False);
+                return Task.FromResult(new HttpResponse(request, new HttpHeader(), "{}", HttpStatusCode.OK));
+            });
+
+            Assert.That(settings.Validate().IsValid, Is.True);
+            Assert.That(Create(transport).Test(settings), Is.Null);
+            Assert.That(transport.RequestedUrls.Count, Is.EqualTo(1));
+            settings.ApiKey = " ";
+            Assert.That(settings.Validate().IsValid, Is.False);
+        }
+
+        [Test]
+        public void should_report_a_revoked_api_key_without_retrying_saved_credentials()
+        {
+            var settings = Settings;
+            settings.ApiKey = "revoked-dock-key";
+            var transport = new DirectDownloadTestHttp();
+            transport.AddRoute(url => url.EndsWith("/book-dock/summary"), request =>
+                throw new HttpException(request, new HttpResponse(request, new HttpHeader(), "unauthorized", HttpStatusCode.Unauthorized)));
+
+            var failure = Create(transport).Test(settings);
+
+            Assert.That(failure.PropertyName, Is.EqualTo(nameof(BookOrbitSettings.ApiKey)));
+            Assert.That(failure.ErrorMessage, Does.Not.Contain(settings.ApiKey));
+            Assert.That(transport.RequestedUrls.Count, Is.EqualTo(1));
         }
 
         [Test]

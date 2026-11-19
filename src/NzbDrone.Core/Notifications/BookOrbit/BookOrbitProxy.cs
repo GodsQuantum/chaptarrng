@@ -46,6 +46,11 @@ namespace NzbDrone.Core.Notifications.BookOrbit
             }
             catch (HttpException ex) when (IsCredentialRejection(ex))
             {
+                if (!string.IsNullOrWhiteSpace(settings.ApiKey))
+                {
+                    return NzbDroneValidationFailure.ForMessage(nameof(settings.ApiKey), "Invalid API Key", "server.message.m95e93a58a893");
+                }
+
                 _logger.Warn("BookOrbit rejected the configured login with HTTP {0} at {1}", (int)ex.Response.StatusCode, settings.BaseUrl);
                 return NzbDroneValidationFailure.ForMessage(nameof(settings.Password), "BookOrbit rejected the login. Check the credentials and password-login policy.", "server.message.m39858dcc08fa");
             }
@@ -91,6 +96,11 @@ namespace NzbDrone.Core.Notifications.BookOrbit
 
         private string GetAccessToken(BookOrbitSettings settings)
         {
+            if (!string.IsNullOrWhiteSpace(settings.ApiKey))
+            {
+                return settings.ApiKey.Trim();
+            }
+
             var request = new HttpRequestBuilder($"{settings.BaseUrl.TrimEnd('/')}/api/v1/auth/login")
                 .Post()
                 .SetHeader("Content-Type", "application/json")

@@ -2758,6 +2758,7 @@
   "BookNotAddableMissingProviderIdsHelpText": "Cần có ID sách/tác phẩm và ID tác giả để thêm định dạng. Hãy thử kết quả hoặc nguồn danh mục khác.",
   "BookOrbitBaseUrlHelpText": "URL cơ sở của máy chủ BookOrbit, chẳng hạn http://bookorbit:3000. Hãy thêm BookOrbit riêng; thông tin đăng nhập BookLore sẽ không được dùng lại.",
   "BookOrbitPasswordHelpText": "Mật khẩu tài khoản BookOrbit. Tài khoản này phải bật đăng nhập bằng mật khẩu.",
+  "BookOrbitApiKeyHelpText": "Không bắt buộc trên BookOrbit 3.8 trở lên. Bạn có thể dùng khóa API có quyền đọc, ghi và quyền Book Dock Access thay cho tên người dùng và mật khẩu.",
   "BookOrbitUsernameHelpText": "Tài khoản BookOrbit có quyền Book Dock Access.",
   "BookshelfAllFormatsMonitoringHelpText": "Thao tác đã chọn áp dụng cho bản ghi sách điện tử và sách nói của các tác giả được chọn. Thao tác này không thay đổi việc theo dõi tác giả hoặc cách theo dõi sách trong tương lai.",
   "BookshelfFormatGroupingHelpText": "Ở chế độ cả hai định dạng, ChaptarrNG chỉ nhóm bản ghi sách điện tử và sách nói khi chúng dùng chung ID tác phẩm từ Hardcover, Goodreads hoặc Open Library. Các bản ghi không có ID chung vẫn tách biệt. Để cập nhật ID, hãy dùng “Làm mới” trên trang sách và tác giả.",

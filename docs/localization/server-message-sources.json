@@ -3955,7 +3955,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitProxy.cs",
-          "line": 50,
+          "line": 55,
           "sourceLine": "return NzbDroneValidationFailure.ForMessage(nameof(settings.Password), \"BookOrbit rejected the login. Check the credentials and password-login policy.\", \"server.message.m39858dcc08fa\");",
           "sourceLineSha256": "dcc06794333e3e4b95bb545f3d17bd7c21ec00ad3deef6b813ecec74ca19dd7a",
           "category": "validation-failure",
@@ -8970,7 +8970,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitProxy.cs",
-          "line": 55,
+          "line": 60,
           "sourceLine": "return NzbDroneValidationFailure.ForMessage(string.Empty, \"Unable to connect to BookOrbit. Check the URL, credentials, and logs.\", \"server.message.m7e0e0494a488\");",
           "sourceLineSha256": "318585c84b606aeae93458ed55f856adcabed82fa675f78e6f1c9940ab5ff568",
           "category": "validation-failure",
@@ -8978,7 +8978,7 @@
         },
         {
           "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitProxy.cs",
-          "line": 60,
+          "line": 65,
           "sourceLine": "return NzbDroneValidationFailure.ForMessage(string.Empty, \"Unable to connect to BookOrbit. Check the URL, credentials, and logs.\", \"server.message.m7e0e0494a488\");",
           "sourceLineSha256": "318585c84b606aeae93458ed55f856adcabed82fa675f78e6f1c9940ab5ff568",
           "category": "validation-failure",
@@ -10855,6 +10855,14 @@
           "line": 388,
           "sourceLine": "return NzbDroneValidationFailure.ForMessage(\"ApiKey\", \"Invalid API Key\", \"server.message.m95e93a58a893\");",
           "sourceLineSha256": "a1a287b0a95a4a25d272b3bfc1cba181bd2d350863df88403f46f42d6beff6f4",
+          "category": "validation-failure",
+          "surface": "Validation result/message returned to client settings or API consumer"
+        },
+        {
+          "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitProxy.cs",
+          "line": 51,
+          "sourceLine": "return NzbDroneValidationFailure.ForMessage(nameof(settings.ApiKey), \"Invalid API Key\", \"server.message.m95e93a58a893\");",
+          "sourceLineSha256": "2c1d06a4f6c0baa0bc0e9f97456a3dd19e34b0d3ae052390b09b032fdc6f561e",
           "category": "validation-failure",
           "surface": "Validation result/message returned to client settings or API consumer"
         }
@@ -17989,14 +17997,14 @@
   ],
   "counts": {
     "originalTemplates": 618,
-    "sourceOccurrences": 878,
+    "sourceOccurrences": 879,
     "translatableMessages": 618,
     "knownExistingCatalogKeys": 6,
     "newCatalogKeys": 612,
-    "sourceCallsites": 877,
+    "sourceCallsites": 878,
     "excludedTemplates": 1,
     "rawInputSourceOccurrences": 680,
-    "sourceBindings": 886
+    "sourceBindings": 887
   },
   "sourceBaseHead": "ece16c4bd953e4ae77d7473c8b01871bf1d8c8ff",
   "normalizations": [

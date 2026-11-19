@@ -53,11 +53,17 @@ provider or rewrite imported BookLore settings.
 
 ### Configure Book Dock uploads
 
-In **Settings > Connect**, add **BookOrbit** and enter its base URL, username,
-and password. The default URL is `http://localhost:3000`. Use a BookOrbit
-account with the **Book Dock Access** permission and password login enabled.
-The connection test verifies login and read access to Book Dock; BookOrbit checks the upload permission,
-accepted format, and maximum file size when each file is sent.
+In **Settings > Connect**, add **BookOrbit** and enter its base URL
+(default `http://localhost:3000`). Choose either credential:
+
+- On BookOrbit 3.8 or later, create a **Read and write** key under **Settings > You > API keys**.
+  Grant it **Book Dock Access** and paste it into **API Key**. The key takes precedence
+  over saved account credentials and works with password login disabled.
+- For password login, leave **API Key** blank and enter the username and password of
+  an account with **Book Dock Access**.
+
+**Test** checks read access to Book Dock. A read-only key can pass this check.
+BookOrbit checks write access, file format, and size on upload.
 
 After an import, ChaptarrNG streams each imported file to BookOrbit's Book
 Dock as a multipart `file` upload. ChaptarrNG leaves the source files in place
@@ -66,11 +72,13 @@ fails and stops at that file. Earlier uploads remain in Book Dock and later
 files in that event are not sent. The upload is not atomic: if you retry a
 partial batch, check Book Dock first so accepted files are not added again.
 
-BookOrbit's current API uses `POST /api/v1/auth/login` with the configured
-username and password, then sends the returned bearer token to
-`POST /api/v1/book-dock/upload` with multipart field `file`. A successful
-upload returns `201 Created`. ChaptarrNG does not follow redirects for either
-request. Set the base URL to BookOrbit's final canonical address, including
+With password login, ChaptarrNG obtains a bearer token from `POST /api/v1/auth/login`.
+With an API key, it uses the key directly as the bearer credential. The connection
+check uses `GET /api/v1/book-dock/summary` and uploads use
+`POST /api/v1/book-dock/upload` with multipart field `file`. These Book Dock
+routes work with integration credentials on BookOrbit 3.9. A successful upload
+returns `201 Created`. ChaptarrNG disables redirects for these requests.
+Set the base URL to BookOrbit's final canonical address, including
 any reverse-proxy path.
 
 BookshelfNG notification rows configured for BookLore remain configured for
