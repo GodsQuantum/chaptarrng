@@ -2758,6 +2758,7 @@
   "BookNotAddableMissingProviderIdsHelpText": "フォーマットを追加するには、本または作品の ID と作者の ID が必要です。別のカタログ結果またはソースを試してください。",
   "BookOrbitBaseUrlHelpText": "BookOrbit サーバーのベース URL（例: http://bookorbit:3000）。BookOrbit は個別に追加してください。BookLore の認証情報は再利用されません。",
   "BookOrbitPasswordHelpText": "BookOrbit アカウントのパスワード。このアカウントではパスワードによるログインを有効にする必要があります。",
+  "provider.bookOrbit.apiKeyHelp": "BookOrbit 3.8 以降では任意です。Book Dock Access 権限のある読み書き用 API キーを、ユーザー名とパスワードの代わりに使用できます。",
   "BookOrbitUsernameHelpText": "Book Dock Access 権限を持つ BookOrbit アカウント。",
   "BookshelfAllFormatsMonitoringHelpText": "選択した操作は、選択した作者の電子書籍とオーディオブックのレコードに適用されます。作者の監視状態や今後の本の監視方法は変わりません。",
   "BookshelfFormatGroupingHelpText": "両方の形式を扱うモードでは、ChaptarrNG は Hardcover、Goodreads、または Open Library の作品 ID を共有する場合に限り、電子書籍とオーディオブックのレコードをまとめます。共通 ID がないレコードは別々のままです。ID を更新するには、本と作者のページで「更新」を使用してください。",
@@ -4163,5 +4164,9 @@
   "ui.task.processPendingImports": "保留中のインポートを処理",
   "ui.task.refreshMonitoredDownloads": "監視対象のダウンロードを更新",
   "ui.task.refreshMyAnonaMouseAccountStatus": "My Anona Mouse アカウントの状態を更新",
-  "ui.task.repairAuthorMediaCovers": "著者のカバー画像を修復"
+  "ui.task.repairAuthorMediaCovers": "著者のカバー画像を修復",
+  "provider.field.f1345270f389d": "Search URL templates",
+  "provider.field.f58976fe1396bf": "Optional. Add one catalog|URL or mirror|URL template per line. Put {query} where the encoded search term belongs. Each template must use the same origin as a configured URL, and results must match its format. Browser-verification challenges can use the optional FlareSolverr service.",
+  "provider.field.fe9b8363486b09": "FlareSolverr URL",
+  "provider.field.f49b40e588f3d5": "Optional FlareSolverr /v1 endpoint. Direct requests run first; 403/503 responses and detected browser challenges are retried through this service."
 }

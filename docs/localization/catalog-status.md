@@ -2,46 +2,46 @@
 
 # Localization catalog status
 
-Source catalog: **4165 messages** in `en.json`. Each locale below resolves source IDs through its exact catalog, configured parent catalog, and English fallback.
+Source catalog: **4170 messages** in `en.json`. Each locale below resolves source IDs through its exact catalog, configured parent catalog, and English fallback.
 
 Source-equal exact values are separately classified as invariants or native equivalents by a source-fingerprinted agent audit; this classification does not claim qualified native review. Unclassified values remain unreviewed. Strings without an exact translation inherit from the configured parent locale or English. Machine drafts and reviewed entries are explicit fingerprinted provenance records. Existing exact translations without provenance are shown as unreviewed; they are not assumed to be machine-generated.
 
 | Locale | Exact catalog | Direction | Source IDs | Direct exact | Classified source-equal | Machine drafts | Unreviewed exact | Inherited | Reviewed |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `en` | `en.json` | ltr | 4165 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `ar` | `ar.json` | rtl | 4165 | 4165 | 26 | 1204 | 2925 | 0 | 10 |
-| `az` | `az.json` | ltr | 4165 | 0 | 0 | 0 | 0 | 4165 | 0 |
-| `bg` | `bg.json` | ltr | 4165 | 699 | 0 | 0 | 699 | 3466 | 0 |
-| `bn` | `bn.json` | ltr | 4165 | 3 | 0 | 0 | 3 | 4162 | 0 |
-| `cs` | `cs.json` | ltr | 4165 | 762 | 0 | 0 | 762 | 3403 | 0 |
-| `da` | `da.json` | ltr | 4165 | 675 | 0 | 0 | 675 | 3490 | 0 |
-| `de` | `de.json` | ltr | 4165 | 4165 | 59 | 665 | 3432 | 0 | 9 |
-| `es` | `es.json` | ltr | 4165 | 4165 | 52 | 675 | 3429 | 0 | 9 |
-| `fa` | `fa.json` | rtl | 4165 | 10 | 0 | 0 | 10 | 4155 | 0 |
-| `fr` | `fr.json` | ltr | 4165 | 4165 | 77 | 558 | 3521 | 0 | 9 |
-| `he` | `he.json` | rtl | 4165 | 691 | 0 | 0 | 691 | 3474 | 0 |
-| `hi` | `hi.json` | ltr | 4165 | 4165 | 26 | 866 | 3264 | 0 | 9 |
-| `hu` | `hu.json` | ltr | 4165 | 1081 | 0 | 0 | 1081 | 3084 | 0 |
-| `id` | `id.json` | ltr | 4165 | 4165 | 48 | 713 | 3395 | 0 | 9 |
-| `it` | `it.json` | ltr | 4165 | 917 | 0 | 0 | 917 | 3248 | 0 |
-| `ja` | `ja.json` | ltr | 4165 | 4165 | 30 | 897 | 3229 | 0 | 9 |
-| `kk` | `kk.json` | ltr | 4165 | 0 | 0 | 0 | 0 | 4165 | 0 |
-| `ko` | `ko.json` | ltr | 4165 | 4165 | 31 | 1144 | 2981 | 0 | 9 |
-| `ms` | `ms.json` | ltr | 4165 | 0 | 0 | 0 | 0 | 4165 | 0 |
-| `nb` | `nb_NO.json` | ltr | 4165 | 211 | 0 | 0 | 211 | 3954 | 0 |
-| `nl` | `nl.json` | ltr | 4165 | 771 | 0 | 0 | 771 | 3394 | 0 |
-| `pl` | `pl.json` | ltr | 4165 | 722 | 0 | 0 | 722 | 3443 | 0 |
-| `pt` | `pt.json` | ltr | 4165 | 961 | 0 | 0 | 961 | 3204 | 0 |
-| `ru` | `ru.json` | ltr | 4165 | 886 | 0 | 0 | 886 | 3279 | 0 |
-| `sv` | `sv.json` | ltr | 4165 | 878 | 0 | 0 | 878 | 3287 | 0 |
-| `th` | `th.json` | ltr | 4165 | 657 | 0 | 0 | 657 | 3508 | 0 |
-| `tr` | `tr.json` | ltr | 4165 | 869 | 0 | 0 | 869 | 3296 | 0 |
-| `uk` | `uk.json` | ltr | 4165 | 855 | 0 | 0 | 855 | 3310 | 0 |
-| `uz` | `uz.json` | ltr | 4165 | 0 | 0 | 0 | 0 | 4165 | 0 |
-| `vi` | `vi.json` | ltr | 4165 | 4165 | 35 | 961 | 3159 | 0 | 10 |
-| `zh-Hans` | `zh_CN.json` | ltr | 4165 | 4165 | 29 | 721 | 3406 | 0 | 9 |
-| `es-419` | `es_419.json` ← `es.json` | ltr | 4165 | 0 | 0 | 0 | 0 | 4165 | 0 |
-| `fr-CA` | `fr_CA.json` ← `fr.json` | ltr | 4165 | 0 | 0 | 0 | 0 | 4165 | 0 |
-| `pt-BR` | `pt_BR.json` ← `pt.json` | ltr | 4165 | 4165 | 47 | 540 | 3569 | 0 | 9 |
-| `pt-PT` | `pt_PT.json` ← `pt.json` | ltr | 4165 | 0 | 0 | 0 | 0 | 4165 | 0 |
-| `zh-Hant` | `zh_TW.json` | ltr | 4165 | 4165 | 30 | 853 | 3273 | 0 | 9 |
+| `en` | `en.json` | ltr | 4170 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `ar` | `ar.json` | rtl | 4170 | 4170 | 26 | 1204 | 2930 | 0 | 10 |
+| `az` | `az.json` | ltr | 4170 | 0 | 0 | 0 | 0 | 4170 | 0 |
+| `bg` | `bg.json` | ltr | 4170 | 699 | 0 | 0 | 699 | 3471 | 0 |
+| `bn` | `bn.json` | ltr | 4170 | 3 | 0 | 0 | 3 | 4167 | 0 |
+| `cs` | `cs.json` | ltr | 4170 | 762 | 0 | 0 | 762 | 3408 | 0 |
+| `da` | `da.json` | ltr | 4170 | 675 | 0 | 0 | 675 | 3495 | 0 |
+| `de` | `de.json` | ltr | 4170 | 4170 | 60 | 666 | 3435 | 0 | 9 |
+| `es` | `es.json` | ltr | 4170 | 4170 | 52 | 676 | 3433 | 0 | 9 |
+| `fa` | `fa.json` | rtl | 4170 | 10 | 0 | 0 | 10 | 4160 | 0 |
+| `fr` | `fr.json` | ltr | 4170 | 4170 | 77 | 559 | 3525 | 0 | 9 |
+| `he` | `he.json` | rtl | 4170 | 691 | 0 | 0 | 691 | 3479 | 0 |
+| `hi` | `hi.json` | ltr | 4170 | 4170 | 26 | 867 | 3268 | 0 | 9 |
+| `hu` | `hu.json` | ltr | 4170 | 1081 | 0 | 0 | 1081 | 3089 | 0 |
+| `id` | `id.json` | ltr | 4170 | 4170 | 48 | 714 | 3399 | 0 | 9 |
+| `it` | `it.json` | ltr | 4170 | 917 | 0 | 0 | 917 | 3253 | 0 |
+| `ja` | `ja.json` | ltr | 4170 | 4170 | 30 | 898 | 3233 | 0 | 9 |
+| `kk` | `kk.json` | ltr | 4170 | 0 | 0 | 0 | 0 | 4170 | 0 |
+| `ko` | `ko.json` | ltr | 4170 | 4170 | 31 | 1145 | 2985 | 0 | 9 |
+| `ms` | `ms.json` | ltr | 4170 | 0 | 0 | 0 | 0 | 4170 | 0 |
+| `nb` | `nb_NO.json` | ltr | 4170 | 211 | 0 | 0 | 211 | 3959 | 0 |
+| `nl` | `nl.json` | ltr | 4170 | 771 | 0 | 0 | 771 | 3399 | 0 |
+| `pl` | `pl.json` | ltr | 4170 | 722 | 0 | 0 | 722 | 3448 | 0 |
+| `pt` | `pt.json` | ltr | 4170 | 961 | 0 | 0 | 961 | 3209 | 0 |
+| `ru` | `ru.json` | ltr | 4170 | 886 | 0 | 0 | 886 | 3284 | 0 |
+| `sv` | `sv.json` | ltr | 4170 | 878 | 0 | 0 | 878 | 3292 | 0 |
+| `th` | `th.json` | ltr | 4170 | 657 | 0 | 0 | 657 | 3513 | 0 |
+| `tr` | `tr.json` | ltr | 4170 | 869 | 0 | 0 | 869 | 3301 | 0 |
+| `uk` | `uk.json` | ltr | 4170 | 855 | 0 | 0 | 855 | 3315 | 0 |
+| `uz` | `uz.json` | ltr | 4170 | 0 | 0 | 0 | 0 | 4170 | 0 |
+| `vi` | `vi.json` | ltr | 4170 | 4170 | 35 | 962 | 3163 | 0 | 10 |
+| `zh-Hans` | `zh_CN.json` | ltr | 4170 | 4170 | 29 | 722 | 3410 | 0 | 9 |
+| `es-419` | `es_419.json` ← `es.json` | ltr | 4170 | 0 | 0 | 0 | 0 | 4170 | 0 |
+| `fr-CA` | `fr_CA.json` ← `fr.json` | ltr | 4170 | 0 | 0 | 0 | 0 | 4170 | 0 |
+| `pt-BR` | `pt_BR.json` ← `pt.json` | ltr | 4170 | 4170 | 47 | 541 | 3573 | 0 | 9 |
+| `pt-PT` | `pt_PT.json` ← `pt.json` | ltr | 4170 | 0 | 0 | 0 | 0 | 4170 | 0 |
+| `zh-Hant` | `zh_TW.json` | ltr | 4170 | 4170 | 30 | 854 | 3277 | 0 | 9 |
