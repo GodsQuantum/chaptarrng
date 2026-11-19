@@ -48,24 +48,13 @@ function getDisplayIconName(name, isWorking, isPaused) {
   return getIconName(name);
 }
 
-function renderMessage(props) {
-  const { message, messageMode, messageId, messageParameters } = props;
-
-  if (messageMode === 'opaque' || messageMode === 'localized') {
-    return <BidiText lang="und">{message}</BidiText>;
-  }
-
-  if (messageMode === 'trusted') {
-    return translateServerMessageById(messageId, messageParameters) || <BidiText lang="und">{message}</BidiText>;
-  }
-
-  return translateServerMessage(message);
-}
-
 function Message(props) {
   const {
     name,
     message,
+    messageMode,
+    messageId,
+    messageParameters,
     type,
     progress,
     counters,
@@ -190,7 +179,11 @@ function Message(props) {
       </div>
 
       <div className={styles.text}>
-        {renderMessage(props)}
+        {messageMode === 'opaque' ?
+          <BidiText lang="und">{message}</BidiText> :
+          messageMode === 'trusted' ?
+            (translateServerMessageById(messageId, messageParameters) || <BidiText lang="und">{message}</BidiText>) :
+            messageMode === 'localized' ? message : translateServerMessage(message)}
       </div>
     </div>
   );

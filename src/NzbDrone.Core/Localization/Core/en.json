@@ -2431,7 +2431,6 @@
   "BookOrbitBaseUrlHelpText": "Base URL of your BookOrbit server, such as http://bookorbit:3000. Add BookOrbit separately; BookLore credentials are not reused.",
   "BookOrbitUsernameHelpText": "BookOrbit account with Book Dock Access permission.",
   "BookOrbitPasswordHelpText": "BookOrbit account password. Password login must be enabled for this account.",
-  "provider.bookOrbit.apiKeyHelp": "Optional on BookOrbit 3.8 or later. A read and write API key with Book Dock Access replaces the username and password.",
   "Sunday": "Sunday",
   "Monday": "Monday",
   "Light": "Light theme",
@@ -4164,9 +4163,5 @@
   "server.message.m4cd205e7d07a": "rTorrent will not pause torrents when they meet the seed criteria. Chaptarr can remove torrents after seeding is done only when Remove Completed is enabled and the torrent is not protected by Preserve torrents in client or Post-Import Category. After importing it will also set \"{value0}\" as an rTorrent view, which can be used in rTorrent scripts to customize behavior.",
   "server.message.mc6073db4b613": "Chaptarr will handle automatic removal of torrents based on the current seed criteria in Settings -> Indexers",
   "server.message.m12f8b73a2b72": "Chaptarr is unable to connect to Download Station if 2-Factor Authentication is enabled on your DSM account",
-  "server.message.m47f0922640fa": "Testing will execute the script with the EventType set to Test, ensure your script handles this correctly",
-  "provider.field.f1345270f389d": "Search URL templates",
-  "provider.field.f58976fe1396bf": "Optional. Add one catalog|URL or mirror|URL template per line. Put {query} where the encoded search term belongs. Each template must use the same origin as a configured URL, and results must match its format. Browser-verification challenges can use the optional FlareSolverr service.",
-  "provider.field.fe9b8363486b09": "FlareSolverr URL",
-  "provider.field.f49b40e588f3d5": "Optional FlareSolverr /v1 endpoint. Direct requests run first; 403/503 responses and detected browser challenges are retried through this service."
+  "server.message.m47f0922640fa": "Testing will execute the script with the EventType set to Test, ensure your script handles this correctly"
 }

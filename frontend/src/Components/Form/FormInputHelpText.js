@@ -5,9 +5,8 @@ import BidiText from 'Components/BidiText';
 import Icon from 'Components/Icon';
 import Link from 'Components/Link/Link';
 import { icons } from 'Helpers/Props';
-import isolateBidiText from 'Utilities/String/isolateBidiText';
-import translate from 'Utilities/String/translate';
 import translateServerMessage, { translateServerMessageById } from 'Utilities/String/translateServerMessage';
+import translate from 'Utilities/String/translate';
 import styles from './FormInputHelpText.css';
 
 function FormInputHelpText(props) {
@@ -30,7 +29,7 @@ function FormInputHelpText(props) {
     translate(messageKey, messageParameters) :
     translatedById ||
     (messageMode === 'opaque' || messageId ? <BidiText lang="und">{text}</BidiText> : translateServerMessage(text));
-  const translatedTooltip = messageMode === 'opaque' && tooltip ? isolateBidiText(tooltip) : translateServerMessage(tooltip);
+  const translatedTooltip = messageMode === 'opaque' && tooltip ? `\u2068${tooltip}\u2069` : translateServerMessage(tooltip);
 
   return (
     <div

@@ -50,8 +50,7 @@ def main():
     if not caller.get('value25000Accepted') or not caller.get('valuesAbove25000Rejected') or not bc.get('behavior','').find('exactly 25000 does not enter this error branch')>=0: fail('inclusive predicate conclusion')
     if subprocess.check_output(['git','-C',str(REPO),'rev-parse',f'{HEAD}^{{tree}}'],text=True).strip()!=TREE: fail('pinned review commit/tree unavailable')
     path=caller['file']; content=subprocess.check_output(['git','-C',str(REPO),'show',f'{HEAD}:{path}'])
-    # Match Git's object ID; the content is also pinned with SHA-256.
-    blob=subprocess.check_output(['git','-C',str(REPO),'hash-object','--stdin'],input=content).decode().strip()
+    blob=hashlib.sha1(b'blob '+str(len(content)).encode()+b'\0'+content).hexdigest()
     lines=content.decode('utf-8').splitlines()
     if sha(content)!=caller['fileSha256'] or blob!=caller['gitBlob'] or lines[347].strip()!='else if (value > 25000)' or CURRENT_EN not in lines[349] or CURRENT_ID not in lines[349]: fail('live source/caller content')
     pl={r['locale']:r for r in jl(OUT/'primary-locale-translations.jsonl')}; bl={r['locale']:r for r in jl(OUT/'blind-locale-review.jsonl')}; led=jl(OUT/'cross-review-ledger.jsonl')

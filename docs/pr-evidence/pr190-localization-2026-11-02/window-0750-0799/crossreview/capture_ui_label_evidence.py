@@ -1,12 +1,10 @@
-import hashlib,json,pathlib,subprocess
+import hashlib,json,pathlib
 repo=pathlib.Path('/mnt/disks/scratch/task-worktrees/localization-20261102/chaptarrng-pr190-readonly-0750-0799-a58de8c')
 out=pathlib.Path('/mnt/disks/scratch/task-scratch/chaptarrng-pr190-window-0750-0799-crossreview-20261102')
 primary=pathlib.Path('/mnt/disks/scratch/task-scratch/chaptarrng-pr190-window-0750-0799-primary-20261102')
 manifest=json.load(open(primary/'input-manifest.json'))
 sha=lambda b:hashlib.sha256(b).hexdigest()
-def blob(b):
-    # Match Git's object ID; the content is also pinned with SHA-256 above.
-    return subprocess.check_output(['git','hash-object','--stdin'],input=b).decode().strip()
+blob=lambda b:hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
 def pin(path,line_no):
     data=(repo/path).read_bytes(); lines=data.decode('utf-8').splitlines(); line=lines[line_no-1].strip()
     return {'path':path,'line':line_no,'lineText':line,'lineSha256':sha(line.encode()),'fileSha256':sha(data),'gitBlob':blob(data),'bytes':len(data),'contextBefore':[x.strip() for x in lines[max(0,line_no-4):line_no-1]],'contextAfter':[x.strip() for x in lines[line_no:min(len(lines),line_no+3)]]}

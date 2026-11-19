@@ -2758,7 +2758,6 @@
   "BookNotAddableMissingProviderIdsHelpText": "Un ID de livre/œuvre et un ID d’auteur sont requis pour ajouter un format. Essayez un autre résultat ou une autre source du catalogue.",
   "BookOrbitBaseUrlHelpText": "URL de base de votre serveur BookOrbit, par exemple http://bookorbit:3000. Ajoutez BookOrbit séparément ; les identifiants BookLore ne sont pas réutilisés.",
   "BookOrbitPasswordHelpText": "Mot de passe du compte BookOrbit. La connexion par mot de passe doit être activée pour ce compte.",
-  "provider.bookOrbit.apiKeyHelp": "Facultatif à partir de BookOrbit 3.8. Une clé API en lecture et en écriture avec l’autorisation Book Dock Access remplace le nom d’utilisateur et le mot de passe.",
   "BookOrbitUsernameHelpText": "Compte BookOrbit avec l’autorisation Book Dock Access.",
   "BookshelfAllFormatsMonitoringHelpText": "L’action sélectionnée s’applique aux entrées eBook et livre audio des auteurs sélectionnés. Elle ne modifie ni la surveillance d’un auteur ni celle de ses futurs livres.",
   "BookshelfFormatGroupingHelpText": "Lorsque les deux formats sont sélectionnés, ChaptarrNG regroupe les entrées eBook et livre audio uniquement lorsqu’elles partagent un ID d’œuvre Hardcover, Goodreads ou Open Library. Sans ID partagé, elles restent séparées. Pour mettre les ID à jour, utilisez « Rafraîchir » sur les pages du livre et de l’auteur.",
@@ -4164,9 +4163,5 @@
   "ui.task.processPendingImports": "Traiter les importations en attente",
   "ui.task.refreshMonitoredDownloads": "Actualiser les téléchargements surveillés",
   "ui.task.refreshMyAnonaMouseAccountStatus": "Actualiser le statut du compte My Anona Mouse",
-  "ui.task.repairAuthorMediaCovers": "Réparer les images de couverture des auteurs",
-  "provider.field.f1345270f389d": "Search URL templates",
-  "provider.field.f58976fe1396bf": "Optional. Add one catalog|URL or mirror|URL template per line. Put {query} where the encoded search term belongs. Each template must use the same origin as a configured URL, and results must match its format. Browser-verification challenges can use the optional FlareSolverr service.",
-  "provider.field.fe9b8363486b09": "FlareSolverr URL",
-  "provider.field.f49b40e588f3d5": "Optional FlareSolverr /v1 endpoint. Direct requests run first; 403/503 responses and detected browser challenges are retried through this service."
+  "ui.task.repairAuthorMediaCovers": "Réparer les images de couverture des auteurs"
 }

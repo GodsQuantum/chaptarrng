@@ -202,9 +202,9 @@
       "sha256": "a8c00c5e5026ef1a91827cca4ed51e09304268d4add17139b2c649dcec932f5c"
     },
     {
-      "byteCount": 10802,
+      "byteCount": 10700,
       "path": "verify_cross_audit.py",
-      "sha256": "cba9ac8b77c8657fd9b69b78dd9f529f736a306054423e66a9b120f58e9382d8"
+      "sha256": "b8c1bbe9cd073907b5e654a4bee19b74018bbd718cc752f3c672e0dd9760c9f5"
     }
   ],
   "head": "712d597e6f27f6485f7c287b70f6dc79003ca714",

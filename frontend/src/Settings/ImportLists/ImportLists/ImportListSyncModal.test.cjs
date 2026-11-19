@@ -163,14 +163,14 @@ test('preview failures offer retry and repeated preview clicks start only one re
   assert.equal(modal.state.isPreviewing, false);
   assert.equal(modal.state.previewError.type, 'Components/LocalizedServerMessage');
   assert.equal(modal.state.previewError.props.message, 'preview unavailable');
+  const previewError = findElements(modal.render(), (element) => element.type === 'Components/LocalizedServerMessage')
+    .find((element) => element.props.message === 'preview unavailable');
+  assert.ok(previewError);
   assert.equal(requests.length, 3);
   assert.equal(requests[0].url, '/importlist/12/history');
   assert.equal(requests[2].url, '/importlist/12/history');
 
   const output = modal.render();
-  const previewError = findElements(output, (element) => element.type === 'Components/LocalizedServerMessage')
-    .find((element) => element.props.message === 'preview unavailable');
-  assert.ok(previewError);
   const retryButton = findElements(output, (element) => element.type === 'Components/Link/Button')
     .find((element) => element.props.children === 'Retry');
   assert.ok(retryButton);

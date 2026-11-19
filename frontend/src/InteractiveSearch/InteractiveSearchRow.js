@@ -21,7 +21,6 @@ import formatDateTime from 'Utilities/Date/formatDateTime';
 import formatAge from 'Utilities/Number/formatAge';
 import formatBytes from 'Utilities/Number/formatBytes';
 import formatCustomFormatScore from 'Utilities/Number/formatCustomFormatScore';
-import { sanitizeBidiText } from 'Utilities/String/isolateBidiText';
 import translate from 'Utilities/String/translate';
 import { translateServerMessageById } from 'Utilities/String/translateServerMessage';
 import Peers from './Peers';
@@ -55,7 +54,7 @@ function getDownloadKind(isGrabbed, grabError, downloadAllowed, existingTorrentA
   return kinds.DEFAULT;
 }
 
-function getDownloadTooltip(isGrabbing, isGrabbed, grabError, existingTorrentAvailable, preserveBalancedIsolates) {
+function getDownloadTooltip(isGrabbing, isGrabbed, grabError, existingTorrentAvailable) {
   if (isGrabbing) {
     return '';
   } else if (isGrabbed) {
@@ -63,7 +62,7 @@ function getDownloadTooltip(isGrabbing, isGrabbed, grabError, existingTorrentAva
   } else if (existingTorrentAvailable) {
     return translate('AdoptExistingTorrent');
   } else if (grabError) {
-    return sanitizeBidiText(grabError, preserveBalancedIsolates);
+    return grabError;
   }
 
   return translate('AddToDownloadedQueue');
@@ -100,7 +99,7 @@ function renderTitleWithMatch(title, matchedTitleCharStart, matchedTitleCharEnd)
 }
 
 function getNarratorDisplay(narrator) {
-  const rawNarrator = typeof narrator === 'string' ? sanitizeBidiText(narrator.trim()) : '';
+  const rawNarrator = typeof narrator === 'string' ? narrator.trim() : '';
 
   if (!rawNarrator) {
     return {
@@ -352,19 +351,14 @@ class InteractiveSearchRow extends Component {
             <div className={styles.titleTextBlock}>
               <Link
                 to={infoUrl}
-                title={sanitizeBidiText(title)}
+                title={title}
                 className={styles.titleLink}
               >
-                <BidiText>{titleText}</BidiText>
+                {titleText}
               </Link>
               {grabError ? (
                 <div className={styles.grabError}>
-                  <BidiText
-                    lang={grabErrorIsOpaque ? 'und' : undefined}
-                    preserveBalancedIsolates={Boolean(localizedGrabError)}
-                  >
-                    {renderedGrabError}
-                  </BidiText>
+                  <BidiText lang={grabErrorIsOpaque ? 'und' : undefined}>{renderedGrabError}</BidiText>
                 </div>
               ) : null}
             </div>
@@ -376,7 +370,7 @@ class InteractiveSearchRow extends Component {
 
         <TableRowCell
           className={styles.indexer}
-          title={sanitizeBidiText(indexer)}
+          title={indexer}
         >
           {indexer}
         </TableRowCell>
@@ -472,13 +466,7 @@ class InteractiveSearchRow extends Component {
             <SpinnerIconButton
               name={getDownloadIcon(isGrabbing, isGrabbed, grabError)}
               kind={getDownloadKind(isGrabbed, grabError, downloadAllowed, existingTorrentAvailable)}
-              title={getDownloadTooltip(
-                isGrabbing,
-                isGrabbed,
-                renderedGrabError,
-                existingTorrentAvailable,
-                Boolean(localizedGrabError)
-              )}
+              title={getDownloadTooltip(isGrabbing, isGrabbed, renderedGrabError, existingTorrentAvailable)}
               lang={grabErrorIsOpaque ? 'und' : undefined}
               dir={grabErrorIsOpaque ? 'auto' : undefined}
               isSpinning={isGrabbing}

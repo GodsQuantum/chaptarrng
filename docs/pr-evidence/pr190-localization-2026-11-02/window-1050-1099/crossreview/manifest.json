@@ -15,8 +15,8 @@
     },
     {
       "path": "build_crossreview.py",
-      "bytes": 21045,
-      "sha256": "fbbc2ec5fc8408d4647b453930571b9aeb09ddd54e5d90b04d653edbc97f6277"
+      "bytes": 20945,
+      "sha256": "9d79b1c1529b06ca9945e070c5c0a3ae4ab5cbb0b6e3fac9b85f04a380aaae25"
     },
     {
       "path": "caller-pin-checks.jsonl",

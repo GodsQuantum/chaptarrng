@@ -270,7 +270,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Download/CompletedDownloadService.cs",
-          "line": 230,
+          "line": 224,
           "sourceLine": "var reason = string.Format(\"No file in this download is in a format allowed by the quality profile ({0})\",",
           "sourceLineSha256": "717f23e6d24730b54efa1ef05bf959157b62d35c9286c95152901faaf1f5096d",
           "category": "persisted-notification-format",
@@ -1266,7 +1266,7 @@
       "callsites": [
         {
           "file": "src/Chaptarr.Api.V1/Books/BookController.cs",
-          "line": 1429,
+          "line": 1425,
           "sourceLine": "return BadRequest(\"Page size must be between 1 and 1000\");",
           "sourceLineSha256": "fda3f798b3239125c89796ce9820fcf7a294a995b4fe8719bf49bfe158c4f3b7",
           "category": "direct-api-result",
@@ -3639,7 +3639,7 @@
       "callsites": [
         {
           "file": "src/Chaptarr.Api.V1/Books/BookController.cs",
-          "line": 1639,
+          "line": 1635,
           "sourceLine": "return BadRequest(\"No media type is configured (audiobook/ebook). Configure at least one root folder + quality profile for this instance.\");",
           "sourceLineSha256": "af7f003aaf2576b377f5ccfaa5a3e5f266a1a477b2f9b90f8899b126208a6bb5",
           "category": "direct-api-result",
@@ -3955,7 +3955,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitProxy.cs",
-          "line": 55,
+          "line": 50,
           "sourceLine": "return NzbDroneValidationFailure.ForMessage(nameof(settings.Password), \"BookOrbit rejected the login. Check the credentials and password-login policy.\", \"server.message.m39858dcc08fa\");",
           "sourceLineSha256": "dcc06794333e3e4b95bb545f3d17bd7c21ec00ad3deef6b813ecec74ca19dd7a",
           "category": "validation-failure",
@@ -6527,7 +6527,7 @@
           "sourceLine": "\"server.message.m6026247dc0f2\",",
           "sourceLineSha256": "da26b6d64b011bc357b4806efbef089974690a34c9e1c0a0d2c83d43d2e11a4f",
           "category": "release-grab-error",
-          "surface": "Interactive release result error body and download tooltip; values remain raw"
+          "surface": "Interactive release result error body and download tooltip; stable app text is keyed, captured download-client detail remains a dynamic value"
         }
       ],
       "protectedLiterals": []
@@ -8970,7 +8970,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitProxy.cs",
-          "line": 60,
+          "line": 55,
           "sourceLine": "return NzbDroneValidationFailure.ForMessage(string.Empty, \"Unable to connect to BookOrbit. Check the URL, credentials, and logs.\", \"server.message.m7e0e0494a488\");",
           "sourceLineSha256": "318585c84b606aeae93458ed55f856adcabed82fa675f78e6f1c9940ab5ff568",
           "category": "validation-failure",
@@ -8978,7 +8978,7 @@
         },
         {
           "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitProxy.cs",
-          "line": 65,
+          "line": 60,
           "sourceLine": "return NzbDroneValidationFailure.ForMessage(string.Empty, \"Unable to connect to BookOrbit. Check the URL, credentials, and logs.\", \"server.message.m7e0e0494a488\");",
           "sourceLineSha256": "318585c84b606aeae93458ed55f856adcabed82fa675f78e6f1c9940ab5ff568",
           "category": "validation-failure",
@@ -10643,7 +10643,7 @@
       "callsites": [
         {
           "file": "src/Chaptarr.Api.V1/Books/BookController.cs",
-          "line": 1493,
+          "line": 1489,
           "sourceLine": "return BadRequest($\"authorIds must contain between 1 and {MaxBookshelfAuthorIds} author IDs\");",
           "sourceLineSha256": "741bddd36af9722ec52ea7d4ea8b2d18803fe1d3fd5a933529a40a744d0658ad",
           "category": "direct-api-result",
@@ -10857,14 +10857,6 @@
           "sourceLineSha256": "a1a287b0a95a4a25d272b3bfc1cba181bd2d350863df88403f46f42d6beff6f4",
           "category": "validation-failure",
           "surface": "Validation result/message returned to client settings or API consumer"
-        },
-        {
-          "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitProxy.cs",
-          "line": 51,
-          "sourceLine": "return NzbDroneValidationFailure.ForMessage(nameof(settings.ApiKey), \"Invalid API Key\", \"server.message.m95e93a58a893\");",
-          "sourceLineSha256": "2c1d06a4f6c0baa0bc0e9f97456a3dd19e34b0d3ae052390b09b032fdc6f561e",
-          "category": "validation-failure",
-          "surface": "Validation result/message returned to client settings or API consumer"
         }
       ],
       "protectedLiterals": [
@@ -11024,7 +11016,7 @@
       "callsites": [
         {
           "file": "src/Chaptarr.Api.V1/Books/BookController.cs",
-          "line": 1665,
+          "line": 1661,
           "sourceLine": "return BadRequest(\"Cannot add book: missing upstream provider book/work ID (Hardcover/Goodreads/OpenLibrary/GoogleBooks).\");",
           "sourceLineSha256": "eb925b55d7c6a0d1ed15073aa52fc48f0d1383bcfeb62799c2966431cc574f37",
           "category": "direct-api-result",
@@ -11032,7 +11024,7 @@
         },
         {
           "file": "src/Chaptarr.Api.V1/Books/BookController.cs",
-          "line": 1700,
+          "line": 1696,
           "sourceLine": "return BadRequest(\"Cannot add book: missing upstream provider book/work ID (Hardcover/Goodreads/OpenLibrary/GoogleBooks).\");",
           "sourceLineSha256": "eb925b55d7c6a0d1ed15073aa52fc48f0d1383bcfeb62799c2966431cc574f37",
           "category": "direct-api-result",
@@ -11040,7 +11032,7 @@
         },
         {
           "file": "src/Chaptarr.Api.V1/Books/BookController.cs",
-          "line": 1766,
+          "line": 1762,
           "sourceLine": "return BadRequest(\"Cannot add book: missing upstream provider book/work ID (Hardcover/Goodreads/OpenLibrary/GoogleBooks).\");",
           "sourceLineSha256": "eb925b55d7c6a0d1ed15073aa52fc48f0d1383bcfeb62799c2966431cc574f37",
           "category": "direct-api-result",
@@ -12118,7 +12110,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Books/Services/BookService.cs",
-          "line": 386,
+          "line": 385,
           "sourceLine": "new ValidationFailure(\"Editions\", \"Cannot add book because metadata did not provide any editions for it.\")",
           "sourceLineSha256": "c85cb7ad0ffad8bb5a3fd579832ed8681e953fc402fe20cc24862381dd4e92e9",
           "category": "validation-failure",
@@ -13052,7 +13044,7 @@
       "callsites": [
         {
           "file": "src/Chaptarr.Api.V1/Books/BookController.cs",
-          "line": 2633,
+          "line": 2629,
           "sourceLine": "return BadRequest(\"EditionId is required\");",
           "sourceLineSha256": "cb0d38e687b93edd458d5bbeed5b1db975752b921d97ccfd20041303a41f0b7a",
           "category": "direct-api-result",
@@ -13328,7 +13320,7 @@
       "callsites": [
         {
           "file": "src/Chaptarr.Api.V1/Books/BookController.cs",
-          "line": 1963,
+          "line": 1959,
           "sourceLine": "new ValidationFailure(",
           "sourceLineSha256": "9a7b6bcc91b8133e7cc8bc770fd340ba9f08c6f7ea0a7df417d95247c98c50b1",
           "category": "validation-failure",
@@ -16029,7 +16021,7 @@
       "callsites": [
         {
           "file": "src/Chaptarr.Api.V1/Books/BookController.cs",
-          "line": 1735,
+          "line": 1731,
           "sourceLine": "return BadRequest($\"Invalid mediaType parameter: '{requestedMediaType}'. Valid values are: audiobook, ebook\");",
           "sourceLineSha256": "a3b01c7b29542048ac87e21608a39c9547eaa0a45a01db4f4ee9608abbeb459c",
           "category": "direct-api-result",
@@ -16437,7 +16429,7 @@
       "callsites": [
         {
           "file": "src/Chaptarr.Api.V1/Books/BookController.cs",
-          "line": 1434,
+          "line": 1430,
           "sourceLine": "return BadRequest(\"Offset must be non-negative\");",
           "sourceLineSha256": "f62ab8c603fcffbb253b3685801ed755527fc2e7b30df1ffd6204576e5f5b711",
           "category": "direct-api-result",
@@ -17997,14 +17989,14 @@
   ],
   "counts": {
     "originalTemplates": 618,
-    "sourceOccurrences": 879,
+    "sourceOccurrences": 878,
     "translatableMessages": 618,
     "knownExistingCatalogKeys": 6,
     "newCatalogKeys": 612,
-    "sourceCallsites": 878,
+    "sourceCallsites": 877,
     "excludedTemplates": 1,
     "rawInputSourceOccurrences": 680,
-    "sourceBindings": 887
+    "sourceBindings": 886
   },
   "sourceBaseHead": "ece16c4bd953e4ae77d7473c8b01871bf1d8c8ff",
   "normalizations": [

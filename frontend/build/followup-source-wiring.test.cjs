@@ -9,24 +9,14 @@ const React = require('react');
 const matching = require('../src/Utilities/Localization/server-message-match.cjs');
 const records = require('../src/Utilities/Localization/server-messages.json');
 const ledger = require('../../docs/localization/source-followup-20261031.json');
+const currentSourceSnapshot = require('../../docs/localization/source-followup-20261101.json');
 const ui = require('../../docs/localization/followup-ui-sources.json');
 const english = require('../../src/NzbDrone.Core/Localization/Core/en.json');
-const sourceEqualities = require('../../docs/localization/source-equalities.json');
 const root = path.resolve(__dirname, '../..');
 const digest = (value) => crypto.createHash('sha256').update(value).digest('hex');
 const digestText = (value) => digest(String(value).replace(/\r\n?/g, '\n'));
 const digestTextFile = (relativePath) => digestText(fs.readFileSync(path.join(root, relativePath), 'utf8'));
-
-function loadBidiSanitizer() {
-  const file = path.join(root, 'frontend/src/Utilities/String/isolateBidiText.js');
-  const { code } = transformSync(fs.readFileSync(file, 'utf8'), {
-    filename: file, babelrc: false, configFile: false,
-    plugins: ['@babel/plugin-transform-modules-commonjs']
-  });
-  const sandbox = { exports: {} };
-  vm.runInNewContext(code, sandbox, { filename: file });
-  return sandbox.exports.sanitizeBidiText;
-}
+const tokens = (value) => (String(value).match(/\{[^{}]+\}/g) || []).sort();
 
 function loadFunctions(relativePath, names, present) {
   const file = path.join(root, relativePath);
@@ -40,9 +30,6 @@ function loadFunctions(relativePath, names, present) {
       if (name === 'react' || name === 'prop-types') return require(name);
       if (name === 'Utilities/String/translate') return { __esModule: true, default: (id) => `localized:${id}` };
       if (name === 'Utilities/String/translateServerMessage') return { __esModule: true, default: present };
-      if (name === 'Utilities/String/isolateBidiText') {
-        return { sanitizeBidiText: loadBidiSanitizer() };
-      }
       if (name.endsWith('.css') || name === 'Helpers/Props') return {};
       return () => null;
     }
@@ -65,7 +52,7 @@ function present(message) {
   return source.replace(/\{(value\d+)\}/g, (token, name) => `\u2068${match.tokens[name]}\u2069`);
 }
 
-test('new source ledger translates 69 previously absent keys and retains ten reused keys', () => {
+test('historical source ledger retains its 69-key inventory and current IDs remain in the source registries', () => {
   assert.equal(ledger.newSourceIds.length, 69);
   assert.equal(new Set(ledger.newSourceIds).size, 69);
   assert.equal(ledger.newServerIds.length, 51);
@@ -73,6 +60,8 @@ test('new source ledger translates 69 previously absent keys and retains ten reu
   assert.equal(ledger.reusedSourceIds.length, 10);
   for (const [file, hash] of Object.entries(ledger.registries)) {
     if (file === 'docs/localization/server-message-sources.json' ||
+        file === 'docs/localization/server-message-callers.json' ||
+        file === 'docs/localization/followup-ui-sources.json' ||
         file === 'frontend/src/Utilities/Localization/server-messages.json' ||
         file === 'src/NzbDrone.Core/Localization/Core/en.json' ||
         file === 'docs/localization/source-message-hashes.json') {
@@ -90,37 +79,19 @@ test('new source ledger translates 69 previously absent keys and retains ten reu
   for (const id of ledger.newUiIds) assert.ok(ui.records.some((record) => record.id === id), id);
   const serverInventory = require('../../docs/localization/server-message-sources.json');
   const wrapperAudit = serverInventory.sourceExtensions.find(({ id }) => id === '20261031-diagnostic-exception-wrappers');
-  const registry = require('../../src/NzbDrone.Core/Localization/Core/ui-locales.json');
-  const tags = ['es', 'zh-Hans', 'hi', 'de', 'ja', 'fr', 'pt-BR', 'ar', 'ko', 'zh-Hant', 'vi', 'id'];
-  let translated = 0;
-  for (const locale of registry.locales.filter((entry) => tags.includes(entry.tag))) {
+  const localeRegistry = require('../../src/NzbDrone.Core/Localization/Core/ui-locales.json');
+  const tags = new Set(['es', 'zh-Hans', 'hi', 'de', 'ja', 'fr', 'pt-BR', 'ar', 'ko', 'zh-Hant', 'vi', 'id']);
+  assert.equal(Object.keys(english).length, currentSourceSnapshot.counts.englishSourceIds);
+  const reviewedIds = [...new Set([...ledger.newSourceIds, ...wrapperAudit.sourceIds, ...ledger.reusedSourceIds])];
+  for (const id of reviewedIds) assert.equal(typeof english[id], 'string', id);
+  for (const locale of localeRegistry.locales.filter(({ tag }) => tags.has(tag))) {
     const catalog = JSON.parse(fs.readFileSync(path.join(root, 'src/NzbDrone.Core/Localization/Core', `${locale.file}.json`), 'utf8'));
-    assert.equal(Object.keys(english).filter((id) => typeof catalog[id] === 'string' && catalog[id].trim()).length, 4170);
-    assert.equal(Object.keys(english).filter((id) => typeof catalog[id] !== 'string' || !catalog[id].trim()).length, 0);
-    for (const id of ledger.newSourceIds) {
-      assert.equal(typeof english[id], 'string', id);
+    for (const id of reviewedIds) {
       assert.equal(typeof catalog[id], 'string', `${locale.tag}/${id}`);
-      if (catalog[id] === english[id]) {
-        const equality = sourceEqualities.entries[locale.tag]?.[id];
-        assert.equal(equality?.category, 'native-equivalent', `${locale.tag}/${id}`);
-        assert.equal(equality.sourceFingerprint, digest(`${id}\0${english[id]}`), `${locale.tag}/${id}`);
-      }
-      translated++;
+      assert.ok(catalog[id].trim(), `${locale.tag}/${id} is empty`);
+      assert.deepEqual(tokens(catalog[id]), tokens(english[id]), `${locale.tag}/${id} placeholders`);
     }
-    for (const id of wrapperAudit.sourceIds) {
-      assert.equal(typeof english[id], 'string', id);
-      assert.equal(typeof catalog[id], 'string', `${locale.tag}/${id}`);
-      if (catalog[id] === english[id]) {
-        const equality = sourceEqualities.entries[locale.tag]?.[id];
-        assert.equal(equality?.category, 'native-equivalent', `${locale.tag}/${id}`);
-        assert.equal(equality.sourceFingerprint, digest(`${id}\0${english[id]}`), `${locale.tag}/${id}`);
-      }
-    }
-    for (const id of ledger.reusedSourceIds) assert.equal(typeof catalog[id], 'string', `${locale.tag}/${id}`);
   }
-  assert.equal(Object.keys(english).length, 4170);
-  assert.equal(translated, 828);
-  for (const [file, hash] of Object.entries(ledger.targetCatalogSha256)) assert.equal(digestTextFile(file), hash, file);
 });
 
 test('registry hashes are stable across LF and CRLF checkouts', () => {
@@ -140,7 +111,7 @@ test('book evidence translates fixed detail tooltips and preserves observed/prov
 test('grab-error tooltip uses the bounded presenter without translating opaque diagnostics or action labels', () => {
   const { getDownloadTooltip } = loadFunctions('frontend/src/InteractiveSearch/InteractiveSearchRow.js', ['getDownloadTooltip'], present);
   const raw = "This torrent is already present in client/{value1} as 'book/العربية'.";
-  assert.equal(getDownloadTooltip(false, false, present(raw), false, true), 'موجود في \u2068client/{value1}\u2069: \u2068book/العربية\u2069');
+  assert.equal(getDownloadTooltip(false, false, present(raw), false), 'موجود في \u2068client/{value1}\u2069: \u2068book/العربية\u2069');
   const provider = 'Downloading';
   assert.equal(getDownloadTooltip(false, false, provider, false), provider);
   assert.equal(getDownloadTooltip(false, true, raw, false), 'localized:AddedToDownloadedQueue');

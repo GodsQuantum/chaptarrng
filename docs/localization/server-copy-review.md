@@ -111,7 +111,7 @@ This adds 11 source IDs and 12 bindings, with 132 target cells pending.
 `source-followup-20261101.json` binds the current complete missing-cell set to
 the English and target catalog hashes: 4,165 English IDs, 2,955 populated
 values per target locale, and 1,210 missing values per locale (14,520 cells).
-The source presentation ledger covers 77 boundaries across 35 files. Target
+The source presentation ledger covers 76 boundaries across 35 files. Target
 catalogs remain unchanged. No semantic or native-speaker approval is claimed.
 
 The provider-validation follow-up carries existing trusted message IDs and
@@ -140,8 +140,3 @@ matched against app copy.
 `DownstreamException` responses preserve the producer's HTTP status code while
 retaining any trusted message ID and opaque parameters. Raw exception/provider
 output remains outside catalog matching.
-
-
-## Raw fallback direction-control hardening
-
-Untrusted opaque and localized fallbacks now strip all bidirectional controls at render time; only server messages verified through an application message ID may preserve the application-generated balanced isolates around captured values. Unknown and oversized server messages are scrubbed and isolated as one display string. Stored API and history values remain unchanged. Focused regressions cover nested text, opaque/localized fallbacks, unmatched controls, balanced attacker-supplied isolates, and oversized messages.

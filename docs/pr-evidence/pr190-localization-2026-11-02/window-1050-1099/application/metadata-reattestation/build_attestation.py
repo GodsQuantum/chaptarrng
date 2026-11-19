@@ -15,9 +15,7 @@ EXPECTED_README_BYTES=3061
 EXPECTED_README_SHA='897127e176748c01d02b61bb77e9faac82a83571ed33c83bf4a31752ab9efbd4'
 
 def sha(data): return hashlib.sha256(data).hexdigest()
-def blob_sha(data):
-    # Match Git's object ID; the content is also pinned with SHA-256.
-    return subprocess.check_output(['git','-C',str(REPO),'hash-object','--stdin'],input=data).decode().strip()
+def blob_sha(data): return hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
 def git(*args): return subprocess.check_output(['git','-C',str(REPO),*args])
 def gitfile(path): return git('show',f'{HEAD}:{path}')
 def readj(path): return json.loads(path.read_text(encoding='utf-8'))

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import collections, hashlib, json, pathlib, re, subprocess, sys
+import collections, hashlib, json, pathlib, re, sys
 OUT=pathlib.Path(__file__).resolve().parent
 HEAD='712d597e6f27f6485f7c287b70f6dc79003ca714'
 TREE='275b19ba948bacd883d845ec970c154511be0e43'
@@ -60,8 +60,7 @@ def main():
         f=head/path
         if not f.is_file(): fail('missing captured pinned file '+path)
         raw=f.read_bytes()
-        # Match Git's object ID; the content is also pinned with SHA-256.
-        blob=subprocess.check_output(['git','hash-object','--stdin'],input=raw).decode().strip()
+        blob=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
         audit=live_pin_audit[path]
         if len(raw)!=item.get('bytes') or sha(raw)!=item.get('sha256') or blob!=item.get('gitBlob') or audit.get('actualGitBlob')!=blob or audit.get('actualSha256')!=sha(raw): fail('captured raw blob mismatch '+path)
         if path.endswith('.json') and '/Localization/Core/' in path:

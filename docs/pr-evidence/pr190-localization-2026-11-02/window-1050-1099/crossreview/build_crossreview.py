@@ -20,8 +20,7 @@ def git(*args):
 def gitfile(path):
     return git('show', f'{HEAD}:{path}')
 def git_blob_hash(data):
-    # Match Git's object ID; the content is also pinned with SHA-256.
-    return subprocess.check_output(['git','-C',str(REPO),'hash-object','--stdin'],input=data).decode().strip()
+    return hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
 def json_from_git(path):
     return json.loads(gitfile(path).decode('utf-8'))
 def read_jsonl(path):

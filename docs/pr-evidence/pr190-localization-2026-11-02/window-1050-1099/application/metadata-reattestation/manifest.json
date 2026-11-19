@@ -14,8 +14,8 @@
     },
     {
       "path": "build_attestation.py",
-      "bytes": 13865,
-      "sha256": "2a59eb98ebd39ae5501b08b57b6d1741f1320f70888bf919bd6af33d344eb144"
+      "bytes": 13761,
+      "sha256": "45380a96b9307e516c964ec165e71383ba48a35d2eff4f1eb838f43e7a6d9c64"
     },
     {
       "path": "checksum-audit.jsonl",

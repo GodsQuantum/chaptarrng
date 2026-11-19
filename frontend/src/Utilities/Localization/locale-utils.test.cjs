@@ -83,7 +83,7 @@ test('applies lang and direction to the document root', () => {
   assert.equal(getCurrentLocale(root), 'fa-IR');
 });
 
-test('keeps Arabic document direction LTR until layout review is approved', () => {
+test('keeps Arabic language metadata while gating whole-document RTL for layout review', () => {
   const root = { lang: '', dir: '' };
   assert.equal(getDirectionForLocale('ar'), 'rtl');
   assert.deepEqual(applyDocumentLocale('ar', root), { tag: 'ar', direction: 'ltr' });

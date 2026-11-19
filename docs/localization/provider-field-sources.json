@@ -51,7 +51,7 @@
         },
         {
           "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 116,
+          "line": 90,
           "kind": "Label",
           "sourceLine": "[FieldDefinition(1, Label = \"ApiKey\", Privacy = PrivacyLevel.ApiKey, HelpText = \"provider.field.f80cf5c07c14e\")]",
           "sourceLineSha256": "ab8917d5bd18b2e074d01583baa2fc5f46d82d46eae12550bc5c9c6d36c2d9fc"
@@ -76,13 +76,6 @@
           "kind": "Label",
           "sourceLine": "[FieldDefinition(4, Label = \"ApiKey\", Type = FieldType.Password, Privacy = PrivacyLevel.ApiKey, HelpText = \"provider.field.f1a590a9b00ad\")]",
           "sourceLineSha256": "6a04deafd6c5310f9c8ade398fb01b8de92994e1525e140cada063c19d09f7e3"
-        },
-        {
-          "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitSettings.cs",
-          "line": 39,
-          "kind": "Label",
-          "sourceLine": "[FieldDefinition(3, Label = \"ApiKey\", Type = FieldType.Password, Privacy = PrivacyLevel.ApiKey, HelpText = \"provider.bookOrbit.apiKeyHelp\")]",
-          "sourceLineSha256": "5059ce18293e8b5ac9e21a03b69e693732b3b4ee6c50611654f7818b2ed294d4"
         },
         {
           "file": "src/NzbDrone.Core/Notifications/Join/JoinSettings.cs",
@@ -771,9 +764,7 @@
           "sourceLineSha256": "7d1cae87367caeb7a387a1d70b9d42ed5c8f503ddc1c09273d27e4cfe08263b6"
         }
       ],
-      "protectedLiterals": [
-        "ID"
-      ]
+      "protectedLiterals": []
     },
     {
       "id": "provider.field.f00d387283c10",
@@ -992,7 +983,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 123,
+          "line": 97,
           "kind": "HelpText",
           "sourceLine": "[FieldDefinition(2, Label = \"provider.field.fcff0d77f9e68\", Type = FieldType.Checkbox, HelpText = \"provider.field.f0a31411d36c6\")]",
           "sourceLineSha256": "9d03c924c5b791dfd32d30de1b356635d619e143ff8f21d5004a5f1916533bf7"
@@ -1234,8 +1225,7 @@
         }
       ],
       "protectedLiterals": [
-        "Goodreads",
-        "ID"
+        "Goodreads"
       ]
     },
     {
@@ -1385,7 +1375,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 106,
+          "line": 80,
           "kind": "Label",
           "sourceLine": "[FieldDefinition(0, Type = FieldType.TextArea, Label = \"provider.field.f1240054e2040\", HelpText = \"provider.field.f5c8c10dd48e0\")]",
           "sourceLineSha256": "0ce024db03547268cccac1112031d6af31eb25b7e0912ea53a9523ccc0afd01c"
@@ -1426,21 +1416,6 @@
       "protectedLiterals": [
         "http://[host]:[port]/[urlBase]/rpc,"
       ]
-    },
-    {
-      "id": "provider.field.f1345270f389d",
-      "source": "Search URL templates",
-      "sourceFingerprint": "fa591eb601a22a301bf9153b7c2952db8ef31f4c8eb443c1c6a5efe840bc610c",
-      "callsites": [
-        {
-          "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 126,
-          "kind": "Label",
-          "sourceLine": "[FieldDefinition(3, Type = FieldType.TextArea, Label = \"provider.field.f1345270f389d\", HelpText = \"provider.field.f58976fe1396bf\")]",
-          "sourceLineSha256": "55686bdc82774d141eb114098c95607254cc7e5427f4dbed73869fbdfc3d69fe"
-        }
-      ],
-      "protectedLiterals": []
     },
     {
       "id": "provider.field.f14f23b87f76a",
@@ -1485,9 +1460,7 @@
           "sourceLineSha256": "5c693dd35644681c041e0a3c02365b7b1c6422ef3def5c866fc791d9fbfd82bf"
         }
       ],
-      "protectedLiterals": [
-        "ID"
-      ]
+      "protectedLiterals": []
     },
     {
       "id": "provider.field.f17181a60f2c1",
@@ -2987,8 +2960,7 @@
         }
       ],
       "protectedLiterals": [
-        "Goodreads",
-        "ID"
+        "Goodreads"
       ]
     },
     {
@@ -3221,7 +3193,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 106,
+          "line": 80,
           "kind": "HelpText",
           "sourceLine": "[FieldDefinition(0, Type = FieldType.TextArea, Label = \"provider.field.f1240054e2040\", HelpText = \"provider.field.f5c8c10dd48e0\")]",
           "sourceLineSha256": "0ce024db03547268cccac1112031d6af31eb25b7e0912ea53a9523ccc0afd01c"
@@ -3684,7 +3656,7 @@
         },
         {
           "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitSettings.cs",
-          "line": 30,
+          "line": 27,
           "kind": "Label",
           "sourceLine": "[FieldDefinition(0, Label = \"provider.field.f70589413a3c9\", HelpText = \"BookOrbitBaseUrlHelpText\")]",
           "sourceLineSha256": "6e09ccb98ba23587721c79885984d30197b28715b90ddc1753a51f37152d61e9"
@@ -4019,7 +3991,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 116,
+          "line": 90,
           "kind": "HelpText",
           "sourceLine": "[FieldDefinition(1, Label = \"ApiKey\", Privacy = PrivacyLevel.ApiKey, HelpText = \"provider.field.f80cf5c07c14e\")]",
           "sourceLineSha256": "ab8917d5bd18b2e074d01583baa2fc5f46d82d46eae12550bc5c9c6d36c2d9fc"
@@ -4111,9 +4083,7 @@
           "sourceLineSha256": "91456e5d6321a0524d552efeabd9a52115a5fc598460b2d6fd09cdc7c2f49ec1"
         }
       ],
-      "protectedLiterals": [
-        "URL"
-      ]
+      "protectedLiterals": []
     },
     {
       "id": "provider.field.f848a6d927677",
@@ -4385,7 +4355,6 @@
       ],
       "protectedLiterals": [
         "Goodreads",
-        "ID",
         "OAuth",
         "URL"
       ]
@@ -4418,9 +4387,7 @@
           "sourceLineSha256": "0ca30ef4935dc4f32ffee4bb57f019a0f78974f4693f5537c02673f019036b31"
         }
       ],
-      "protectedLiterals": [
-        "ID"
-      ]
+      "protectedLiterals": []
     },
     {
       "id": "provider.field.f8cc89a742cf5",
@@ -4973,23 +4940,6 @@
       ]
     },
     {
-      "id": "provider.field.f58976fe1396bf",
-      "source": "Optional. Add one catalog|URL or mirror|URL template per line. Put {query} where the encoded search term belongs. Each template must use the same origin as a configured URL, and results must match its format. Browser-verification challenges can use the optional FlareSolverr service.",
-      "sourceFingerprint": "7b5759079ec870e96fa033f5d84f56990ad02aa4c542971098c0bae396ad95b3",
-      "callsites": [
-        {
-          "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 126,
-          "kind": "HelpText",
-          "sourceLine": "[FieldDefinition(3, Type = FieldType.TextArea, Label = \"provider.field.f1345270f389d\", HelpText = \"provider.field.f58976fe1396bf\")]",
-          "sourceLineSha256": "55686bdc82774d141eb114098c95607254cc7e5427f4dbed73869fbdfc3d69fe"
-        }
-      ],
-      "protectedLiterals": [
-        "{query}"
-      ]
-    },
-    {
       "id": "provider.field.f9d0dec541ca6",
       "source": "Grimmory URL, including http(s):// and port, e.g. http://grimmory:6060. Grimmory must see the same files as Chaptarr (shared or identically mounted storage)",
       "sourceFingerprint": "e1fdf8d9972729f83741c3c317b5b236cb55bc584cc35ee4eba9c4a507f74911",
@@ -5076,8 +5026,7 @@
         }
       ],
       "protectedLiterals": [
-        "Goodreads",
-        "ID"
+        "Goodreads"
       ]
     },
     {
@@ -6082,9 +6031,7 @@
           "sourceLineSha256": "3698cba90a58b86745f468dc0cb6d81c3c8d6099b69e29948823578503ff71e7"
         }
       ],
-      "protectedLiterals": [
-        "ID"
-      ]
+      "protectedLiterals": []
     },
     {
       "id": "provider.field.fc03eb4d77a85",
@@ -6630,7 +6577,7 @@
       "callsites": [
         {
           "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 123,
+          "line": 97,
           "kind": "Label",
           "sourceLine": "[FieldDefinition(2, Label = \"provider.field.fcff0d77f9e68\", Type = FieldType.Checkbox, HelpText = \"provider.field.f0a31411d36c6\")]",
           "sourceLineSha256": "9d03c924c5b791dfd32d30de1b356635d619e143ff8f21d5004a5f1916533bf7"
@@ -6751,9 +6698,7 @@
           "sourceLineSha256": "778ad0bee0ce487de423870449c3efe3f94d1b948b8b6b739e2d80a5f361e06b"
         }
       ],
-      "protectedLiterals": [
-        "ID"
-      ]
+      "protectedLiterals": []
     },
     {
       "id": "provider.field.fd237f4cb52a2",
@@ -8200,62 +8145,14 @@
         }
       ],
       "protectedLiterals": []
-    },
-    {
-      "id": "provider.field.fe9b8363486b09",
-      "source": "FlareSolverr URL",
-      "sourceFingerprint": "5afda38f85f70fd074a7f50dd2c7234985b9d2fac857f50c1006fe9244e2de80",
-      "callsites": [
-        {
-          "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 129,
-          "kind": "Label",
-          "sourceLine": "[FieldDefinition(4, Type = FieldType.Textbox, Label = \"provider.field.fe9b8363486b09\", HelpText = \"provider.field.f49b40e588f3d5\")]",
-          "sourceLineSha256": "bf972b77536e3e102fe411220c6b9a0f3cd2aa3183eb5ffab221a42c280c33dd"
-        }
-      ],
-      "protectedLiterals": []
-    },
-    {
-      "id": "provider.field.f49b40e588f3d5",
-      "source": "Optional FlareSolverr /v1 endpoint. Direct requests run first; 403/503 responses and detected browser challenges are retried through this service.",
-      "sourceFingerprint": "88cd4f1054d9dd87d3820649a2f7682304b956912a32a1efd6c168db1d74c974",
-      "callsites": [
-        {
-          "file": "src/NzbDrone.Core/Indexers/DirectDownload/DirectDownloadSettings.cs",
-          "line": 129,
-          "kind": "HelpText",
-          "sourceLine": "[FieldDefinition(4, Type = FieldType.Textbox, Label = \"provider.field.fe9b8363486b09\", HelpText = \"provider.field.f49b40e588f3d5\")]",
-          "sourceLineSha256": "bf972b77536e3e102fe411220c6b9a0f3cd2aa3183eb5ffab221a42c280c33dd"
-        }
-      ],
-      "protectedLiterals": []
-    },
-    {
-      "id": "provider.bookOrbit.apiKeyHelp",
-      "source": "Optional on BookOrbit 3.8 or later. A read and write API key with Book Dock Access replaces the username and password.",
-      "sourceFingerprint": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983",
-      "callsites": [
-        {
-          "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitSettings.cs",
-          "line": 39,
-          "kind": "HelpText",
-          "sourceLine": "[FieldDefinition(3, Label = \"ApiKey\", Type = FieldType.Password, Privacy = PrivacyLevel.ApiKey, HelpText = \"provider.bookOrbit.apiKeyHelp\")]",
-          "sourceLineSha256": "5059ce18293e8b5ac9e21a03b69e693732b3b4ee6c50611654f7818b2ed294d4"
-        }
-      ],
-      "protectedLiterals": [
-        "BookOrbit",
-        "Book Dock Access"
-      ]
     }
   ],
   "counts": {
-    "total": 820,
+    "total": 814,
     "existingId": 168,
     "changedFiles": 69,
-    "mappedDistinctSources": 414,
-    "newSourceKeys": 398,
-    "mappedCallsites": 652
+    "mappedDistinctSources": 409,
+    "newSourceKeys": 393,
+    "mappedCallsites": 646
   }
 }

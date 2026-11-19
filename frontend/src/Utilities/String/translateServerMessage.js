@@ -3,7 +3,7 @@ import serverMessages from 'Utilities/Localization/server-messages.json';
 import isolateBidiText from 'Utilities/String/isolateBidiText';
 import { translateWithFallback } from 'Utilities/String/translate';
 
-const { MAX_MESSAGE_LENGTH, compileServerMessageMatchers, matchServerMessage } = serverMessageMatching;
+const { compileServerMessageMatchers, matchServerMessage } = serverMessageMatching;
 const matchers = compileServerMessageMatchers(serverMessages);
 const serverMessagesById = new Map(serverMessages.map((message) => [message.id, message]));
 const retainedFileMarker = ' Converted file retained at: ';
@@ -20,7 +20,7 @@ const snippetBaseMessageIds = new Set([
   'server.message.m4d3e6de749b4',
   'server.message.m8af0d2379b97',
   'server.message.ma69b7ec09fb3',
-  'server.message.mccfb6e3b050a'
+  'server.message.mccfb6e3b050a',
 ]);
 
 // Only call this at a server-message presentation boundary. Unknown messages
@@ -40,9 +40,9 @@ export function translateServerMessageById(messageId, parameters = {}) {
   const message = serverMessagesById.get(messageId);
   // Missing parameter bags are valid only for descriptors without tokens.
   const normalizedParameters = parameters === null &&
-    (!message || !message.parameters || message.parameters.length === 0) ?
-    {} :
-    parameters;
+    (!message || !message.parameters || message.parameters.length === 0)
+    ? {}
+    : parameters;
 
   if (
     !message ||
@@ -85,7 +85,7 @@ function translateAlternateDownloadClients(match) {
   let suffix = remaining;
 
   while (suffix) {
-    const phraseMatch = (/^(Found \d+ enabled (?:direct|torrent|usenet) client\(s\)\.)/).exec(suffix);
+    const phraseMatch = /^(Found \d+ enabled (?:direct|torrent|usenet) client\(s\)\.)/.exec(suffix);
 
     if (!phraseMatch) {
       return null;
@@ -111,7 +111,7 @@ function translateAlternateDownloadClients(match) {
 
   return translateMatch({
     ...match,
-    tokens: { ...match.tokens, value1: phrases.join(' ') }
+    tokens: { ...match.tokens, value1: phrases.join(' ') },
   });
 }
 
@@ -148,60 +148,52 @@ function markerPositions(value, marker) {
   const positions = [];
   let cursor = 0;
 
-  while (cursor <= value.length - marker.length) {
+  while (true) {
     const index = value.indexOf(marker, cursor);
 
     if (index < 0) {
-      break;
+      return positions;
     }
 
     positions.push(index);
     cursor = index + 1;
   }
-
-  return positions;
-}
-
-function translateRetainedFileMessage(message, retainedFileIndex) {
-  const retainedPath = matchServerMessage(message.slice(retainedFileIndex + 1), matchers);
-
-  if (!retainedPath || retainedPath.id !== retainedFileMessageId) {
-    return null;
-  }
-
-  let prefix = message.slice(0, retainedFileIndex);
-  const suffixes = [retainedPath];
-
-  if (prefix.endsWith(readableM4bSuffix)) {
-    const readableSuffix = matchServerMessage(readableM4bSuffix.slice(1), matchers);
-
-    if (!readableSuffix || readableSuffix.id !== readableM4bMessageId) {
-      return null;
-    }
-
-    prefix = prefix.slice(0, -readableM4bSuffix.length);
-    suffixes.unshift(readableSuffix);
-  }
-
-  const base = matchFixedM4bBase(prefix);
-
-  return base ? [base, ...suffixes].map(translateMatch).join(' ') : null;
 }
 
 function translateComposedM4bMessage(message) {
-  if (typeof message !== 'string' || !message || message.length > MAX_MESSAGE_LENGTH || message.includes(toolOutputMarker)) {
+  if (typeof message !== 'string' || !message || message.includes(toolOutputMarker)) {
     return null;
   }
 
   // Retained-path messages have the construction order: fixed base, optional
   // readable-M4B suffix, then retained-path suffix. Try each marker position,
   // but accept it only when the remaining prefix is an exact fixed source.
-  const retainedFileTranslation = markerPositions(message, retainedFileMarker)
-    .map((index) => translateRetainedFileMessage(message, index))
-    .find(Boolean);
+  for (const retainedFileIndex of markerPositions(message, retainedFileMarker)) {
+    const retainedPath = matchServerMessage(message.slice(retainedFileIndex + 1), matchers);
 
-  if (retainedFileTranslation) {
-    return retainedFileTranslation;
+    if (!retainedPath || retainedPath.id !== retainedFileMessageId) {
+      continue;
+    }
+
+    let prefix = message.slice(0, retainedFileIndex);
+    const suffixes = [retainedPath];
+
+    if (prefix.endsWith(readableM4bSuffix)) {
+      const readableSuffix = matchServerMessage(readableM4bSuffix.slice(1), matchers);
+
+      if (!readableSuffix || readableSuffix.id !== readableM4bMessageId) {
+        continue;
+      }
+
+      prefix = prefix.slice(0, -readableM4bSuffix.length);
+      suffixes.unshift(readableSuffix);
+    }
+
+    const base = matchFixedM4bBase(prefix);
+
+    if (base) {
+      return [base, ...suffixes].map(translateMatch).join(' ');
+    }
   }
 
   if (message.endsWith(readableM4bSuffix)) {
@@ -217,21 +209,9 @@ function translateComposedM4bMessage(message) {
 }
 
 export default function translateServerMessage(message) {
-  if (typeof message !== 'string' || !message) {
-    return message;
-  }
-
-  // Even messages that are unknown, malformed, or too large to inspect are
-  // rendered as untrusted text. Sanitize and isolate the display copy so its
-  // natural direction cannot reorder surrounding application-authored text;
-  // callers keep the original API/history value unchanged.
-  if (message.length > MAX_MESSAGE_LENGTH) {
-    return isolateBidiText(message);
-  }
-
-  const toolOutputTranslation = typeof message === 'string' ?
-    translateToolOutputMessage(message) :
-    null;
+  const toolOutputTranslation = typeof message === 'string'
+    ? translateToolOutputMessage(message)
+    : null;
 
   if (toolOutputTranslation) {
     return toolOutputTranslation;
@@ -241,11 +221,11 @@ export default function translateServerMessage(message) {
 
   if (match) {
     if (match.id === alternateDownloadClientMessageId) {
-      return translateAlternateDownloadClients(match) || isolateBidiText(message);
+      return translateAlternateDownloadClients(match) || message;
     }
 
     return translateMatch(match);
   }
 
-  return translateComposedM4bMessage(message) || isolateBidiText(message);
+  return translateComposedM4bMessage(message) || message;
 }

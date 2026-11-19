@@ -11,9 +11,7 @@ checks=collections.Counter()
 def sha(b): return hashlib.sha256(b).hexdigest()
 def textsha(s): return sha(s.encode('utf-8'))
 def git(*args): return subprocess.check_output(['git','-C',str(REPO),*args],text=True).strip()
-def blobsha(b):
-    # Match Git's object ID; the content is also pinned with SHA-256.
-    return subprocess.check_output(['git','-C',str(REPO),'hash-object','--stdin'],input=b).decode().strip()
+def blobsha(b): return hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
 def load(path): return json.loads(path.read_text(encoding='utf-8'))
 def loadj(path): return [json.loads(line) for line in path.open(encoding='utf-8') if line.strip()]
 def dup_load(path):

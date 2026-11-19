@@ -32,8 +32,7 @@ def gh(args):
 def fetch(pin):
     url='repos/{}/contents/{}?ref={}'.format(REPO,pin['path'],HEAD)
     obj=json.loads(gh(['gh','api',url])); data=base64.b64decode(obj['content'])
-    # Match Git's object ID; the content is also pinned with SHA-256.
-    blob=subprocess.check_output(['git','hash-object','--stdin'],input=data).decode().strip()
+    blob=hashlib.sha1(b'blob '+str(len(data)).encode()+bytes([0])+data).hexdigest()
     require(len(data)==pin['byteCount'],'byte count mismatch: '+pin['path'])
     require(sha(data)==pin['sha256'],'file SHA-256 mismatch: '+pin['path'])
     require(blob==pin['gitBlob'],'git blob mismatch: '+pin['path'])

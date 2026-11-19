@@ -2758,7 +2758,6 @@
   "BookNotAddableMissingProviderIdsHelpText": "Zum Hinzufügen eines Formats sind eine Buch-/Werk-ID und eine Autoren-ID erforderlich. Versuche es mit einem anderen Katalogergebnis oder einer anderen Quelle.",
   "BookOrbitBaseUrlHelpText": "Basis-URL deines BookOrbit-Servers, zum Beispiel http://bookorbit:3000. Füge BookOrbit separat hinzu; BookLore-Zugangsdaten werden nicht wiederverwendet.",
   "BookOrbitPasswordHelpText": "Passwort des BookOrbit-Kontos. Für dieses Konto muss die Anmeldung mit Passwort aktiviert sein.",
-  "provider.bookOrbit.apiKeyHelp": "Optional ab BookOrbit 3.8. Ein API-Schlüssel mit Lese- und Schreibzugriff und der Berechtigung Book Dock Access ersetzt Benutzername und Passwort.",
   "BookOrbitUsernameHelpText": "BookOrbit-Konto mit der Berechtigung Book Dock Access.",
   "BookshelfAllFormatsMonitoringHelpText": "Die ausgewählte Aktion gilt für eBook- und Hörbuchdatensätze der ausgewählten Autoren. Dadurch ändert sich weder, ob ein Autor überwacht wird, noch wie künftige Bücher überwacht werden.",
   "BookshelfFormatGroupingHelpText": "Im Modus für beide Formate gruppiert ChaptarrNG eBook- und Hörbuchdatensätze nur dann, wenn sie dieselbe Werk-ID von Hardcover, Goodreads oder Open Library haben. Datensätze ohne gemeinsame ID bleiben getrennt. Aktualisiere die IDs mit „Aktualisieren“ auf den Buch- und Autorenseiten.",
@@ -4164,9 +4163,5 @@
   "ui.task.processPendingImports": "Ausstehende Importe verarbeiten",
   "ui.task.refreshMonitoredDownloads": "Überwachte Downloads aktualisieren",
   "ui.task.refreshMyAnonaMouseAccountStatus": "Kontostatus von My Anona Mouse aktualisieren",
-  "ui.task.repairAuthorMediaCovers": "Autoren-Coverbilder reparieren",
-  "provider.field.f1345270f389d": "Search URL templates",
-  "provider.field.f58976fe1396bf": "Optional. Add one catalog|URL or mirror|URL template per line. Put {query} where the encoded search term belongs. Each template must use the same origin as a configured URL, and results must match its format. Browser-verification challenges can use the optional FlareSolverr service.",
-  "provider.field.fe9b8363486b09": "FlareSolverr URL",
-  "provider.field.f49b40e588f3d5": "Optional FlareSolverr /v1 endpoint. Direct requests run first; 403/503 responses and detected browser challenges are retried through this service."
+  "ui.task.repairAuthorMediaCovers": "Autoren-Coverbilder reparieren"
 }

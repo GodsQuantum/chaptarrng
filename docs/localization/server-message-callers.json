@@ -3,7 +3,7 @@
   "scope": "Message handling and presentation boundaries only; stores retain raw server messages and captured provider/user values stay data. See server-copy-review.md for complete caller review.",
   "counts": {
     "files": 35,
-    "callsites": 77
+    "callsites": 76
   },
   "callsites": [
     {
@@ -194,19 +194,19 @@
     },
     {
       "file": "frontend/src/Components/Form/FormInputHelpText.js",
-      "line": 45,
+      "line": 44,
       "sourceLine": "{translatedText}",
       "sourceLineSha256": "33dc1daa8106d99a5ceadd88b572830dccdb2b261ff783c4ffbf36778cb1fe50"
     },
     {
       "file": "frontend/src/Components/Form/FormInputHelpText.js",
-      "line": 52,
+      "line": 51,
       "sourceLine": "title={translatedTooltip}",
       "sourceLineSha256": "64b6234cfb2bc4648a8c5b03c829d9b5592ac97c7d3678b79f4e1acdb7be3197"
     },
     {
       "file": "frontend/src/Components/Form/FormInputHelpText.js",
-      "line": 66,
+      "line": 65,
       "sourceLine": "title={translatedTooltip}",
       "sourceLineSha256": "64b6234cfb2bc4648a8c5b03c829d9b5592ac97c7d3678b79f4e1acdb7be3197"
     },
@@ -242,33 +242,27 @@
     },
     {
       "file": "frontend/src/Components/Page/Sidebar/Messages/Message.js",
-      "line": 55,
-      "sourceLine": "return <BidiText lang=\"und\">{message}</BidiText>;",
-      "sourceLineSha256": "758783a447dd0fa14444433fe0bf6c399140912d41d01d4627cbeaf328eedd8a"
-    },
-    {
-      "file": "frontend/src/Components/Page/Sidebar/Messages/Message.js",
-      "line": 59,
-      "sourceLine": "return translateServerMessageById(messageId, messageParameters) || <BidiText lang=\"und\">{message}</BidiText>;",
-      "sourceLineSha256": "eb19c093fe7a1412f9bbeb3a7074b715320f59fbcfb04ac8d2177b334f40447b"
-    },
-    {
-      "file": "frontend/src/Components/Page/Sidebar/Messages/Message.js",
-      "line": 62,
-      "sourceLine": "return translateServerMessage(message);",
-      "sourceLineSha256": "4024ec05599851e5044fd2eb4f50111b35c183b3ef3ccebf9e1dc0dd2766f1e2"
-    },
-    {
-      "file": "frontend/src/Components/Page/Sidebar/Messages/Message.js",
-      "line": 91,
+      "line": 80,
       "sourceLine": "message={translateServerMessage(message)}",
       "sourceLineSha256": "ef86e1bc76c9ac3d7b22713a2b7ef2bb8724a0665ed8df21398a6eafc1815534"
     },
     {
       "file": "frontend/src/Components/Page/Sidebar/Messages/Message.js",
-      "line": 114,
+      "line": 103,
       "sourceLine": "const stageText = translateServerMessage(message);",
       "sourceLineSha256": "7b74f4a37332c5045ffcb0c09d2c3e3639ce76a05fd5cf9c73352dbf9bfca721"
+    },
+    {
+      "file": "frontend/src/Components/Page/Sidebar/Messages/Message.js",
+      "line": 185,
+      "sourceLine": "(translateServerMessageById(messageId, messageParameters) || <BidiText lang=\"und\">{message}</BidiText>) :",
+      "sourceLineSha256": "e647b0c79ba92d10eb7303eb5835d8abf7a66f7f4c99f4947c1acc28ec237e33"
+    },
+    {
+      "file": "frontend/src/Components/Page/Sidebar/Messages/Message.js",
+      "line": 186,
+      "sourceLine": "messageMode === 'localized' ? message : translateServerMessage(message)}",
+      "sourceLineSha256": "c766145fcaa5581d0c883565e3edacf59136ec59b83b8c5fd4cb938d65cdf219"
     },
     {
       "file": "frontend/src/Components/PendingImportStatus/PendingImportStatus.js",
@@ -290,7 +284,7 @@
     },
     {
       "file": "frontend/src/InteractiveSearch/InteractiveSearchRow.js",
-      "line": 306,
+      "line": 305,
       "sourceLine": "const localizedGrabError = translateServerMessageById(grabErrorMessageId, grabErrorMessageParameters);",
       "sourceLineSha256": "1320c2417fecaaf1d073c0c51a72efd004c78a71682fd8aa9eb5eeb9bd2fbdeb"
     },
@@ -302,7 +296,7 @@
     },
     {
       "file": "frontend/src/Search/Series/AddNewSeriesModalContent.js",
-      "line": 56,
+      "line": 49,
       "sourceLine": "const translated = translateServerMessageById(response?.messageId, response?.messageParameters);",
       "sourceLineSha256": "36e570a40081f9972bef9715581df70217631356d23915af9ecc0bd5c0a45f16"
     },

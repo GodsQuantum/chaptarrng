@@ -30,6 +30,10 @@ function renderErrorDescriptor(error) {
     return translated;
   }
 
+  if (error.isLocalized) {
+    return error.message;
+  }
+
   return error.message ? <BidiText lang="und">{error.message}</BidiText> : null;
 }
 
@@ -39,31 +43,17 @@ function renderApiError(error) {
   }
 
   const response = typeof error === 'object' ? error.responseJSON : null;
-  let message = '';
-
-  if (typeof error === 'string') {
-    message = error;
-  } else if (typeof response === 'string') {
-    message = response;
-  } else if (response) {
-    message = response.message || response.errorMessage || response.ErrorMessage || response.error || '';
-  }
-
-  if (!message && typeof error.responseText === 'string') {
-    message = error.responseText;
-  }
-
+  const message = typeof error === 'string' ? error : typeof response === 'string' ? response :
+    response && (response.message || response.errorMessage || response.ErrorMessage || response.error) ||
+    error.responseText;
   const translated = translateServerMessageById(response?.messageId, response?.messageParameters);
 
   if (translated) {
     return translated;
   }
 
-  if (typeof message === 'string' && message) {
-    return <BidiText lang="und">{message}</BidiText>;
-  }
-
-  return typeof error.message === 'string' && error.message ? <BidiText lang="und">{error.message}</BidiText> : null;
+  return typeof message === 'string' && message ? <BidiText lang="und">{message}</BidiText> :
+    (typeof error.message === 'string' && error.message ? <BidiText lang="und">{error.message}</BidiText> : null);
 }
 
 function normalizeDefaultMediaType(value, allowBoth) {
