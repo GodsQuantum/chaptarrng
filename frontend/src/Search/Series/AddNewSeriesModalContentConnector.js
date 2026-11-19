@@ -18,13 +18,9 @@ import {
   resolveMonitorOption
 } from 'Utilities/Author/monitorOptions';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
+import isolateBidiText from 'Utilities/String/isolateBidiText';
 import translate from 'Utilities/String/translate';
-import { translateServerMessageById } from 'Utilities/String/translateServerMessage';
 import AddNewSeriesModalContent from './AddNewSeriesModalContent';
-
-function isolateOpaqueValue(value) {
-  return `\u2068${value}\u2069`;
-}
 
 function resolveErrorDescriptor(error) {
   if (error?.isLocalized) {
@@ -767,7 +763,7 @@ class AddNewSeriesModalContentConnector extends Component {
                 booksCount,
                 queueSuffix,
                 ebooksLabel: translate('Ebooks'),
-                error: isolateOpaqueValue(partialError.message)
+                error: isolateBidiText(partialError.message)
               }
             );
             handleFailure({ message, isLocalized: true });
@@ -833,7 +829,7 @@ class AddNewSeriesModalContentConnector extends Component {
               booksCount,
               queueSuffix,
               ebooksLabel: translate('Ebooks'),
-              error: isolateOpaqueValue(partialError.message)
+              error: isolateBidiText(partialError.message)
             }
           );
           handleFailure({ message, isLocalized: true });

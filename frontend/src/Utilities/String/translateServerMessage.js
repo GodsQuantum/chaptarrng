@@ -1,5 +1,6 @@
 import serverMessageMatching from 'Utilities/Localization/server-message-match.cjs';
 import serverMessages from 'Utilities/Localization/server-messages.json';
+import isolateBidiText from 'Utilities/String/isolateBidiText';
 import { translateWithFallback } from 'Utilities/String/translate';
 
 const { compileServerMessageMatchers, matchServerMessage } = serverMessageMatching;
@@ -28,11 +29,9 @@ function translateMatch(match) {
   // Isolate rendered values from the sentence direction. The matched API/history
   // string and each captured value stay intact; only this display result gains
   // first-strong isolate / pop directional isolate boundaries.
-  const tokens = Object.fromEntries(Object.entries(match.tokens).map(([key, value]) => {
-    const isIsolated = value.startsWith('\u2068') && value.endsWith('\u2069');
-
-    return [key, !value || isIsolated ? value : `\u2068${value}\u2069`];
-  }));
+  const tokens = Object.fromEntries(
+    Object.entries(match.tokens).map(([key, value]) => [key, isolateBidiText(value)])
+  );
 
   return translateWithFallback(match.id, match.source, tokens);
 }
@@ -62,12 +61,12 @@ export function translateServerMessageById(messageId, parameters = {}) {
       return;
     }
 
-    if (typeof value === 'string' && value && !(value.startsWith('\u2068') && value.endsWith('\u2069'))) {
-      tokens[name] = `\u2068${value}\u2069`;
+    if (typeof value === 'string') {
+      tokens[name] = isolateBidiText(value);
       return;
     }
 
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    if (typeof value === 'number' || typeof value === 'boolean') {
       tokens[name] = value;
     }
   });
