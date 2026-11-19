@@ -190,17 +190,17 @@
     "Remaining diagnostic/exception-wrapper/log source classification is explicitly open. This is bounded coverage, not whole-app closure or qualified native approval."
   ],
   "targetCatalogSha256": {
-    "src/NzbDrone.Core/Localization/Core/es.json": "f91bf25eb54c13f651e008be6c6081c926efcaec7ffe018423e070ed943717bd",
-    "src/NzbDrone.Core/Localization/Core/zh_CN.json": "9608cdeff76890723dfb3a7df5259050b0de4e70da5f5eb1b3ada0eb616f2484",
-    "src/NzbDrone.Core/Localization/Core/hi.json": "8bea6b7b5a246ac7fcc2e4cbb5e272013610672d669a6caf2606393e6148f845",
-    "src/NzbDrone.Core/Localization/Core/de.json": "9fd3a28d34ca4770f6cabf09abb795cec110c0de4fd51f7b9d0215758359d343",
-    "src/NzbDrone.Core/Localization/Core/ja.json": "3f26e3fd54dbae5b368bf39ee2fcacb267214632b93fbd1c968b2c6103c44a04",
-    "src/NzbDrone.Core/Localization/Core/fr.json": "d9ce983873601c7a4a9c2379c3016e1a400e87ef753b07167b3372427d19a93b",
-    "src/NzbDrone.Core/Localization/Core/pt_BR.json": "0afd200b8b04555bdf52783b9d6b5facefc3d33890fe0eacfc15c8cc71761928",
-    "src/NzbDrone.Core/Localization/Core/ar.json": "acd81af530bc6a30fb15c7d80eaab89a0e988119ce7a4c4d6b2f4621f7b0cd5b",
-    "src/NzbDrone.Core/Localization/Core/ko.json": "b371eec5ca0c50443c535c6dfb38a15b4c4a3e9b1bd0bc332de3aafa7d782c0f",
-    "src/NzbDrone.Core/Localization/Core/zh_TW.json": "cbc3ef59fcfa4aead61be1b5582f23fb3e161afe6a3a263f29df9e9d25b6187d",
-    "src/NzbDrone.Core/Localization/Core/vi.json": "bd3f99738262b2a5a7e942bcf197d20e129e8c748049c6d0d5afa94e084a6b2e",
-    "src/NzbDrone.Core/Localization/Core/id.json": "623dc2ef12d17ca455b232ae91e4c1b02f93f1a9fcebaef10eeddda142b5c06d"
+    "src/NzbDrone.Core/Localization/Core/es.json": "3bf3072fe266536552c26f59c01d05fe72b4822dc00ad85ff0cb18c253bce0e2",
+    "src/NzbDrone.Core/Localization/Core/zh_CN.json": "fe49dce4ed9a13528744cb075e2ce80e4d6e893638dcc26ff936edae65c5f232",
+    "src/NzbDrone.Core/Localization/Core/hi.json": "5e0afdea1d8caab10ee3e5ec850f047968582ac3f539bcff9bd33d07d2601cd5",
+    "src/NzbDrone.Core/Localization/Core/de.json": "24a81bf0e778b7e6fecd848290e1d99b388b73dac4349ffa2e24e7495cefef25",
+    "src/NzbDrone.Core/Localization/Core/ja.json": "b538d04ca14919bd07098a202c445cd05cff0fe67b2722d531264f8374d56c06",
+    "src/NzbDrone.Core/Localization/Core/fr.json": "5c00f8406af170a3030eab271d37497000826b15b619e0c0e94a937cd9498817",
+    "src/NzbDrone.Core/Localization/Core/pt_BR.json": "0bbaf531a048bb03629f325a0fcb529b2091acb4ec4bb3b898af20722ff9de5d",
+    "src/NzbDrone.Core/Localization/Core/ar.json": "9357b598344dccbe99d41d599bd5b5e2074f0b021b3f50d1348df2b47c862688",
+    "src/NzbDrone.Core/Localization/Core/ko.json": "4e742f32470522b38d298f0a28736924fa92a4423e21db0c999f44e03851da2d",
+    "src/NzbDrone.Core/Localization/Core/zh_TW.json": "891931a4205380ebf55c4451c590ffe9ef9f33e1afffd52f041615a7915cc746",
+    "src/NzbDrone.Core/Localization/Core/vi.json": "fa88aa5e118220de600910e6e8da974d5ad73673635796ac67a4220c470e1313",
+    "src/NzbDrone.Core/Localization/Core/id.json": "df9843c0659860b31a0514aecd602fa3931fdfca8b69c90f966426525359f351"
   }
 }

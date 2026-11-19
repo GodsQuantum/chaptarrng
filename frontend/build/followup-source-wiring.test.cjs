@@ -95,7 +95,7 @@ test('new source ledger translates 69 previously absent keys and retains ten reu
   let translated = 0;
   for (const locale of registry.locales.filter((entry) => tags.includes(entry.tag))) {
     const catalog = JSON.parse(fs.readFileSync(path.join(root, 'src/NzbDrone.Core/Localization/Core', `${locale.file}.json`), 'utf8'));
-    assert.equal(Object.keys(english).filter((id) => typeof catalog[id] === 'string' && catalog[id].trim()).length, 4169);
+    assert.equal(Object.keys(english).filter((id) => typeof catalog[id] === 'string' && catalog[id].trim()).length, 4170);
     assert.equal(Object.keys(english).filter((id) => typeof catalog[id] !== 'string' || !catalog[id].trim()).length, 0);
     for (const id of ledger.newSourceIds) {
       assert.equal(typeof english[id], 'string', id);
@@ -118,7 +118,7 @@ test('new source ledger translates 69 previously absent keys and retains ten reu
     }
     for (const id of ledger.reusedSourceIds) assert.equal(typeof catalog[id], 'string', `${locale.tag}/${id}`);
   }
-  assert.equal(Object.keys(english).length, 4169);
+  assert.equal(Object.keys(english).length, 4170);
   assert.equal(translated, 828);
   for (const [file, hash] of Object.entries(ledger.targetCatalogSha256)) assert.equal(digestTextFile(file), hash, file);
 });

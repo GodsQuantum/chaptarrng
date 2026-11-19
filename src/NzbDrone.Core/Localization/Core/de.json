@@ -2758,7 +2758,7 @@
   "BookNotAddableMissingProviderIdsHelpText": "Zum Hinzufügen eines Formats sind eine Buch-/Werk-ID und eine Autoren-ID erforderlich. Versuche es mit einem anderen Katalogergebnis oder einer anderen Quelle.",
   "BookOrbitBaseUrlHelpText": "Basis-URL deines BookOrbit-Servers, zum Beispiel http://bookorbit:3000. Füge BookOrbit separat hinzu; BookLore-Zugangsdaten werden nicht wiederverwendet.",
   "BookOrbitPasswordHelpText": "Passwort des BookOrbit-Kontos. Für dieses Konto muss die Anmeldung mit Passwort aktiviert sein.",
-  "BookOrbitApiKeyHelpText": "Optional ab BookOrbit 3.8. Ein API-Schlüssel mit Lese- und Schreibzugriff und der Berechtigung Book Dock Access ersetzt Benutzername und Passwort.",
+  "provider.bookOrbit.apiKeyHelp": "Optional ab BookOrbit 3.8. Ein API-Schlüssel mit Lese- und Schreibzugriff und der Berechtigung Book Dock Access ersetzt Benutzername und Passwort.",
   "BookOrbitUsernameHelpText": "BookOrbit-Konto mit der Berechtigung Book Dock Access.",
   "BookshelfAllFormatsMonitoringHelpText": "Die ausgewählte Aktion gilt für eBook- und Hörbuchdatensätze der ausgewählten Autoren. Dadurch ändert sich weder, ob ein Autor überwacht wird, noch wie künftige Bücher überwacht werden.",
   "BookshelfFormatGroupingHelpText": "Im Modus für beide Formate gruppiert ChaptarrNG eBook- und Hörbuchdatensätze nur dann, wenn sie dieselbe Werk-ID von Hardcover, Goodreads oder Open Library haben. Datensätze ohne gemeinsame ID bleiben getrennt. Aktualisiere die IDs mit „Aktualisieren“ auf den Buch- und Autorenseiten.",

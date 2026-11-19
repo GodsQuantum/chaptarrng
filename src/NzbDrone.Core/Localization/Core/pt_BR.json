@@ -2758,7 +2758,7 @@
   "BookNotAddableMissingProviderIdsHelpText": "É necessário um ID de livro/obra e um ID de autor para adicionar um formato. Tente outro resultado ou outra fonte do catálogo.",
   "BookOrbitBaseUrlHelpText": "URL base do seu servidor BookOrbit, como http://bookorbit:3000. Adicione o BookOrbit separadamente; as credenciais do BookLore não são reutilizadas.",
   "BookOrbitPasswordHelpText": "Senha da conta do BookOrbit. O login por senha precisa estar habilitado para essa conta.",
-  "BookOrbitApiKeyHelpText": "Opcional no BookOrbit 3.8 ou posterior. Uma chave de API de leitura e gravação com a permissão Book Dock Access substitui o nome de usuário e a senha.",
+  "provider.bookOrbit.apiKeyHelp": "Opcional no BookOrbit 3.8 ou posterior. Uma chave de API de leitura e gravação com a permissão Book Dock Access substitui o nome de usuário e a senha.",
   "BookOrbitUsernameHelpText": "Conta do BookOrbit com a permissão Book Dock Access.",
   "BookshelfAllFormatsMonitoringHelpText": "A ação selecionada é aplicada aos registros de eBook e audiolivro dos autores selecionados. Isso não altera se um autor está monitorado nem como os livros futuros serão monitorados.",
   "BookshelfFormatGroupingHelpText": "No modo para ambos os formatos, o ChaptarrNG agrupa registros de eBook e audiolivro somente quando eles compartilham um ID de obra do Hardcover, Goodreads ou Open Library. Registros sem um ID compartilhado permanecem separados. Para atualizar os IDs, use “Atualizar” nas páginas do livro e do autor.",

@@ -2758,7 +2758,7 @@
   "BookNotAddableMissingProviderIdsHelpText": "添加格式需要书籍/作品 ID 和作者 ID。请尝试其他目录结果或来源。",
   "BookOrbitBaseUrlHelpText": "BookOrbit 服务器的基本 URL，例如 http://bookorbit:3000。请单独添加 BookOrbit；不会重复使用 BookLore 凭据。",
   "BookOrbitPasswordHelpText": "BookOrbit 账户密码。此账户必须启用密码登录。",
-  "BookOrbitApiKeyHelpText": "BookOrbit 3.8 及更高版本可选。具有 Book Dock Access 权限的读写 API 密钥可代替用户名和密码。",
+  "provider.bookOrbit.apiKeyHelp": "BookOrbit 3.8 及更高版本可选。具有 Book Dock Access 权限的读写 API 密钥可代替用户名和密码。",
   "BookOrbitUsernameHelpText": "具有 Book Dock Access 权限的 BookOrbit 账户。",
   "BookshelfAllFormatsMonitoringHelpText": "将所选操作应用于所选作者的电子书和有声书记录。这不会更改作者是否受监控，也不会更改未来书籍的监控方式。",
   "BookshelfFormatGroupingHelpText": "在同时处理两种格式的模式下，ChaptarrNG 仅在电子书和有声书记录共享 Hardcover、Goodreads 或 Open Library 的作品 ID 时才会将它们分组。没有共享 ID 的记录会保持分开。要更新 ID，请在书籍和作者页面使用“刷新”。",

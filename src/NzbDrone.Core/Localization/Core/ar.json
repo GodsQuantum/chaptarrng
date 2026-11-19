@@ -2758,7 +2758,7 @@
   "BookNotAddableMissingProviderIdsHelpText": "يلزم معرّف كتاب/عمل ومعرّف مؤلف لإضافة تنسيق. جرّب نتيجة أخرى من الفهرس أو مصدرًا آخر.",
   "BookOrbitBaseUrlHelpText": "عنوان URL الأساسي لخادم BookOrbit، مثل http://bookorbit:3000. أضف BookOrbit بشكل منفصل؛ لا يُعاد استخدام بيانات اعتماد BookLore.",
   "BookOrbitPasswordHelpText": "كلمة مرور حساب BookOrbit. يجب تفعيل تسجيل الدخول بكلمة مرور لهذا الحساب.",
-  "BookOrbitApiKeyHelpText": "اختياري في BookOrbit 3.8 والإصدارات الأحدث. يمكن استخدام مفتاح API للقراءة والكتابة مع إذن Book Dock Access بدلاً من اسم المستخدم وكلمة المرور.",
+  "provider.bookOrbit.apiKeyHelp": "اختياري في BookOrbit 3.8 والإصدارات الأحدث. يمكن استخدام مفتاح API للقراءة والكتابة مع إذن Book Dock Access بدلاً من اسم المستخدم وكلمة المرور.",
   "BookOrbitUsernameHelpText": "حساب BookOrbit لديه إذن Book Dock Access.",
   "BookshelfAllFormatsMonitoringHelpText": "يُطبّق الإجراء المحدد على سجلات الكتب الإلكترونية والكتب الصوتية للمؤلفين المحددين. لا يغيّر ذلك ما إذا كان المؤلف قيد المراقبة أو كيفية مراقبة كتبه المستقبلية.",
   "BookshelfFormatGroupingHelpText": "في وضع التنسيقين معًا، يجمع ChaptarrNG سجلات الكتب الإلكترونية والصوتية فقط عندما تشترك في معرّف عمل من Hardcover أو Goodreads أو Open Library. تبقى السجلات التي لا تشترك في معرّف منفصلة. لتحديث المعرّفات، استخدم «تحديث» في صفحتي الكتاب والمؤلف.",

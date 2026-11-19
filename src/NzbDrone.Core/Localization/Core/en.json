@@ -2431,7 +2431,7 @@
   "BookOrbitBaseUrlHelpText": "Base URL of your BookOrbit server, such as http://bookorbit:3000. Add BookOrbit separately; BookLore credentials are not reused.",
   "BookOrbitUsernameHelpText": "BookOrbit account with Book Dock Access permission.",
   "BookOrbitPasswordHelpText": "BookOrbit account password. Password login must be enabled for this account.",
-  "BookOrbitApiKeyHelpText": "Optional on BookOrbit 3.8 or later. A read and write API key with Book Dock Access replaces the username and password.",
+  "provider.bookOrbit.apiKeyHelp": "Optional on BookOrbit 3.8 or later. A read and write API key with Book Dock Access replaces the username and password.",
   "Sunday": "Sunday",
   "Monday": "Monday",
   "Light": "Light theme",

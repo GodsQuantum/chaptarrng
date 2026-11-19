@@ -1366,7 +1366,8 @@
       "Seeders": "1d69d42425dec97d05c578331f1a4e43000d409b5ca75ba8abc119bd03eb1748",
       "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9",
       "MediaManagement": "882c52a2352ee5276a44676e3dda91193a17e11b079a0ed522e8e36216d42dcc",
-      "MediaLibrary": "f1104b9dcab5e6b9bc0d3604038d8cdff1947a39c93b0229c59ef54101e4db4f"
+      "MediaLibrary": "f1104b9dcab5e6b9bc0d3604038d8cdff1947a39c93b0229c59ef54101e4db4f",
+      "provider.bookOrbit.apiKeyHelp": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983"
     },
     "az": {},
     "bg": {},
@@ -2038,7 +2039,8 @@
       "MetadataProfileIdHelpText": "a15c1e1c7ea091e9f0f978332475023a0ecef3d7f89128038032b670cf10ba24",
       "UnselectFiltered": "bd1c252c049012fd88d52f171766eb3a54789214739b30a67b2984611e578b89",
       "MinFormatScoreHelpText": "ea370b72f7d349bb9cd594386815b114a360e625a2a6df8c6861feb8fa684b2e",
-      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9"
+      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9",
+      "provider.bookOrbit.apiKeyHelp": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983"
     },
     "es": {
       "AdditionalMetadataSourcesEnvironmentOverride": "9d989a927029de173b9446bd1465f1088c90408d3636ab3027c990b6f10445ef",
@@ -2715,7 +2717,8 @@
       "AllowFingerprinting": "76952d10c7a4d7a859c0cfa3738b774d0f2c60c6581a5e945773304b1c8d2c04",
       "MetadataProfileIdHelpText": "a15c1e1c7ea091e9f0f978332475023a0ecef3d7f89128038032b670cf10ba24",
       "MinFormatScoreHelpText": "ea370b72f7d349bb9cd594386815b114a360e625a2a6df8c6861feb8fa684b2e",
-      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9"
+      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9",
+      "provider.bookOrbit.apiKeyHelp": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983"
     },
     "fa": {},
     "fr": {
@@ -3276,7 +3279,8 @@
       "MinFormatScoreHelpText": "ea370b72f7d349bb9cd594386815b114a360e625a2a6df8c6861feb8fa684b2e",
       "AbsMappingsEbookSlotLabel": "da07f1362270a90e1043b266f888b36a1bf1b37031a77c10d409880214f6e068",
       "EbookLabel": "92f7e3fa4b8651f1883ba7535e0686666a13230f3a3ea47fd3f8c24450f29bb5",
-      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9"
+      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9",
+      "provider.bookOrbit.apiKeyHelp": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983"
     },
     "he": {},
     "hi": {
@@ -4145,7 +4149,8 @@
       "MetadataProfileIdHelpText": "a15c1e1c7ea091e9f0f978332475023a0ecef3d7f89128038032b670cf10ba24",
       "DeleteSelectedBook": "099fdb2b177073c77947d079e542fa16e74218401c653ec10c5d6898ee5eb407",
       "MinFormatScoreHelpText": "ea370b72f7d349bb9cd594386815b114a360e625a2a6df8c6861feb8fa684b2e",
-      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9"
+      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9",
+      "provider.bookOrbit.apiKeyHelp": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983"
     },
     "hu": {},
     "id": {
@@ -4861,7 +4866,8 @@
       "UrlBaseHelpTextWarning": "91b482b1a0455e238549b61b028327f25ae1453727491e426a5327ccb9af7a0b",
       "MetadataProfileIdHelpText": "a15c1e1c7ea091e9f0f978332475023a0ecef3d7f89128038032b670cf10ba24",
       "UnselectFiltered": "bd1c252c049012fd88d52f171766eb3a54789214739b30a67b2984611e578b89",
-      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9"
+      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9",
+      "provider.bookOrbit.apiKeyHelp": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983"
     },
     "it": {},
     "ja": {
@@ -5761,7 +5767,8 @@
       "MinFormatScoreHelpText": "ea370b72f7d349bb9cd594386815b114a360e625a2a6df8c6861feb8fa684b2e",
       "UsenetDelayHelpText": "cc54fe49f85a2eb0c9331bdd753195fc9ad1f381f22921417b73098a1f38a5d0",
       "Min": "12d276e847d282245907ed8426bd92276898a073aa9c1ed2c9f8c493ee59b6bd",
-      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9"
+      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9",
+      "provider.bookOrbit.apiKeyHelp": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983"
     },
     "kk": {},
     "ko": {
@@ -6908,7 +6915,8 @@
       "DeleteSelectedBook": "099fdb2b177073c77947d079e542fa16e74218401c653ec10c5d6898ee5eb407",
       "MinFormatScoreHelpText": "ea370b72f7d349bb9cd594386815b114a360e625a2a6df8c6861feb8fa684b2e",
       "Min": "12d276e847d282245907ed8426bd92276898a073aa9c1ed2c9f8c493ee59b6bd",
-      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9"
+      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9",
+      "provider.bookOrbit.apiKeyHelp": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983"
     },
     "ms": {},
     "nb": {},
@@ -7882,7 +7890,8 @@
       "MinFormatScoreHelpText": "ea370b72f7d349bb9cd594386815b114a360e625a2a6df8c6861feb8fa684b2e",
       "UsenetDelayHelpText": "cc54fe49f85a2eb0c9331bdd753195fc9ad1f381f22921417b73098a1f38a5d0",
       "Min": "12d276e847d282245907ed8426bd92276898a073aa9c1ed2c9f8c493ee59b6bd",
-      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9"
+      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9",
+      "provider.bookOrbit.apiKeyHelp": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983"
     },
     "zh-Hans": {
       "AdditionalMetadataSourcesEnvironmentOverride": "9d989a927029de173b9446bd1465f1088c90408d3636ab3027c990b6f10445ef",
@@ -8605,7 +8614,8 @@
       "MinFormatScoreHelpText": "ea370b72f7d349bb9cd594386815b114a360e625a2a6df8c6861feb8fa684b2e",
       "UsenetDelayHelpText": "cc54fe49f85a2eb0c9331bdd753195fc9ad1f381f22921417b73098a1f38a5d0",
       "Min": "12d276e847d282245907ed8426bd92276898a073aa9c1ed2c9f8c493ee59b6bd",
-      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9"
+      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9",
+      "provider.bookOrbit.apiKeyHelp": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983"
     },
     "es-419": {},
     "fr-CA": {},
@@ -9149,7 +9159,8 @@
       "NoProxiesConfigured": "2800db1cad0ec4325afbf1cbde0a326b0974de1ee5c27834ccf798ca1f48fece",
       "MetadataProfileIdHelpText": "a15c1e1c7ea091e9f0f978332475023a0ecef3d7f89128038032b670cf10ba24",
       "MinFormatScoreHelpText": "ea370b72f7d349bb9cd594386815b114a360e625a2a6df8c6861feb8fa684b2e",
-      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9"
+      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9",
+      "provider.bookOrbit.apiKeyHelp": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983"
     },
     "pt-PT": {},
     "zh-Hant": {
@@ -10005,7 +10016,8 @@
       "NarratedByWithName": "80d5db2d6697d27af680ddddb6e0f732f8d21004fcf04786217126090fde0779",
       "MetadataProfileIdHelpText": "a15c1e1c7ea091e9f0f978332475023a0ecef3d7f89128038032b670cf10ba24",
       "UsenetDelayHelpText": "cc54fe49f85a2eb0c9331bdd753195fc9ad1f381f22921417b73098a1f38a5d0",
-      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9"
+      "MIA": "5bb42a6ee729f8ea54959ea02575e2e65cadf0f000327ba0287b5b30123a5ec9",
+      "provider.bookOrbit.apiKeyHelp": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983"
     }
   }
 }

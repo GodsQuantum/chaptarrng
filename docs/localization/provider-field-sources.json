@@ -78,6 +78,13 @@
           "sourceLineSha256": "6a04deafd6c5310f9c8ade398fb01b8de92994e1525e140cada063c19d09f7e3"
         },
         {
+          "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitSettings.cs",
+          "line": 39,
+          "kind": "Label",
+          "sourceLine": "[FieldDefinition(3, Label = \"ApiKey\", Type = FieldType.Password, Privacy = PrivacyLevel.ApiKey, HelpText = \"provider.bookOrbit.apiKeyHelp\")]",
+          "sourceLineSha256": "5059ce18293e8b5ac9e21a03b69e693732b3b4ee6c50611654f7818b2ed294d4"
+        },
+        {
           "file": "src/NzbDrone.Core/Notifications/Join/JoinSettings.cs",
           "line": 27,
           "kind": "Label",
@@ -3677,7 +3684,7 @@
         },
         {
           "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitSettings.cs",
-          "line": 27,
+          "line": 30,
           "kind": "Label",
           "sourceLine": "[FieldDefinition(0, Label = \"provider.field.f70589413a3c9\", HelpText = \"BookOrbitBaseUrlHelpText\")]",
           "sourceLineSha256": "6e09ccb98ba23587721c79885984d30197b28715b90ddc1753a51f37152d61e9"
@@ -8223,14 +8230,32 @@
         }
       ],
       "protectedLiterals": []
+    },
+    {
+      "id": "provider.bookOrbit.apiKeyHelp",
+      "source": "Optional on BookOrbit 3.8 or later. A read and write API key with Book Dock Access replaces the username and password.",
+      "sourceFingerprint": "60a9f5835dc31d151575ac2e11f96cda22695376a6cfeb7427e6186a1b66f983",
+      "callsites": [
+        {
+          "file": "src/NzbDrone.Core/Notifications/BookOrbit/BookOrbitSettings.cs",
+          "line": 39,
+          "kind": "HelpText",
+          "sourceLine": "[FieldDefinition(3, Label = \"ApiKey\", Type = FieldType.Password, Privacy = PrivacyLevel.ApiKey, HelpText = \"provider.bookOrbit.apiKeyHelp\")]",
+          "sourceLineSha256": "5059ce18293e8b5ac9e21a03b69e693732b3b4ee6c50611654f7818b2ed294d4"
+        }
+      ],
+      "protectedLiterals": [
+        "BookOrbit",
+        "Book Dock Access"
+      ]
     }
   ],
   "counts": {
-    "total": 818,
+    "total": 820,
     "existingId": 168,
     "changedFiles": 69,
-    "mappedDistinctSources": 413,
-    "newSourceKeys": 397,
-    "mappedCallsites": 650
+    "mappedDistinctSources": 414,
+    "newSourceKeys": 398,
+    "mappedCallsites": 652
   }
 }

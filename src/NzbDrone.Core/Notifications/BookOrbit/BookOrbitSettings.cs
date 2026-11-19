@@ -36,7 +36,7 @@ namespace NzbDrone.Core.Notifications.BookOrbit
         [FieldDefinition(2, Label = "Password", Type = FieldType.Password, Privacy = PrivacyLevel.Password, HelpText = "BookOrbitPasswordHelpText")]
         public string Password { get; set; }
 
-        [FieldDefinition(3, Label = "ApiKey", Type = FieldType.Password, Privacy = PrivacyLevel.ApiKey, HelpText = "BookOrbitApiKeyHelpText")]
+        [FieldDefinition(3, Label = "ApiKey", Type = FieldType.Password, Privacy = PrivacyLevel.ApiKey, HelpText = "provider.bookOrbit.apiKeyHelp")]
         public string ApiKey { get; set; }
 
         public NzbDroneValidationResult Validate()

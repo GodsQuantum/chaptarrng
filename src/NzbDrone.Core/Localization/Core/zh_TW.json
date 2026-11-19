@@ -2758,7 +2758,7 @@
   "BookNotAddableMissingProviderIdsHelpText": "新增格式需要書籍／作品 ID 和作者 ID。請嘗試其他目錄結果或來源。",
   "BookOrbitBaseUrlHelpText": "BookOrbit 伺服器的基本 URL，例如 http://bookorbit:3000。請另外新增 BookOrbit；不會重複使用 BookLore 認證資料。",
   "BookOrbitPasswordHelpText": "BookOrbit 帳戶密碼。此帳戶必須啟用密碼登入。",
-  "BookOrbitApiKeyHelpText": "BookOrbit 3.8 及更新版本可選用此設定。具備 Book Dock Access 權限的讀寫 API 金鑰可取代使用者名稱和密碼。",
+  "provider.bookOrbit.apiKeyHelp": "BookOrbit 3.8 及更新版本可選用此設定。具備 Book Dock Access 權限的讀寫 API 金鑰可取代使用者名稱和密碼。",
   "BookOrbitUsernameHelpText": "具備 Book Dock Access 權限的 BookOrbit 帳戶。",
   "BookshelfAllFormatsMonitoringHelpText": "所選動作會套用至所選作者的電子書和有聲書記錄。這不會變更作者是否受監控，也不會變更未來書籍的監控方式。",
   "BookshelfFormatGroupingHelpText": "在同時處理兩種格式的模式中，ChaptarrNG 只有在電子書和有聲書記錄共用 Hardcover、Goodreads 或 Open Library 的作品 ID 時才會將它們分組。沒有共用 ID 的記錄會維持分開。若要更新 ID，請在書籍和作者頁面使用「重新整理」。",

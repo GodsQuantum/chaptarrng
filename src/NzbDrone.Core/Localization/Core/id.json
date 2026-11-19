@@ -2758,7 +2758,7 @@
   "BookNotAddableMissingProviderIdsHelpText": "ID buku/karya dan ID penulis diperlukan untuk menambahkan format. Coba hasil atau sumber katalog lain.",
   "BookOrbitBaseUrlHelpText": "URL dasar server BookOrbit Anda, misalnya http://bookorbit:3000. Tambahkan BookOrbit secara terpisah; kredensial BookLore tidak digunakan kembali.",
   "BookOrbitPasswordHelpText": "Kata sandi akun BookOrbit. Login dengan kata sandi harus diaktifkan untuk akun ini.",
-  "BookOrbitApiKeyHelpText": "Opsional pada BookOrbit 3.8 atau lebih baru. Kunci API dengan akses baca dan tulis serta izin Book Dock Access menggantikan nama pengguna dan kata sandi.",
+  "provider.bookOrbit.apiKeyHelp": "Opsional pada BookOrbit 3.8 atau lebih baru. Kunci API dengan akses baca dan tulis serta izin Book Dock Access menggantikan nama pengguna dan kata sandi.",
   "BookOrbitUsernameHelpText": "Akun BookOrbit dengan izin Book Dock Access.",
   "BookshelfAllFormatsMonitoringHelpText": "Tindakan yang dipilih diterapkan pada catatan eBook dan buku audio untuk penulis yang dipilih. Ini tidak mengubah apakah penulis dimonitor atau cara buku mendatang dimonitor.",
   "BookshelfFormatGroupingHelpText": "Dalam mode kedua format, ChaptarrNG hanya mengelompokkan catatan eBook dan buku audio jika memiliki ID karya Hardcover, Goodreads, atau Open Library yang sama. Catatan tanpa ID yang sama tetap terpisah. Untuk memperbarui ID, gunakan “Muat Ulang” pada halaman buku dan penulis.",
