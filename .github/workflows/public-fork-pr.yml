@@ -26,5 +26,5 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-    uses: snapetech-org/chaptarrng/.github/workflows/fork-safe-validation.yml@03274100af783fdffaca4dd8436e163dc6b18795
+    uses: snapetech-org/chaptarrng/.github/workflows/fork-safe-validation.yml@d021f01457c08fc83a22fc51e1c517de0102b6ad
 
