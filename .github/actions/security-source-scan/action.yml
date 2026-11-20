@@ -30,6 +30,9 @@ runs:
         ref: ${{ inputs.source-sha }}
         path: source
         persist-credentials: false
+        # The source is untrusted PR data. This composite scans it without
+        # executing it and runs with read-only permissions on disposable runners.
+        allow-unsafe-pr-checkout: true
     - name: Verify checked out source revision
       shell: bash
       env:
