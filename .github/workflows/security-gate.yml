@@ -7,7 +7,7 @@ on:
   # content is checked out only as data and scanned on disposable hosted runners.
   pull_request_target:
     branches: [main]
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
   workflow_dispatch:
     inputs:
       ref:
