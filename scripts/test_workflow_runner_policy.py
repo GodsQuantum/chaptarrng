@@ -128,7 +128,7 @@ class WorkflowRunnerPolicyTests(unittest.TestCase):
         self.assertIn("ref: ${{ env.SECURITY_POLICY_SHA }}", status_job)
         self.assertIn("persist-credentials: false", status_job)
         self.assertNotIn("workflow_run:", security_gate)
-        self.assertIn("SECURITY_POLICY_SHA: ${{ github.event.pull_request.base.sha || github.sha }}", security_gate)
+        self.assertIn("SECURITY_POLICY_SHA: ${{ github.sha }}", security_gate)
         self.assertEqual(security_gate.count("ref: ${{ env.SECURITY_POLICY_SHA }}"), 5)
         self.assertNotIn("ref: ${{ github.event.pull_request", security_gate)
 

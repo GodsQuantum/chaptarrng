@@ -22,9 +22,9 @@ on:
 permissions:
   contents: read
 env:
-  # Use the trusted target branch SHA for policy checkout; keep PR head refs out
-  # of every actions/checkout ref field in this privileged workflow.
-  SECURITY_POLICY_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+  # pull_request_target runs against the latest default-branch commit. Use that
+  # trusted workflow revision, never the potentially stale PR payload base SHA.
+  SECURITY_POLICY_SHA: ${{ github.sha }}
 concurrency:
   group: security-gate-${{ github.event.pull_request.number || inputs.ref || github.ref }}
   cancel-in-progress: true
