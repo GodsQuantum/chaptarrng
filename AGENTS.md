@@ -21,12 +21,17 @@ channel. Verify both the webhook guild and channel before posting and retain
 message links from Discord receipts. A successful webhook response from a
 different channel is not a ChaptarrNG announcement.
 
-## CodeQL — owner directive, 2026-10-30
+## CodeQL — owner directive, 2026-11-20
 
-CodeQL is disabled across snapetech-org repositories. Do not add, enable,
-invoke, restore, or reroute CodeQL workflows unless the owner explicitly
-reverses this directive. Other build, test, scan, packaging, and release work
-follows the runner policy above.
+Enable CodeQL on every public snapetech-org repository that supports it at no
+cost. Use GitHub's free public-repository scanning, configure default setup for
+supported languages when no equivalent CodeQL workflow exists, and keep
+supported existing CodeQL workflows active. Do not enable paid CodeQL scanning
+on private repositories. GitHub Code Quality is separate and unchanged. This
+supersedes the 2026-10-30 CodeQL-off directive. Audit public repositories for
+visibility, supported languages, and CodeQL configuration, then verify each
+change. Other build, test, scan, packaging, and release work follows the
+public-hosted-first runner policy above.
 
 ## Security scan acceptance
 

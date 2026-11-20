@@ -8,7 +8,7 @@ The installed pre-commit hook runs Semgrep on staged source/config files; Trivy 
 
 Local scans use Semgrep Community Edition and do not require a Semgrep SaaS account.
 
-The Security gate runs on pull requests targeting `main` and pushes to `main`. It scans source and rebuilds and scans the product, build, and test image inputs. Untrusted pull-request code uses isolated disposable runners without secrets. Separate Semgrep Community Edition, Security analysis, and Trivy filesystem workflows can be dispatched from `main`; they default to compatible public GitHub-hosted runners. CodeQL analysis is disabled for this repository.
+The Security gate runs on pull requests targeting `main` and pushes to `main`. It scans source and rebuilds and scans the product, build, and test image inputs. Untrusted pull-request code uses isolated disposable runners without secrets. Separate Semgrep Community Edition, Security analysis, and Trivy filesystem workflows can be dispatched from `main`; they default to compatible public GitHub-hosted runners. GitHub's free CodeQL default setup scans the supported languages in this public repository. Review its findings in the repository's Security tab.
 
 Local scans report findings without failing by default so existing findings can be triaged. Set `SEMGREP_FAIL_ON_FINDINGS=1` or `TRIVY_EXIT_CODE=1` to make a local scan fail on findings. The trusted CI Security gate fails on active HIGH or CRITICAL Trivy findings and on Semgrep findings. Trivy downloads its vulnerability and check databases automatically; use `TRIVY_OFFLINE=1` only after those databases are cached. The default timeout is 20 minutes for slow first downloads; set `TRIVY_TIMEOUT` to change it.
 

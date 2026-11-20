@@ -9,8 +9,9 @@ yarn audit
 dotnet list src/Chaptarr.sln package --vulnerable --include-transitive
 ```
 
-CI also runs Trivy dependency and secret scans and Semgrep Community Edition;
-CodeQL analysis is disabled. `yarn audit` checks
+CI also runs Trivy dependency and secret scans and Semgrep Community Edition.
+GitHub's free CodeQL default setup scans supported languages in this public
+repository. `yarn audit` checks
 the frontend build and lint dependency tree; the .NET command checks resolved
 packages across the solution's target frameworks.
 
