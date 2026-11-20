@@ -36,6 +36,41 @@ if (-not [string]::IsNullOrWhiteSpace($configuredHandoffTimeout)) {
 }
 
 $nssm = Get-Command nssm.exe -ErrorAction Stop
+
+function Expand-ChaptarrPackageArchive {
+  param(
+    [Parameter(Mandatory = $true)][string]$Path,
+    [Parameter(Mandatory = $true)][string]$DestinationPath
+  )
+
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $destinationRoot = [System.IO.Path]::GetFullPath($DestinationPath)
+  $destinationPrefix = $destinationRoot.TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
+  $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
+  try {
+    foreach ($entry in $archive.Entries) {
+      $relativePath = $entry.FullName.Replace('/', [System.IO.Path]::DirectorySeparatorChar).Replace('\', [System.IO.Path]::DirectorySeparatorChar)
+      $targetPath = [System.IO.Path]::GetFullPath((Join-Path $destinationRoot $relativePath))
+      if (-not $targetPath.StartsWith($destinationPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "The verified ChaptarrNG archive contains an invalid path: $($entry.FullName)"
+      }
+
+      if ([string]::IsNullOrEmpty([System.IO.Path]::GetFileName($relativePath))) {
+        New-Item -ItemType Directory -Force -Path $targetPath | Out-Null
+        continue
+      }
+
+      New-Item -ItemType Directory -Force -Path ([System.IO.Path]::GetDirectoryName($targetPath)) | Out-Null
+      $inputStream = $entry.Open()
+      $outputStream = [System.IO.File]::Open($targetPath, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+      try { $inputStream.CopyTo($outputStream) }
+      finally {
+        $outputStream.Dispose()
+        $inputStream.Dispose()
+      }
+    }
+  } finally { $archive.Dispose() }
+}
 $packageParameters = ''
 if ($env:ChocolateyPackageParameters) {
   $packageParameters = $env:ChocolateyPackageParameters.Trim().Trim('"').Trim("'")
@@ -947,7 +982,7 @@ try {
     }
     Copy-Item -LiteralPath $testArchivePath -Destination $archivePath -Force
   }
-  Expand-Archive -LiteralPath $archivePath -DestinationPath (Join-Path $stageDir 'bin') -Force
+  Expand-ChaptarrPackageArchive -Path $archivePath -DestinationPath (Join-Path $stageDir 'bin')
   if (-not (Test-Path (Join-Path $stageDir 'bin\Chaptarr.Console.exe')) -or
       -not (Test-Path (Join-Path $stageDir 'bin\UI\index.html'))) {
     throw 'The verified ChaptarrNG archive is missing its executable or web UI.'
