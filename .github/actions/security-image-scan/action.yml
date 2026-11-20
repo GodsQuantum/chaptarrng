@@ -59,6 +59,8 @@ runs:
         ref: ${{ inputs.source-sha }}
         path: source
         persist-credentials: false
+        # Build and scan the fork as data only; do not execute its code.
+        allow-unsafe-pr-checkout: true
     - name: Verify checked out source revision
       shell: bash
       env:
