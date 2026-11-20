@@ -43,6 +43,24 @@ def step_block(source: str, name: str) -> str:
 
 
 class WorkflowRunnerPolicyTests(unittest.TestCase):
+    def test_public_fork_release_note_validation_uses_trusted_main_workflow(
+        self,
+    ) -> None:
+        workflow_dir = WORKFLOW.parent
+        caller = (workflow_dir / "public-fork-pr.yml").read_text(encoding="utf-8")
+        self.assertTrue(caller.startswith("# ng-runner-policy: github-hosted-primary-v1"))
+        self.assertIn("pull_request_target:", caller)
+        self.assertNotRegex(caller, r"(?m)^  pull_request:")
+        self.assertIn(
+            "uses: snapetech-org/chaptarrng/.github/workflows/fork-safe-validation.yml@",
+            caller,
+        )
+
+        validator = (workflow_dir / "fork-safe-validation.yml").read_text(encoding="utf-8")
+        self.assertIn("github.event_name == 'pull_request_target'", validator)
+        self.assertIn("runs-on: ubuntu-24.04", job_block(validator, "release-notes"))
+        self.assertIn("persist-credentials: false", validator)
+
     def test_fork_safe_release_note_validation_uses_hosted_runner(self) -> None:
         source = (WORKFLOW.parent / "fork-safe-validation.yml").read_text(encoding="utf-8")
         self.assertTrue(source.startswith("# ng-runner-policy: github-hosted-primary-v1"))
