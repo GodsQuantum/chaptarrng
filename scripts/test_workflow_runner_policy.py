@@ -43,6 +43,12 @@ def step_block(source: str, name: str) -> str:
 
 
 class WorkflowRunnerPolicyTests(unittest.TestCase):
+    def test_fork_safe_release_note_validation_uses_hosted_runner(self) -> None:
+        source = (WORKFLOW.parent / "fork-safe-validation.yml").read_text(encoding="utf-8")
+        self.assertTrue(source.startswith("# ng-runner-policy: github-hosted-primary-v1"))
+        self.assertIn("runs-on: ubuntu-24.04", job_block(source, "release-notes"))
+        self.assertNotIn("self-hosted", source)
+
     def test_security_gate_scans_builder_inputs_and_requires_the_full_image_matrix(self) -> None:
         workflow_dir = WORKFLOW.parent
         security_gate = (workflow_dir / "security-gate.yml").read_text(encoding="utf-8")
