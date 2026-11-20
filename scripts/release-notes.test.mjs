@@ -7,6 +7,7 @@ import test from 'node:test';
 
 import {
   hasExplicitNoReleaseNote,
+  parseReleaseNote,
   prepareReleaseBodies,
   readReleaseNotes,
 } from './release-notes.mjs';
@@ -87,6 +88,41 @@ test('release-note fragments are read from the exact commit, not the working tre
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('tagged legacy fragments normalize without changing their source files', () => {
+  const legacyNotes = [
+    {
+      file: 'release-notes/20261120-chocolatey-zip-extraction.md',
+      category: 'fixed',
+      audience: ['users', 'operators'],
+      area: 'windows-installer',
+    },
+    {
+      file: 'release-notes/20261120-release-version-sync.md',
+      category: 'fixed',
+      audience: ['operators'],
+      area: 'release-pipeline',
+    },
+  ];
+
+  for (const expected of legacyNotes) {
+    const source = fs.readFileSync(new URL('../' + expected.file, import.meta.url), 'utf8');
+    const note = parseReleaseNote(expected.file, source);
+
+    assert.deepEqual(note.errors, []);
+    assert.equal(note.category, expected.category);
+    assert.deepEqual(note.audience, expected.audience);
+    assert.equal(note.area, expected.area);
+    assert.equal(note.action, 'none');
+    assert.equal(note.breaking, false);
+    assert.ok(note.body.length >= 30 && note.body.length <= 400);
+  }
+
+  assert.deepEqual(
+    parseReleaseNote('release-notes/other-legacy.md', '### Fixed\n\n- A legacy note.').errors,
+    ['must contain YAML frontmatter delimited by ---']
+  );
 });
 
 test('release bodies below the limit retain the complete changelog', () => {

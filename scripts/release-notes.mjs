@@ -22,6 +22,29 @@ const FRONTMATTER_KEYS = new Set([
   'action',
   'breaking',
 ]);
+// These tagged fragments predate the curated frontmatter format. Keep their
+// source bytes append-only and normalize them only when assembling release
+// output.
+const LEGACY_RELEASE_NOTE_FORMATS = new Map([
+  [
+    'release-notes/20261120-chocolatey-zip-extraction.md',
+    {
+      heading: 'Fixed',
+      category: 'fixed',
+      audience: 'users, operators',
+      area: 'windows-installer',
+    },
+  ],
+  [
+    'release-notes/20261120-release-version-sync.md',
+    {
+      heading: 'Release fixes',
+      category: 'fixed',
+      audience: 'operators',
+      area: 'release-pipeline',
+    },
+  ],
+]);
 
 export const isReleaseNoteFile = (file) =>
   file.startsWith(RELEASE_NOTE_DIRECTORY + '/') &&
@@ -32,10 +55,28 @@ export const isReleaseNoteFile = (file) =>
 export function parseReleaseNote(file, content) {
   const errors = [];
   const normalized = content.replace(/\r\n?/gu, '\n');
-  const frontmatter = normalized.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/u);
+  let frontmatter = normalized.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/u);
 
   if (!frontmatter) {
-    return { file, errors: ['must contain YAML frontmatter delimited by ---'] };
+    const legacy = LEGACY_RELEASE_NOTE_FORMATS.get(file);
+    const prefix = legacy ? '### ' + legacy.heading + '\n\n- ' : null;
+    if (!legacy || !prefix || !normalized.startsWith(prefix)) {
+      return { file, errors: ['must contain YAML frontmatter delimited by ---'] };
+    }
+
+    const body = normalized.slice(prefix.length).trim();
+    const normalizedLegacy = [
+      '---',
+      'category: ' + legacy.category,
+      'audience: ' + legacy.audience,
+      'area: ' + legacy.area,
+      'action: none',
+      'breaking: false',
+      '---',
+      body,
+      '',
+    ].join('\n');
+    frontmatter = normalizedLegacy.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/u);
   }
 
   const metadata = new Map();
