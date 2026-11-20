@@ -1,6 +1,7 @@
+# ng-runner-policy: github-hosted-primary-v1
 name: ChaptarrNG fork PR validation
 on:
-  pull_request:
+  pull_request_target:
     types: [labeled]
 permissions:
   contents: read
@@ -26,5 +27,5 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-    uses: snapetech-org/chaptarrng/.github/workflows/fork-safe-validation.yml@d021f01457c08fc83a22fc51e1c517de0102b6ad
+    uses: snapetech-org/chaptarrng/.github/workflows/fork-safe-validation.yml@dcfe7ae84f5335e2bfb3cbfe4e858bb4d0e85d40
 
