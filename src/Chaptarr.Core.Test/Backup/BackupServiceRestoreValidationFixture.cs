@@ -15,6 +15,7 @@ using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Backup;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Datastore;
+using NzbDrone.Core.Datastore.Migration.Framework;
 
 namespace Chaptarr.Core.Test.Backup
 {
@@ -140,6 +141,7 @@ namespace Chaptarr.Core.Test.Backup
                 _archiveService,
                 DispatchProxy.Create<IConfigService, ThrowingProxy<IConfigService>>(),
                 restoreDatabase,
+                new MigrationController(LogManager.GetCurrentClassLogger(), null),
                 LogManager.GetCurrentClassLogger());
             return _subject;
         }
@@ -244,6 +246,7 @@ namespace Chaptarr.Core.Test.Backup
                 new TestArchiveService(),
                 DispatchProxy.Create<IConfigService, ThrowingProxy<IConfigService>>(),
                 _restoreDatabase,
+                new MigrationController(LogManager.GetCurrentClassLogger(), null),
                 LogManager.GetCurrentClassLogger());
 
             var archivePath = service.CreateTemporaryBackup();

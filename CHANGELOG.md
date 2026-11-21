@@ -10,6 +10,8 @@ history grouped from conventional commits.
 
 #### Fixed
 
+- Restore an upstream Chaptarr SQLite library from **System → Backups → Restore Backup**. ChaptarrNG converts a private copy, rebuilds its search indexes, and checks the database before scheduling the restart. [@robertlordhood](https://github.com/robertlordhood) contributed the [backup format and recovery changes](https://github.com/Chaptarr/chaptarr/commit/4aacfb1c8a01d74a915f81e69856dbdb145dcad3) to upstream Chaptarr. ChaptarrNG independently implemented and tested import from the [upstream v0.9.1000 release](https://github.com/Chaptarr/chaptarr/releases/tag/v0.9.1000).
+
 - Correct the NzbGet KeepHistory message to include the accepted 25000 limit and update its translations across all 12 direct locales.
 
 - Apply 38 context-matched translation corrections across 11 locales, including AudioBookShelf library labels, torrent adoption prompts, and author-folder help.

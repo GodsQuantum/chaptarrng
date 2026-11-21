@@ -6,6 +6,8 @@ The linked people contributed reports, suggestions, discussions, or code to the 
 
 ## Additional shipped adaptations
 
+- [@robertlordhood](https://github.com/robertlordhood) contributed the [backup format and recovery changes](https://github.com/Chaptarr/chaptarr/commit/4aacfb1c8a01d74a915f81e69856dbdb145dcad3) to upstream Chaptarr. ChaptarrNG independently implemented and tested import from the [upstream v0.9.1000 release](https://github.com/Chaptarr/chaptarr/releases/tag/v0.9.1000).
+
 - [Upstream commit `2ed39e6c8c6ccdcae67707f6aaacdd821fb51e3f`](https://github.com/Chaptarr/chaptarr/commit/2ed39e6c8c6ccdcae67707f6aaacdd821fb51e3f), “Keep the parts of a split audiobook release,” by [@snapetech](https://github.com/snapetech) — the author contributed split-release part tracking to Chaptarr. ChaptarrNG independently adapted the parsing boundary to ignore a quoted posted filename when finding `Part N`; the author did not contribute to or endorse this fork.
 
 ## Implemented; final validation pending

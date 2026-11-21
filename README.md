@@ -934,6 +934,14 @@ Use the `X-Api-Key` header for API clients. ChaptarrNG still accepts the legacy
 `apikey` query parameter for compatibility, so reverse proxies should redact
 that parameter from access logs.
 
+### Restore an upstream Chaptarr library
+
+Create a full backup under **System → Backups** in upstream Chaptarr. In ChaptarrNG open **System → Backups → Restore Backup**, upload the original ZIP, and allow the restart. Full SQLite backups from upstream v0.9.1000 have been tested. Keep the original archive until you have checked the library. If an older ChaptarrNG installation already tried to open this database, upload the original upstream backup again.
+
+The restore carries over the library database and saved configuration, including the server port, credentials and library paths. Make the existing media available at those paths. ChaptarrNG checks the upstream manifest when present and converts a private copy before staging it. Upstream PostgreSQL dumps require a separate database restore.
+
+### Full backup encryption
+
 Traditional full backups contain the database and config file, including credentials. Without the setting below they are stored as plain ZIP files; protect them as secrets.
 
 To encrypt scheduled, update, and manual full backups, store a randomly

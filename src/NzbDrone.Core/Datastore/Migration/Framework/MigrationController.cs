@@ -25,6 +25,7 @@ namespace NzbDrone.Core.Datastore.Migration.Framework
     {
         void Migrate(string connectionString, MigrationContext migrationContext, DatabaseType databaseType);
         void MigrateBookshelfSource(string connectionString);
+        bool ConvertUpstreamBackup(string sourcePath, string destinationPath);
         BookshelfDatabaseConversionResult MigrateBookshelf(
             string connectionString,
             MigrationContext migrationContext,
@@ -126,6 +127,12 @@ namespace NzbDrone.Core.Datastore.Migration.Framework
             }
 
             MigrateNative(connectionString, migrationContext, databaseType);
+        }
+
+        public bool ConvertUpstreamBackup(string sourcePath, string destinationPath)
+        {
+            return UpstreamChaptarrRestore.TryConvert(sourcePath, destinationPath,
+                target => MigrateNative(target, new MigrationContext(MigrationType.Main), DatabaseType.SQLite));
         }
 
         private bool HasBothPopulatedBookshelfSources()
@@ -541,8 +548,6 @@ namespace NzbDrone.Core.Datastore.Migration.Framework
 
             _logger.Info("*** Migrating {0} database ***", databaseType);
 
-            ServiceProvider serviceProvider;
-
             // FluentMigrator processor/generator ids are case-sensitive and use "SQLite"/"PostgreSQL"
             // (older versions used "sqlite"/"postgres").
             var db = databaseType == DatabaseType.SQLite ? "SQLite" : "PostgreSQL";
@@ -599,7 +604,7 @@ namespace NzbDrone.Core.Datastore.Migration.Framework
                 SchemaScopedPostgresProcessor.Register(migrationServices, defaultSchema);
             }
 
-            serviceProvider = migrationServices.BuildServiceProvider();
+            using var serviceProvider = migrationServices.BuildServiceProvider();
 
             using (var scope = serviceProvider.CreateScope())
             {
@@ -615,18 +620,23 @@ namespace NzbDrone.Core.Datastore.Migration.Framework
                         "PostgreSQL migration history was not scoped to the active schema. No migration was run.");
                 }
 
+                var previousContext = MigrationContext.Current;
                 MigrationContext.Current = migrationContext;
-
-                if (migrationContext.DesiredVersion.HasValue)
+                try
                 {
-                    runner.MigrateUp(migrationContext.DesiredVersion.Value);
+                    if (migrationContext.DesiredVersion.HasValue)
+                    {
+                        runner.MigrateUp(migrationContext.DesiredVersion.Value);
+                    }
+                    else
+                    {
+                        runner.MigrateUp();
+                    }
                 }
-                else
+                finally
                 {
-                    runner.MigrateUp();
+                    MigrationContext.Current = previousContext;
                 }
-
-                MigrationContext.Current = null;
             }
 
             sw.Stop();

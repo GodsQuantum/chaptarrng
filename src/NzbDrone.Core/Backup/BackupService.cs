@@ -14,6 +14,7 @@ using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Instrumentation.Extensions;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Datastore;
+using NzbDrone.Core.Datastore.Migration.Framework;
 using NzbDrone.Core.Messaging.Commands;
 
 namespace NzbDrone.Core.Backup
@@ -38,6 +39,7 @@ namespace NzbDrone.Core.Backup
         private readonly IArchiveService _archiveService;
         private readonly IConfigService _configService;
         private readonly IRestoreDatabase _restoreDatabaseService;
+        private readonly IMigrationController _migrationController;
         private readonly Logger _logger;
 
         private string _backupTempFolder;
@@ -53,6 +55,7 @@ namespace NzbDrone.Core.Backup
                              IArchiveService archiveService,
                              IConfigService configService,
                              IRestoreDatabase restoreDatabaseService,
+                             IMigrationController migrationController,
                              Logger logger)
         {
             _maindDb = maindDb;
@@ -63,6 +66,7 @@ namespace NzbDrone.Core.Backup
             _archiveService = archiveService;
             _configService = configService;
             _restoreDatabaseService = restoreDatabaseService;
+            _migrationController = migrationController;
             _logger = logger;
 
             _backupTempFolder = Path.Combine(_appFolderInfo.TempFolder, "chaptarr_backup");
@@ -283,6 +287,8 @@ namespace NzbDrone.Core.Backup
                     RestrictTempFolder(temporaryPath);
                     _archiveService.Extract(backupFileName, temporaryPath, ArchiveExtractionOptions.Backup);
 
+                    UpstreamBackupManifest.ValidateIfPresent(temporaryPath);
+
                     var files = _diskProvider.GetFiles(temporaryPath, false).ToList();
                     var databaseFile = files.FirstOrDefault(file =>
                         Path.GetFileName(file).Equals("chaptarr.db", StringComparison.InvariantCultureIgnoreCase) ||
@@ -299,15 +305,14 @@ namespace NzbDrone.Core.Backup
                     var configFile = files.FirstOrDefault(file =>
                         Path.GetFileName(file).Equals("Config.xml", StringComparison.InvariantCultureIgnoreCase));
 
-                    try
-                    {
-                        FullRestoreBundle.Stage(_appFolderInfo, databaseFile, configFile);
-                    }
-                    catch (InvalidDataException ex)
-                    {
-                        throw new RestoreBackupFailedException(HttpStatusCode.BadRequest, "Unable to restore backup: {0}", ex.Message);
-                    }
+                    var converted = Path.Combine(temporaryPath, $"converted-{Guid.NewGuid():N}.db");
+                    var upstream = ConvertUpstreamBackup(databaseFile, converted);
+                    FullRestoreBundle.Stage(_appFolderInfo, upstream ? converted : databaseFile, configFile);
                     return;
+                }
+                catch (InvalidDataException ex)
+                {
+                    throw new RestoreBackupFailedException(HttpStatusCode.BadRequest, "Unable to restore backup: {0}", ex.Message);
                 }
                 finally
                 {
@@ -326,7 +331,37 @@ namespace NzbDrone.Core.Backup
             }
 
             ValidateRestore(backupFileName);
-            _diskProvider.MoveFile(backupFileName, _appFolderInfo.GetDatabaseRestore(), true);
+            var working = Path.Combine(_appFolderInfo.TempFolder, $"chaptarr_backup_restore_{Guid.NewGuid():N}");
+            _diskProvider.EnsureFolder(working);
+            try
+            {
+                RestrictTempFolder(working);
+                var converted = Path.Combine(working, "converted.db");
+                if (ConvertUpstreamBackup(backupFileName, converted))
+                {
+                    FullRestoreBundle.Stage(_appFolderInfo, converted, null);
+                    return;
+                }
+
+                _diskProvider.MoveFile(backupFileName, _appFolderInfo.GetDatabaseRestore(), true);
+            }
+            finally
+            {
+                _diskProvider.DeleteFolder(working, true);
+            }
+        }
+
+        private bool ConvertUpstreamBackup(string source, string destination)
+        {
+            try
+            {
+                return _migrationController.ConvertUpstreamBackup(source, destination);
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(ex, "Upstream Chaptarr backup conversion failed before staging");
+                throw new RestoreBackupFailedException(HttpStatusCode.BadRequest, "Unable to convert upstream Chaptarr backup: {0}", ex.Message);
+            }
         }
 
         private void ValidateRestore(string databaseFile)
