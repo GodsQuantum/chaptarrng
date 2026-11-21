@@ -27,11 +27,10 @@ Enable CodeQL on every public snapetech-org repository that supports it at no
 cost. Use GitHub's free public-repository scanning, configure default setup for
 supported languages when no equivalent CodeQL workflow exists, and keep
 supported existing CodeQL workflows active. Do not enable paid CodeQL scanning
-on private repositories. GitHub Code Quality is separate and unchanged. This
-supersedes the 2026-10-30 CodeQL-off directive. Audit public repositories for
-visibility, supported languages, and CodeQL configuration, then verify each
-change. Other build, test, scan, packaging, and release work follows the
-public-hosted-first runner policy above.
+on private repositories. GitHub Code Quality is separate and unchanged. Audit
+public repositories for visibility, supported languages, and CodeQL
+configuration, then verify each change. Other build, test, scan, packaging, and
+release work follows the public-hosted-first runner policy above.
 
 ## Security scan acceptance
 

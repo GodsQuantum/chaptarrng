@@ -116,7 +116,7 @@ by this qualification.
 ## Current status — 2026-11-05 UTC
 
 The unpublished candidate now includes schema-126 migration identity indexes. Public hosted runners are
-authorized for trusted validation; CodeQL remains disabled.
+authorized for trusted validation; free CodeQL scanning is active for supported public repositories.
 
 Fresh, consistent snapshots of both running BookshelfNG `.76` instances have now
 passed isolated conversion, migration checks and rollback. Original source

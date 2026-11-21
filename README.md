@@ -918,8 +918,9 @@ ChaptarrNG inherits the Readarr-derived operational model and security work from
 - Optional authenticated encryption for full backup archives
 - Update binaries are verified by SHA256 before install
 
-CI runs Trivy dependency/secret scans and Semgrep Community Edition. CodeQL is
-disabled for this repository. Published container images
+CI runs Trivy dependency/secret scans and Semgrep Community Edition. GitHub's
+free CodeQL default setup scans the supported languages in this public
+repository. Published container images
 include a BuildKit SBOM and provenance metadata, plus a GitHub build-provenance
 attestation. The Compose example also enables `no-new-privileges` and binds
 the published web port to loopback by default.

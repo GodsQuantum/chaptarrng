@@ -162,7 +162,8 @@ publication, external channel acceptance and production cutover remain separate.
 Application candidate `3651598e` includes the legacy API base-path/flag repairs,
 provider creation defaults, source-omitted provider defaults, retained Plex
 master-switch behavior and native settings, and original-author-cover fallback. Later repairs preserve imported author metadata arrays and legacy work-date/page-count/percentage responses.
-It is unpublished. CodeQL remains disabled; trusted public runners are authorized.
+It is unpublished. Free CodeQL scanning for supported public repositories was
+enabled on 2026-11-20; trusted public runners are authorized.
 
 | Evidence | Revision and result |
 | --- | --- |

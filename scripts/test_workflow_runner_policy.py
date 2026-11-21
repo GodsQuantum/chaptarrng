@@ -855,11 +855,6 @@ class WorkflowRunnerPolicyTests(unittest.TestCase):
 
     def test_security_scans_use_explicit_trusted_hosted_or_private_routes(self) -> None:
         workflow_dir = WORKFLOW.parent
-        self.assertFalse((workflow_dir / "codeql.yml").exists())
-        self.assertFalse((workflow_dir / "codeql.yml.disabled").exists())
-        self.assertFalse((workflow_dir.parent / "codeql").exists())
-        for path in workflow_dir.glob("*.yml"):
-            self.assertNotIn("github/codeql-action/", path.read_text(encoding="utf-8"), path.name)
         for workflow_name, job_name in (("security.yml", "trivy"), ("trivy-filesystem.yml", "trivy"), ("semgrep-community.yml", "semgrep")):
             source = (workflow_dir / workflow_name).read_text(encoding="utf-8")
             scan = job_block(source, job_name)

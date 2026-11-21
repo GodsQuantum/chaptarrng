@@ -693,7 +693,8 @@ RPM are retained on the creating host.
 
 The three security scans at `4dfb8c9a` passed (`42129828890`, `42129834139`,
 `42129838969`). The scoped StartOS dependency override fixes CVE-2026-118764
-without upgrading its SDK. CodeQL remains disabled.
+without upgrading its SDK. Free CodeQL default setup was enabled for supported
+public repositories on 2026-11-20.
 
 ## Remaining low-memory refresh investigation
 
